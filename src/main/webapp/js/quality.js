@@ -1,0 +1,25 @@
+/*
+ * (C) 2024 Catch Solve di Davide Montesin
+ * License: AGPL
+ */
+export function throwNPE() {
+    throw new Error('unexpected null or undefined value');
+}
+// use this function instead of <Class> to add runtime checking
+export function cs_cast(tc, x) {
+    if (x === undefined)
+        throw new Error('runtime cast: x is undefined instead of ' + tc.name);
+    if (x === null)
+        throw new Error('runtime cast: x is null instead of ' + tc.name);
+    if (typeof x !== 'object')
+        throw new Error('runtime cast: this function check only objects <T extends object>, instead of ' + (typeof x));
+    if (!(x instanceof tc))
+        throw new Error('runtime cast: x with type: ' + x.constructor.name + ' does not match required type: ' + tc.name);
+    return x;
+}
+export function cs_notnull(x) {
+    if (x === null)
+        throw new Error('unexpected null value');
+    return x;
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicXVhbGl0eS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3R5cGVzY3JpcHQvcXVhbGl0eS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7O0dBR0c7QUFDSCxNQUFNLFVBQVUsUUFBUTtJQUN2QixNQUFNLElBQUksS0FBSyxDQUFDLG9DQUFvQyxDQUFDLENBQUE7QUFDdEQsQ0FBQztBQUVELCtEQUErRDtBQUMvRCxNQUFNLFVBQVUsT0FBTyxDQUFtQixFQUE0QixFQUFFLENBQU07SUFFN0UsSUFBSSxDQUFDLEtBQUssU0FBUztRQUNsQixNQUFNLElBQUksS0FBSyxDQUFDLDBDQUEwQyxHQUFHLEVBQUUsQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUN2RSxJQUFJLENBQUMsS0FBSyxJQUFJO1FBQ2IsTUFBTSxJQUFJLEtBQUssQ0FBQyxxQ0FBcUMsR0FBRyxFQUFFLENBQUMsSUFBSSxDQUFDLENBQUM7SUFDbEUsSUFBSSxPQUFPLENBQUMsS0FBSyxRQUFRO1FBQ3hCLE1BQU0sSUFBSSxLQUFLLENBQUMsZ0ZBQWdGLEdBQUcsQ0FBQyxPQUFPLENBQUMsQ0FBQyxDQUFDLENBQUM7SUFDaEgsSUFBSSxDQUFDLENBQUMsQ0FBQyxZQUFZLEVBQUUsQ0FBQztRQUNyQixNQUFNLElBQUksS0FBSyxDQUFDLDZCQUE2QixHQUFHLENBQUMsQ0FBQyxXQUFXLENBQUMsSUFBSSxHQUFHLGlDQUFpQyxHQUFHLEVBQUUsQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUNuSCxPQUFPLENBQUMsQ0FBQTtBQUNULENBQUM7QUFFRCxNQUFNLFVBQVUsVUFBVSxDQUFJLENBQVM7SUFFdEMsSUFBSSxDQUFDLEtBQUssSUFBSTtRQUNiLE1BQU0sSUFBSSxLQUFLLENBQUMsdUJBQXVCLENBQUMsQ0FBQztJQUMxQyxPQUFPLENBQUMsQ0FBQTtBQUNULENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIvKlxuICogKEMpIDIwMjQgQ2F0Y2ggU29sdmUgZGkgRGF2aWRlIE1vbnRlc2luXG4gKiBMaWNlbnNlOiBBR1BMXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiB0aHJvd05QRSgpOiBuZXZlciB7XG5cdHRocm93IG5ldyBFcnJvcigndW5leHBlY3RlZCBudWxsIG9yIHVuZGVmaW5lZCB2YWx1ZScpXG59XG5cbi8vIHVzZSB0aGlzIGZ1bmN0aW9uIGluc3RlYWQgb2YgPENsYXNzPiB0byBhZGQgcnVudGltZSBjaGVja2luZ1xuZXhwb3J0IGZ1bmN0aW9uIGNzX2Nhc3Q8VCBleHRlbmRzIG9iamVjdD4odGM6IHsgbmV3KC4uLmFyZ3M6IGFueSk6IFQgfSwgeDogYW55KTogVFxue1xuXHRpZiAoeCA9PT0gdW5kZWZpbmVkKVxuXHRcdHRocm93IG5ldyBFcnJvcigncnVudGltZSBjYXN0OiB4IGlzIHVuZGVmaW5lZCBpbnN0ZWFkIG9mICcgKyB0Yy5uYW1lKTtcblx0aWYgKHggPT09IG51bGwpXG5cdFx0dGhyb3cgbmV3IEVycm9yKCdydW50aW1lIGNhc3Q6IHggaXMgbnVsbCBpbnN0ZWFkIG9mICcgKyB0Yy5uYW1lKTtcblx0aWYgKHR5cGVvZiB4ICE9PSAnb2JqZWN0Jylcblx0XHR0aHJvdyBuZXcgRXJyb3IoJ3J1bnRpbWUgY2FzdDogdGhpcyBmdW5jdGlvbiBjaGVjayBvbmx5IG9iamVjdHMgPFQgZXh0ZW5kcyBvYmplY3Q+LCBpbnN0ZWFkIG9mICcgKyAodHlwZW9mIHgpKTtcblx0aWYgKCEoeCBpbnN0YW5jZW9mIHRjKSlcblx0XHR0aHJvdyBuZXcgRXJyb3IoJ3J1bnRpbWUgY2FzdDogeCB3aXRoIHR5cGU6ICcgKyB4LmNvbnN0cnVjdG9yLm5hbWUgKyAnIGRvZXMgbm90IG1hdGNoIHJlcXVpcmVkIHR5cGU6ICcgKyB0Yy5uYW1lKTtcdFxuXHRyZXR1cm4geFxufVxuXG5leHBvcnQgZnVuY3Rpb24gY3Nfbm90bnVsbDxUPih4OiBUfG51bGwpOiBUXG57XG5cdGlmICh4ID09PSBudWxsKVxuXHRcdHRocm93IG5ldyBFcnJvcigndW5leHBlY3RlZCBudWxsIHZhbHVlJyk7XG5cdHJldHVybiB4XG59Il19
