@@ -34,5 +34,20 @@
 			<artifactId>js</artifactId>
 			<version>23.0.5</version>
 		</dependency>
+		
+		<!-- dev libs -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-core</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jasper</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
 	</dependencies>
 </project>
