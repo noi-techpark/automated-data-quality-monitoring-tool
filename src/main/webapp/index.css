@@ -1,0 +1,87 @@
+/*
+ * (C) 2024 Catch Solve di Davide Montesin
+ * License: AGPL
+ */
+
+html {
+	color: #555;
+	font-size: 16px;
+	font-family: sans
+}
+
+.MainComponent .logo {
+	height: 2rem;
+}
+
+.MainComponent .body {
+	display: flex;
+}
+
+.MainComponent .projects {
+	flex-grow: 100;
+}
+
+.MainComponent .body > * {
+	border: 1px solid #ccc;
+}
+
+.ProjectsElement {
+	xmargin: auto;
+	xwidth: 50rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.ProjectsElement input {
+	width: 100%;
+}
+
+.ProjectsElement .container {
+	display: inline-flex;
+	flex-wrap: wrap;
+}
+
+.ProjectsElement > .title {
+	text-align: center;
+	font-size: 1.4rem;
+}
+	
+.DataSetBoxComponent {
+	width: 10rem;
+	border: 1px solid #ccc;
+	text-align: center;
+	margin: 0.5rem;
+	box-shadow: 5px 5px 5px #888888;
+	border-radius: 0.3rem;
+}
+
+.DataSetBoxComponent > * {
+	padding: 0.2rem;
+}
+
+.DataSetBoxComponent > .title {
+	height: 2.4rem;
+	font-weight: bold;
+	overflow: clip;
+	text-overflow: ellipsis;
+}
+
+.DataSetBoxComponent > .img {
+	height: 4rem;
+}
+
+.DataSetBoxComponent .view{
+	background-color: black;
+	color: white;
+	height: 2rem;
+	line-height: 2rem;
+}
+
+.DataSetBoxComponent .view a {
+	color: white;
+}
+
+.MenuElement .menu1_submenus {
+	margin-left: 1rem;
+}
