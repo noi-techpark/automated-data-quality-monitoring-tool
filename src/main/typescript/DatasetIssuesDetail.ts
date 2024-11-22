@@ -4,7 +4,7 @@
  */
 
 import { cs_cast, throwNPE } from "./quality.js";
-import {API3} from './api/api3.js';
+import {API3, catchsolve_noiodh__test_dataset_record_check_failed__row} from './api/api3.js';
 import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
 
@@ -92,6 +92,23 @@ export class DatasetIssuesDetail extends HTMLElement
 		return ret;
 	}
 	
+	groupRecords(list: catchsolve_noiodh__test_dataset_record_check_failed__row[]): {[k:string]: catchsolve_noiodh__test_dataset_record_check_failed__row[]}
+	{
+		const groupBy: {[k:string]: catchsolve_noiodh__test_dataset_record_check_failed__row[]} = {}
+		for (let k = 0; k < list.length; k++)
+		{
+			const json = JSON.parse(list[k].record_json);
+			let sname = json['sname'];
+			if (typeof sname !== 'string')
+				sname = 'n/a'
+			let prev_arr = groupBy[sname]
+			prev_arr = prev_arr === undefined ? [] : prev_arr
+			prev_arr.push(list[k])
+			groupBy[sname] = prev_arr
+		}
+		return groupBy; 
+	}
+	
 	async refresh(p_session_start_ts: string, p_dataset_name: string, p_category_name: string) {
 		
 		this.last_session_start_ts = p_session_start_ts
@@ -131,47 +148,44 @@ export class DatasetIssuesDetail extends HTMLElement
 								check_category: p_category_name,
 								check_name: issue.check_name
 					});
-					const groupBy = {}
-					for (let k = 0; k < json2.length; k++)
-					{
-						const sname = JSON.parse(json2[k].record_json)['sname'];
-						let prev_arr = groupBy[sname]
-						prev_arr = prev_arr === undefined ? [] : prev_arr
-						prev_arr.push(json2[k])
-						groupBy[sname] = prev_arr
-					}
+					const groupBy = this.groupRecords(json2)
 					const keys = Object.keys(groupBy)
 					console.log(keys)
-					for (let k = 0; k < keys.length; k++)
+					if (keys.length == 1)
 					{
-						const sectionRow = new OpenCloseSection();
-						section.addElementToContentArea(sectionRow)
-						sectionRow.refresh(keys[k], '' + groupBy[keys[k]].length + ' records')
-						sectionRow.onclick = () => {
-							const list = groupBy[keys[k]]
-							console.log(list)
-							for (let k2 = 0; k2 < list.length; k2++)
-							{
-								const sectionRow2 = new SectionRow();
-								sectionRow.addElementToContentArea(sectionRow2)
-								sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
-								sectionRow2.onclick = () => {
-									alert(list[k2].record_json)
+						const list = groupBy[keys[0]]
+						for (let k2 = 0; k2 < list.length; k2++)
+						{
+							const sectionRow2 = new SectionRow();
+							section.addElementToContentArea(sectionRow2)
+							sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
+							sectionRow2.onclick = () => {
+								alert(list[k2].record_json)
+							}
+						}
+					}
+					else
+					{
+						for (let k = 0; k < keys.length; k++)
+						{
+							const sectionRow = new OpenCloseSection();
+							section.addElementToContentArea(sectionRow)
+							sectionRow.refresh(keys[k], '' + groupBy[keys[k]].length + ' records')
+							sectionRow.onclick = () => {
+								const list = groupBy[keys[k]]
+								console.log(list)
+								for (let k2 = 0; k2 < list.length; k2++)
+								{
+									const sectionRow2 = new SectionRow();
+									sectionRow.addElementToContentArea(sectionRow2)
+									sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
+									sectionRow2.onclick = () => {
+										alert(list[k2].record_json)
+									}
 								}
 							}
 						}
 					}
-					/*
-					for (let k = 0; k < json2.length; k++)
-					{
-						const sectionRow = new SectionRow();
-						section.addElementToContentArea(sectionRow)
-						sectionRow.refresh(json2[k].record_jsonpath)
-						sectionRow.onclick = () => {
-							alert(json2[k].record_json)
-						}
-					}
-					*/
 				}
 			}
 					
