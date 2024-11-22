@@ -67,7 +67,7 @@ export class API3 {
 		const resp = await API3.call('catchsolve_noiodh.test_dataset_check_category_record_jsonpath_failed_vw', filter)
 		return resp;
 	}
-	
+
 	// end crudl methods
 }
 
@@ -116,6 +116,7 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 	check_category: string
 	dataset_name: string
 	nr_check_names: number
+	record_json: string
 	record_jsonpath: string
 	session_start_ts: string
 }
@@ -179,6 +180,7 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 	check_category?: string
 	dataset_name?: string
 	nr_check_names?: number
+	record_json?: string
 	record_jsonpath?: string
 	session_start_ts?: string
 }
