@@ -62,7 +62,7 @@ export class MainComponent extends HTMLElement
 					this.projectsComponent = new ProjectsElement();
 					this.projectsComponent.refresh();
 				}
-				this.changingSection.appendChild(this.projectsComponent.element)
+				this.changingSection.appendChild(this.projectsComponent)
 				menu.selectItem('')
 			}
 

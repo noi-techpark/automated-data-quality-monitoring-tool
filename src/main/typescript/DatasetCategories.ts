@@ -8,11 +8,14 @@ import { cs_cast, throwNPE } from "./quality.js";
 import {API3} from './api/api3.js';
 import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
+import { Loader } from "./Loader.js";
 
 export class DatasetCategories extends HTMLElement
 {
 	
 	template
+	
+	content
 	
 	constructor() {
 		super()
@@ -46,6 +49,7 @@ export class DatasetCategories extends HTMLElement
 				`
 
 		customElements.upgrade(sroot)
+		this.content = sroot
 		
 		this.template = cs_cast(HTMLElement, sroot.querySelector('.category'))
 		this.template.remove()
@@ -56,11 +60,13 @@ export class DatasetCategories extends HTMLElement
 		
 		console.log(p_session_start_ts)
 		console.log(p_dataset_name)
-		
+		const loader = new Loader()
+		this.content.appendChild(loader)
 		const resp = await API3.list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw({
 			session_start_ts: p_session_start_ts,
 			dataset_name : p_dataset_name
 		})
+		loader.remove()
 		console.log(resp) 
 		for (let i = 0; i < resp.length; i++)
 		{

@@ -58,7 +58,6 @@ export class MenuElement extends HTMLElement
 		const loader = new Loader();
 		this.sroot.appendChild(loader)
 		json_promise.then(async (json) => {
-			await new Promise((s) =>  { setTimeout(s, 1000)})
 			for (let dataset of json)
 			{
 				const menu1_submenu = document.createElement('div');

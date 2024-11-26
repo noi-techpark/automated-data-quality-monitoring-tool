@@ -15,6 +15,8 @@ export class API3 {
 		// http://localhost:8080/api?
 		const resp = await fetch('https://www.catch-solve.tech/noi-odh-testing-tool/api?' + params.toString());
 		const respjson = await resp.json();
+		// wait for debug pourpose
+		await new Promise((s) =>  { setTimeout(s, 1500)})
 		return respjson;
 	}
 

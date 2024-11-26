@@ -9,24 +9,27 @@ import { Loader } from './Loader.js';
 import { API3 } from './api/api3.js';
 import { cs_cast } from './quality.js';
 
-export class ProjectsElement extends Component
+export class ProjectsElement extends HTMLElement
 {
+	sroot
+	
 	boxContainer;
 
 	constructor()
 	{
 		super()
 		
-		this.element.innerHTML = `
-			<style>
-				
-			</style>
-			<div class="title">standard dashboards</div>
-			<input>
-			<!-- <img src="dashitems.png" style="max-width: 100%"> --> 
-			<div class="container"></div>
+		this.sroot = this.attachShadow({ mode: 'open' })
+		this.sroot.innerHTML = `
+			<link rel="stylesheet" href="index.css">
+			<div class="ProjectsElement">
+				<div class="title">standard dashboards</div>
+				<input>
+				<!-- <img src="dashitems.png" style="max-width: 100%"> --> 
+				<div class="container"></div>
+			</div>
 		`
-		this.boxContainer = cs_cast(HTMLDivElement, this.element.querySelector('.container'))
+		this.boxContainer = cs_cast(HTMLDivElement, this.sroot.querySelector('.container'))
 
 		this.boxContainer.textContent = ("loading ...");
 	}
@@ -38,7 +41,6 @@ export class ProjectsElement extends Component
 		const loader = new Loader();
 		this.boxContainer.appendChild(loader)
 		const json = await API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({})
-		await new Promise((s) =>  { setTimeout(s, 1000)})
 		loader.remove();
 		console.log(json)
 		for (let dataset of json)
@@ -47,15 +49,8 @@ export class ProjectsElement extends Component
 			this.boxContainer.appendChild(box)
 			box.refresh(dataset)
 		}
-		/*
-		const resp = await API.get_dataset_list({})
-		this.boxContainer.textContent = ('');
-		for (let dataset of resp.Items)
-		{
-			const box = new DataSetBoxComponent();
-			this.boxContainer.appendChild(box)
-			box.refresh(dataset)
-		}
-		 */
+		
 	} 
 }
+
+customElements.define('cs-projects-element', ProjectsElement)
