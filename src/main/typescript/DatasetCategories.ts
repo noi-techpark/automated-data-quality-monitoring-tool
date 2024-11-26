@@ -39,6 +39,9 @@ export class DatasetCategories extends HTMLElement
 					<div class="category_name">Completeness</div>
 					<span>bla bla bla bla</span>
 					<div class="nr_records">123</div>
+					<details>
+						<summary>failed check list</summary>
+					</details>
 				</div>
 				`
 
@@ -62,14 +65,17 @@ export class DatasetCategories extends HTMLElement
 		for (let i = 0; i < resp.length; i++)
 		{
 			const cat = cs_cast(HTMLElement, this.template.cloneNode(true))
-			cs_cast(HTMLElement, cat.querySelector('.category_name')).textContent = resp[i].check_category
+			const cat_name = cs_cast(HTMLElement, cat.querySelector('.category_name'))
+			cat_name.textContent = resp[i].check_category
 			cs_cast(HTMLElement, cat.querySelector('.nr_records')).textContent = 'failed ' + resp[i].failed_records + ' / '
 			+ resp[i].tot_records
 			this.shadowRoot!.appendChild(cat)
 			
-			cat.onclick = () => {
+			cat_name.onclick = () => {
 				location.hash = '#page=summary&session_start_ts=' + p_session_start_ts + '&dataset_name=' + p_dataset_name + '&category_name=' + resp[i].check_category 
-			} 
+			}
+			
+			const cat_details =  cs_cast(HTMLElement, cat.querySelector('details'))
 			
 			API3.list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw({
 						session_start_ts: p_session_start_ts,
@@ -81,7 +87,7 @@ export class DatasetCategories extends HTMLElement
 						{
 							const div = document.createElement('div')
 							div.textContent = checks[i2].check_name // + ' ' + checks[i2].failed_records +  ' / ' + checks[i2].tot_records 
-							cat.appendChild(div)
+							cat_details.appendChild(div)
 						}
 					})
 			
