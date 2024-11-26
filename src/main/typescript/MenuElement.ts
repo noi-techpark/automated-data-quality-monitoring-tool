@@ -48,7 +48,9 @@ export class MenuElement extends HTMLElement
 			<div class="submenus"></div>
 		`;
 		this.submenus = cs_cast(HTMLElement, this.sroot.querySelector('div.submenus'));
-		this.menuitemByName[''] = cs_cast(HTMLElement, this.sroot.querySelector('div.title'))
+		const title = cs_cast(HTMLElement, this.sroot.querySelector('div.title'))
+		this.menuitemByName[''] = title
+		title.onclick = () => { location.hash = ''}
 
 		let menuready_fun: (x: null) => void
 		this.menuready_promise = new Promise(s => menuready_fun = s)

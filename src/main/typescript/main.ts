@@ -7,4 +7,4 @@ import {MainComponent} from './MainComponent.js'
 
 const mainComponent = new MainComponent();
 // mainComponent.refresh();
-document.body.appendChild(mainComponent.element)
+document.body.appendChild(mainComponent)

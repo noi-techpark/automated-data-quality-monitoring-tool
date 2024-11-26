@@ -3,7 +3,6 @@
  * License: AGPL
  */
 
-import {Component} from './Component.js'
 import {MenuElement} from './MenuElement.js'
 import {ProjectsElement} from './ProjectsElement.js'
 
@@ -12,8 +11,10 @@ import {DatasetIssuesDetail} from './DatasetIssuesDetail.js'
 import { cs_cast, cs_notnull } from './quality.js';
 import { DatasetCategories } from './DatasetCategories.js';
 
-export class MainComponent extends Component
+export class MainComponent extends HTMLElement
 {
+	sroot
+	
 	projectsComponent: ProjectsElement|null = null;
 	
 	changingSection
@@ -23,17 +24,21 @@ export class MainComponent extends Component
 	constructor()
 	{
 		super()
-		this.element.innerHTML = `
-			<div class="header">
-				<img class="logo" src="NOI_OPENDATAHUB_NEW_BK_nospace-01.svg">
-			</div>
-			<div class="body">
-				<div class="projects"></div>
+		this.sroot = this.attachShadow({ mode: 'open' })
+		this.sroot.innerHTML = `
+			<link rel="stylesheet" href="index.css">
+			<div class="MainComponent">
+				<div class="header">
+					<img class="logo" src="NOI_OPENDATAHUB_NEW_BK_nospace-01.svg">
+				</div>
+				<div class="body">
+					<div class="projects"></div>
+				</div>
 			</div>
 		`
-		this.changingSection = this.element.querySelector('.projects')!
+		this.changingSection = this.sroot.querySelector('.projects')!
 		
-		this.logo = cs_cast(HTMLImageElement, this.element.querySelector('.logo'))
+		this.logo = cs_cast(HTMLImageElement, this.sroot.querySelector('.logo'))
 		this.logo.onclick = () => {
 			location.hash = ''
 		}
@@ -97,3 +102,5 @@ export class MainComponent extends Component
 	}
 	
 }
+
+customElements.define('cs-main-component', MainComponent)
