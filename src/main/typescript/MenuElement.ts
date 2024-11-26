@@ -23,6 +23,8 @@ export class MenuElement extends HTMLElement
 	
 	menuitemByName: {[k:string]: HTMLElement} = {}
 	
+	menuready_promise
+	
 	constructor()
 	{
 		super()
@@ -32,8 +34,14 @@ export class MenuElement extends HTMLElement
 				div.submenus {
 					padding-left: 1rem;
 				}
+				div.submenus > * {
+					margin:  0.4rem;
+					padding: 0.2rem;
+					cursor: pointer;
+				}
 				.selected {
-					background: #ccc
+					background: #666;
+					color: white;
 				}
 			</style>
 			<div class="title">standard dashboards</div>
@@ -42,42 +50,36 @@ export class MenuElement extends HTMLElement
 		this.submenus = cs_cast(HTMLElement, this.sroot.querySelector('div.submenus'));
 		this.menuitemByName[''] = cs_cast(HTMLElement, this.sroot.querySelector('div.title'))
 
-		// customElements.upgrade(sroot)
-		
-		/*
-		const menu1_submenus = document.createElement('div');
-		menu1_submenus.className = ("menu1_submenus");
-		sroot.appendChild(menu1_submenus);
-
-
-		for (let i = 0; i < 10; i++)
-		{
-			const menu1_submenu = document.createElement('div');
-			menu1_submenu.textContent = ("dashboard "+i);
-			menu1_submenus.appendChild(menu1_submenu);
-		}
-		 */
+		let menuready_fun: (x: null) => void
+		this.menuready_promise = new Promise(s => menuready_fun = s)
+		const json_promise = API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({})
+		const loader = new Loader();
+		this.sroot.appendChild(loader)
+		json_promise.then(async (json) => {
+			await new Promise((s) =>  { setTimeout(s, 1000)})
+			for (let dataset of json)
+			{
+				const menu1_submenu = document.createElement('div');
+				menu1_submenu.textContent = (dataset.dataset_name);
+				this.menuitemByName[dataset.dataset_name] = menu1_submenu
+				this.submenus.appendChild(menu1_submenu);
+				menu1_submenu.onclick = () => {
+					location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name + "&session_start_ts=" + dataset.session_start_ts
+				}
+			}
+			loader.remove();
+			menuready_fun(null)
+		})
 
 	}
 	
 	async refresh()
 	{
-		const loader = new Loader();
-		this.sroot.appendChild(loader);
-		const json = await API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({})
-		await new Promise((s) =>  { setTimeout(s, 1000)})
-		loader.remove();
-		for (let dataset of json)
-		{
-			const menu1_submenu = document.createElement('div');
-			menu1_submenu.textContent = (dataset.dataset_name);
-			this.menuitemByName[dataset.dataset_name] = menu1_submenu
-			this.submenus.appendChild(menu1_submenu);
-		}
 	}
 	
-	selectItem(name: string)
+	async selectItem(name: string)
 	{
+		await this.menuready_promise
 		for (let k in this.menuitemByName)
 		{
 			const item = this.menuitemByName[k]
