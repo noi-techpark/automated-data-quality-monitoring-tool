@@ -7,6 +7,7 @@ import { cs_cast, throwNPE } from "./quality.js";
 import {API3, catchsolve_noiodh__test_dataset_record_check_failed__row} from './api/api3.js';
 import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
+import { Loader } from "./Loader.js";
 
 export class DatasetIssuesDetail extends HTMLElement
 {
@@ -120,17 +121,19 @@ export class DatasetIssuesDetail extends HTMLElement
 		console.log(p_category_name)
 		
 		this.container.textContent = ''
-
+		
 		if (this.current_tab === 'issues')
 		{
+			const loader = new Loader();
+			this.container.appendChild(loader)
 		
 			const json = await API3.list__catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw({
 				session_start_ts: p_session_start_ts,
 				dataset_name: p_dataset_name,
 				check_category: p_category_name
 			})
-			
-			console.log(json)
+
+			loader.remove();
 	
 			for (let i = 0; i < json.length; i++)
 			{
@@ -194,12 +197,18 @@ export class DatasetIssuesDetail extends HTMLElement
 		
 		if (this.current_tab === 'records')
 		{
+			
+			const loader = new Loader();
+			this.container.appendChild(loader)
+
 			const json = await API3.list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw({
 				session_start_ts: p_session_start_ts,
 				dataset_name: p_dataset_name,
 				check_category: p_category_name
 			});
-			console.log(json)
+			
+			loader.remove();
+
 			const groupBy = this.groupRecords(json)
 			const keys = Object.keys(groupBy)
 			console.log(keys)
@@ -218,6 +227,7 @@ export class DatasetIssuesDetail extends HTMLElement
 													check_category: p_category_name,
 													record_jsonpath: list[k2].record_jsonpath
 											});
+
 						for (let k = 0; k < json2.length; k++)
 						{
 							const sectionRow = new SectionRow();
