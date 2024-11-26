@@ -21,38 +21,47 @@ export class DatasetCategories extends HTMLElement
 		super()
 		const sroot = this.attachShadow({ mode: 'open' })
 		sroot.innerHTML = `
-				<style>
-					:host {
-					}
-					.category {
-						border: 1px solid gray;
-						width: 20rem;
-						display: inline-block;
-					}
-					.category > img {
-						width: 100%;
-					}
-					.category .category_name {
-						font-weight: bold;
-					}
-				</style>
-				<img src="kpi.png">
-				<div class="category">
-					<img src="kpi-pie-chart.png">
-					<div class="category_name">Completeness</div>
-					<span>bla bla bla bla</span>
-					<div class="nr_records">123</div>
-					<details>
-						<summary>failed check list</summary>
-					</details>
-				</div>
-				`
-
-		customElements.upgrade(sroot)
-		this.content = sroot
-		
-		this.template = cs_cast(HTMLElement, sroot.querySelector('.category'))
-		this.template.remove()
+						<style>
+							:host {
+							}
+							.category {
+								border: 1px solid gray;
+								width: 10rem;
+								display: inline-block;
+								margin: 1rem;
+							}
+							.category > img {
+								width: 100%;
+							}
+							.category .category_name {
+								font-weight: bold;
+							}
+							.frame {
+								display: flex
+							}
+							.frame .content {
+								flex-grow: 100;
+								display: flex;
+							}
+						</style>
+						<div class="frame">
+							<div class="content"></div>
+							<img src="kpi-general-info.png">
+						</div>
+						<div class="category">
+							<img src="kpi-pie-chart.png">
+							<div class="category_name">Completeness</div>
+							<span>bla bla bla bla</span>
+							<div class="nr_records">123</div>
+							<details>
+								<summary>failed check list</summary>
+							</details>
+						</div>
+						`;
+		        customElements.upgrade(sroot);
+		        this.content = cs_cast(HTMLElement, sroot.querySelector('.content'));
+		        this.template = cs_cast(HTMLElement, sroot.querySelector('.category'));
+		        this.template.remove();
 		
 	}
 	
@@ -75,7 +84,7 @@ export class DatasetCategories extends HTMLElement
 			cat_name.textContent = resp[i].check_category
 			cs_cast(HTMLElement, cat.querySelector('.nr_records')).textContent = 'failed ' + resp[i].failed_records + ' / '
 			+ resp[i].tot_records
-			this.shadowRoot!.appendChild(cat)
+			this.content.appendChild(cat)
 			
 			cat_name.onclick = () => {
 				location.hash = '#page=summary&session_start_ts=' + p_session_start_ts + '&dataset_name=' + p_dataset_name + '&category_name=' + resp[i].check_category 

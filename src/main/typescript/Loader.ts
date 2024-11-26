@@ -14,6 +14,7 @@ export class Loader extends HTMLElement
 						height: 15px;
 						display: inline-block;
 						overflow: hidden;
+						margin: 2rem;
 					}
 					div.loader {
 						color: #888;
