@@ -39,7 +39,8 @@ export class MainComponent extends Component
 		}
 		
 		const menu: MenuElement = new MenuElement();
-		this.changingSection.parentElement!.prepend(menu.element);
+		menu.refresh()
+		this.changingSection.parentElement!.prepend(menu);
 		
 		// this.projectsComponent = new ProjectsElement();
 		// projects.appendChild(this.projectsComponent.element);
@@ -57,6 +58,7 @@ export class MainComponent extends Component
 					this.projectsComponent.refresh();
 				}
 				this.changingSection.appendChild(this.projectsComponent.element)
+				menu.selectItem('')
 			}
 
 			if (location.hash.indexOf('#page=dataset-categories&') == 0)
@@ -68,6 +70,7 @@ export class MainComponent extends Component
 				const session_start_ts = cs_notnull(params.get('session_start_ts'))
 				const dataset_name = cs_notnull(params.get('dataset_name'))
 				detail.refresh(session_start_ts, dataset_name);
+				menu.selectItem(dataset_name)
 			}
 			
 			if (location.hash.startsWith('#page=summary&'))
@@ -80,6 +83,7 @@ export class MainComponent extends Component
 				const dataset_name = cs_notnull(params.get('dataset_name'))
 				const category_name = cs_notnull(params.get('category_name'))
 				detail.refresh(session_start_ts, dataset_name, category_name);
+				menu.selectItem(dataset_name)
 			}
 		}
 		
