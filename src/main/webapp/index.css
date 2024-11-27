@@ -34,12 +34,13 @@ html {
 }
 
 .ProjectsElement input {
-	width: 100%;
+	width: 90%;
 }
 
 .ProjectsElement .container {
 	display: inline-flex;
 	flex-wrap: wrap;
+	justify-content: space-around;
 }
 
 .ProjectsElement > .title {
