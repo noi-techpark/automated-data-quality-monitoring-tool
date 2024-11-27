@@ -79,7 +79,7 @@ export interface catchsolve_noiodh__test_dataset__row {
 	dataset_name: string
 	id: number
 	session_start_ts: string
-	tested_recors: number
+	tested_records: number
 }
 
 export interface catchsolve_noiodh__test_dataset_check__row {
@@ -125,7 +125,9 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 
 export interface catchsolve_noiodh__test_dataset_max_ts_vw__row {
 	dataset_name: string
+	failed_records: number
 	session_start_ts: string
+	tested_records: number
 }
 
 export interface catchsolve_noiodh__test_dataset_record_check_failed__row {
@@ -143,7 +145,7 @@ export interface catchsolve_noiodh__test_dataset__byexample {
 	dataset_name?: string
 	id?: number
 	session_start_ts?: string
-	tested_recors?: number
+	tested_records?: number
 }
 
 export interface catchsolve_noiodh__test_dataset_check__byexample {
@@ -189,7 +191,9 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 
 export interface catchsolve_noiodh__test_dataset_max_ts_vw__byexample {
 	dataset_name?: string
+	failed_records?: number
 	session_start_ts?: string
+	tested_records?: number
 }
 
 export interface catchsolve_noiodh__test_dataset_record_check_failed__byexample {

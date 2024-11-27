@@ -29,6 +29,7 @@ export class DataSetBoxComponent extends HTMLElement
 					margin: 0.5rem;
 					border-radius: 4px;
 					cursor: pointer;
+					width: 14rem;
 				}
 				.title {
 					font-weight: bold;
@@ -48,7 +49,7 @@ export class DataSetBoxComponent extends HTMLElement
 			<div class="title">XXX</div>
 			<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
 			<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
-			<cs-label-and-data class="totissues" style="display: none">total issues</cs-label-and-data>
+			<cs-label-and-data class="totissues" xstyle="display: none">total issues</cs-label-and-data>
 			<cs-label-and-data class="lastupdate">total issues</cs-label-and-data>
 		`
 
@@ -96,9 +97,9 @@ export class DataSetBoxComponent extends HTMLElement
 		}).format(date)
 		
 		this.dtitle.textContent = dataset.dataset_name
-		this.checkrecs.setData('' + dataset.tested_recors)
+		this.checkrecs.setData('' + dataset.tested_records)
 		this.checkattr.setData('123')
-		this.checkattr.setData('123')
+		this.totissues.setData('' + dataset.failed_records)
 		this.lastupdate.setData(dateformat)
 		this.onclick = () => {
 			location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name + "&session_start_ts=" + dataset.session_start_ts
