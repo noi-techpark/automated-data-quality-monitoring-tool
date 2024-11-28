@@ -39,9 +39,22 @@ export class DatasetIssuesDetail extends HTMLElement
 					.container > * {
 						border-bottom: 1px solid #ccc;
 					}
+					.header {
+						display: flex;
+					}
+					.header .chart {
+						flex-grow: 100;
+					}
 				</style>
-				<img src="kpi-detail.png" style="max-width: 100%">
-				<div style="width: calc(100% - 210px)">
+				<!-- <img src="kpi-detail.png" style="max-width: 100%"> -->
+				<div class="header">
+					<div>
+						<cs-dataset-categories></cs-dataset-categories>
+					</div>
+					<div class="chart">y</div>
+					<div><img src="kpi-general-info.png"></div>
+				</div>
+				<div style="width: calc(100% - 20px)">
 					<div style="text-align: right">
 						<button class="issues">Issues</button>
 						<button class="records">Records</button>
