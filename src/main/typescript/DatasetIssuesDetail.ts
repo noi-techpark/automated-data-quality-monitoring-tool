@@ -9,6 +9,7 @@ import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
 import { DatasetIssueCategory } from "./DatasetIssueCategory.js";
+import Chart = require("chart.js");
 
 export class DatasetIssuesDetail extends HTMLElement
 {
@@ -25,8 +26,18 @@ export class DatasetIssuesDetail extends HTMLElement
 	
 	sroot
 	
+	connected_promise
+	connected_func: (s: null) => void = s => null
+
+	connectedCallback()
+	{
+		console.log('connected')
+		this.connected_func(null)
+	}
+	
 	constructor() {
 		super()
+		this.connected_promise = new Promise(s => this.connected_func = s)
 		this.sroot = this.attachShadow({ mode: 'open' })
 		this.sroot.innerHTML = `
 				<style>
@@ -46,7 +57,7 @@ export class DatasetIssuesDetail extends HTMLElement
 						display: flex;
 					}
 					.header .chart {
-						flex-grow: 100;
+						width: 50%;
 					}
 				</style>
 				<!-- <img src="kpi-detail.png" style="max-width: 100%"> -->
@@ -54,7 +65,9 @@ export class DatasetIssuesDetail extends HTMLElement
 					<div>
 						<cs-dataset-issue-category></cs-dataset-issue-category>
 					</div>
-					<div class="chart">y</div>
+					<div class="chart">
+						<canvas></canvas>
+					</div>
 					<div><img src="kpi-general-info.png"></div>
 				</div>
 				<div style="width: calc(100% - 20px)">
@@ -87,6 +100,37 @@ export class DatasetIssuesDetail extends HTMLElement
 				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records)
 		}
 		
+		const canvas = cs_cast(HTMLCanvasElement, this.sroot.querySelector('canvas'));
+		
+		(async () => {
+			await this.connected_promise
+			new Chart(canvas, {
+				type: 'line',
+				data: {
+					labels: ['oct', 'nov', 'dic'],
+					datasets: [{
+						label: 'good trend',
+						data: [1,3,2],
+						fill: true,
+						backgroundColor: '#8f8'
+					},
+					{
+						label: 'fail trend',
+						data: [3,1,2],
+						fill: true,
+						backgroundColor: '#f88'
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							stacked: true
+						}
+					}
+				}
+			});
+		})();
+
 	}
 	
 	extractHumanReadableName(record_jsonpath: string, json: string): string

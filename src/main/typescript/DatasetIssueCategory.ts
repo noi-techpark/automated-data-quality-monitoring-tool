@@ -3,6 +3,7 @@
  * License: AGPL
  */
 
+import Chart = require("chart.js")
 import { LabelAndData } from "./LabelAndData.js"
 import { Loader } from "./Loader.js"
 import { API3, catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__row } from "./api/api3.js"
@@ -74,9 +75,9 @@ export class DatasetIssueCategory extends HTMLElement
 							</details>
 						</div>
 						`;
-		        customElements.upgrade(sroot);
-		        this.template = cs_cast(HTMLElement, sroot.querySelector('.category'));
-				
+
+		customElements.upgrade(sroot);
+		this.template = cs_cast(HTMLElement, sroot.querySelector('.category'));
 	}
 	
 	async refresh(data: {dataset_name: string, tot_records: number, failed_records: number, check_category: string, session_start_ts: string})
@@ -127,8 +128,8 @@ export class DatasetIssueCategory extends HTMLElement
 	async  setup_chart(cat: HTMLElement, arg1: {tot_records: number, failed_records: number}) {
 		await this.connected_promise
 		const chart = cs_cast(HTMLCanvasElement, cat.querySelector('.chart'));
-		const context = chart.getContext('2d');
-						new Chart(context, 				{
+		// const context = chart.getContext('2d');
+						new Chart(chart, 				{
 						  type: 'doughnut',
 						  data: {
 						    labels: ['ok', 'fail'],
