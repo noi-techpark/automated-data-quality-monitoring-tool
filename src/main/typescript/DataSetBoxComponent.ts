@@ -66,7 +66,7 @@ export class DataSetBoxComponent extends HTMLElement
 		
 		this.checkrecs.setLabel('checked recs')
 		this.checkattr.setLabel('checked attrs')
-		this.totissues.setLabel('tot issues')
+		this.totissues.setLabel('failed recs')
 		this.lastupdate.setLabel('last update')
 		
 		this.totissues.setSeverity("fail")
