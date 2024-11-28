@@ -8,6 +8,7 @@ import {API3, catchsolve_noiodh__test_dataset_record_check_failed__row} from './
 import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
+import { DatasetIssueCategory } from "./DatasetIssueCategory.js";
 
 export class DatasetIssuesDetail extends HTMLElement
 {
@@ -15,17 +16,19 @@ export class DatasetIssuesDetail extends HTMLElement
 	container 
 	
 	last_session_start_ts: string|null = null
-	
 	last_dataset_name: string|null = null
-	
 	last_check_category: string|null = null
+	last_failed_records: number|null = null
+	last_tot_records: number|null = null
 	
 	current_tab: 'issues' | 'records' = 'issues'
 	
+	sroot
+	
 	constructor() {
 		super()
-		const sroot = this.attachShadow({ mode: 'open' })
-		sroot.innerHTML = `
+		this.sroot = this.attachShadow({ mode: 'open' })
+		this.sroot.innerHTML = `
 				<style>
 					:host {
 						padding: 0.5rem;
@@ -49,7 +52,7 @@ export class DatasetIssuesDetail extends HTMLElement
 				<!-- <img src="kpi-detail.png" style="max-width: 100%"> -->
 				<div class="header">
 					<div>
-						<cs-dataset-categories></cs-dataset-categories>
+						<cs-dataset-issue-category></cs-dataset-issue-category>
 					</div>
 					<div class="chart">y</div>
 					<div><img src="kpi-general-info.png"></div>
@@ -63,23 +66,25 @@ export class DatasetIssuesDetail extends HTMLElement
 				</div>
 				`
 
-		customElements.upgrade(sroot)
+		customElements.upgrade(this.sroot)
 
-		this.container = cs_cast(HTMLDivElement, sroot.querySelector('.container'))
+		this.container = cs_cast(HTMLDivElement, this.sroot.querySelector('.container'))
 		
-		const issues = cs_cast(HTMLButtonElement, sroot.querySelector('.issues'))
-		const records = cs_cast(HTMLButtonElement, sroot.querySelector('.records'))
+		const issues = cs_cast(HTMLButtonElement, this.sroot.querySelector('.issues'))
+		const records = cs_cast(HTMLButtonElement, this.sroot.querySelector('.records'))
 		
 		issues.onclick = () => {
 			this.current_tab = 'issues'
-			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null)
-				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category)
+			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null
+				&& this.last_failed_records != null && this.last_tot_records != null)
+				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records)
 		}
 		
 		records.onclick = () => {
 			this.current_tab = 'records'
-			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null)
-				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category)
+			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null
+				&& this.last_failed_records != null && this.last_tot_records != null)
+				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records)
 		}
 		
 	}
@@ -123,15 +128,27 @@ export class DatasetIssuesDetail extends HTMLElement
 		return groupBy; 
 	}
 	
-	async refresh(p_session_start_ts: string, p_dataset_name: string, p_category_name: string) {
+	async refresh(p_session_start_ts: string, p_dataset_name: string, p_category_name: string, p_failed_records: number, p_tot_records: number) {
 		
 		this.last_session_start_ts = p_session_start_ts
 		this.last_dataset_name = p_dataset_name
 		this.last_check_category = p_category_name
+		this.last_failed_records = p_failed_records
+		this.last_tot_records = p_tot_records
 		
 		console.log(p_session_start_ts)
 		console.log(p_dataset_name)
 		console.log(p_category_name)
+		
+		const category = cs_cast(DatasetIssueCategory, this.sroot.querySelector('cs-dataset-issue-category'))
+		category.refresh(
+		{
+			dataset_name: p_dataset_name,
+			session_start_ts: p_session_start_ts,
+			check_category: p_category_name,
+			failed_records: p_failed_records,
+			tot_records: p_tot_records
+		})
 		
 		this.container.textContent = ''
 		
@@ -285,32 +302,6 @@ export class DatasetIssuesDetail extends HTMLElement
 					}
 				}
 			}
-			/*
-			for (let i = 0; i < json.length; i++)
-			{
-				const issue = json[i]
-				// console.log(issue)
-				const section = new OpenCloseSection()
-				section.refresh(issue.record_jsonpath, '' + issue.nr_check_names + ' checks')
-				this.container.appendChild(section)
-				
-				section.onopen = async () => {
-				//console.log('sezione aperta, ricarico!')
-					const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
-							session_start_ts: p_session_start_ts,
-							dataset_name: p_dataset_name,
-							check_category: p_category_name,
-							record_jsonpath: issue.record_jsonpath
-					});
-					for (let k = 0; k < json2.length; k++)
-					{
-						const sectionRow = new OpenCloseSection();
-						section.addElementToContentArea(sectionRow)
-						sectionRow.refresh(json2[k].check_name, '')
-					}
-				}
-			}
-			 */
 		}
 	}
 }

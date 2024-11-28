@@ -87,7 +87,9 @@ export class MainComponent extends HTMLElement
 				const session_start_ts = cs_notnull(params.get('session_start_ts'))
 				const dataset_name = cs_notnull(params.get('dataset_name'))
 				const category_name = cs_notnull(params.get('category_name'))
-				detail.refresh(session_start_ts, dataset_name, category_name);
+				const failed_records = parseInt(cs_notnull(params.get('failed_records')))
+				const tot_records = parseInt(cs_notnull(params.get('tot_records')))
+				detail.refresh(session_start_ts, dataset_name, category_name, failed_records, tot_records);
 				menu.selectItem(dataset_name)
 			}
 		}
