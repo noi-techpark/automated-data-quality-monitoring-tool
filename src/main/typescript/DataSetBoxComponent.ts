@@ -14,7 +14,7 @@ export class DataSetBoxComponent extends HTMLElement
 	img
 	checkrecs
 	checkattr
-	totissues
+	failedrecs
 	lastupdate
 	
 	constructor()
@@ -57,7 +57,7 @@ export class DataSetBoxComponent extends HTMLElement
 
 		this.checkrecs  = cs_cast(LabelAndData,      sroot.querySelector('.checktrec'))
 		this.checkattr  = cs_cast(LabelAndData,      sroot.querySelector('.checkattr'))
-		this.totissues  = cs_cast(LabelAndData,      sroot.querySelector('.totissues'))
+		this.failedrecs  = cs_cast(LabelAndData,     sroot.querySelector('.totissues'))
 		this.dtitle     = cs_cast(HTMLDivElement,    sroot.querySelector('.title'))
 		this.img        = cs_cast(HTMLImageElement,  sroot.querySelector('.img'))
 		this.lastupdate = cs_cast(LabelAndData,      sroot.querySelector('.lastupdate'))
@@ -66,24 +66,17 @@ export class DataSetBoxComponent extends HTMLElement
 		
 		this.checkrecs.setLabel('checked recs')
 		this.checkattr.setLabel('checked attrs')
-		this.totissues.setLabel('failed recs')
+		this.failedrecs.setLabel('failed recs')
 		this.lastupdate.setLabel('last update')
 		
-		this.totissues.setSeverity("fail")
-		this.totissues.setData('123')
+		// this.failedrecs.setSeverity("fail")
+		// this.failedrecs.setData('123')
 
 	}
 
 	
 	refresh(dataset: catchsolve_noiodh__test_dataset_max_ts_vw__row)
 	{
-		/*
-		this.dtitle.textContent=(dataset.Shortname);
-		// console.log(dataset)
-		if (dataset.ImageGallery != null && dataset.ImageGallery.length > 0)
-			this.img.src=(dataset.ImageGallery[0].ImageUrl + "&width=160");
-		 */
-		
 		const datestr = dataset.session_start_ts
 		const date = new Date(datestr)
 		
@@ -99,7 +92,14 @@ export class DataSetBoxComponent extends HTMLElement
 		this.dtitle.textContent = dataset.dataset_name
 		this.checkrecs.setData('' + dataset.tested_records)
 		this.checkattr.setData('123')
-		this.totissues.setData('' + dataset.failed_records)
+		this.failedrecs.setData('' + dataset.failed_records)
+		const quality_ratio = dataset.tested_records == 0 ? 100 : dataset.failed_records / dataset.tested_records
+		if (quality_ratio < 0.1)
+			this.failedrecs.setQualityLevel("good")
+		else if (quality_ratio < 0.3)
+			this.failedrecs.setQualityLevel("warn")
+		else
+			this.failedrecs.setQualityLevel("fail")
 		this.lastupdate.setData(dateformat)
 		this.onclick = () => {
 			location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name + "&session_start_ts=" + dataset.session_start_ts

@@ -39,12 +39,21 @@ export class LabelAndData extends HTMLElement
 				background-color: #fcc;
 				color: #833;
 			}
+			span.data.good {
+				background-color: #cfc;
+				color: #383;
+			}
+			span.data.warn {
+				background-color: #ffc;
+				color: #883;
+			}
 		</style>
-		<span class="label">label</span>
+		<span class="label"></span>
 		<span class="data">.</span>
 		`
 		
 		this.label = cs_cast(HTMLSpanElement, sroot.querySelector('.label'))
+		this.setLabel(this.getAttribute('label') !== null ? this.getAttribute('label')! : 'label')
 		this.data  = cs_cast(HTMLSpanElement, sroot.querySelector('.data'))
 		
 	}
@@ -59,7 +68,7 @@ export class LabelAndData extends HTMLElement
 		this.data.textContent = s
 	}
 	
-	setSeverity(severity: "info" | "warn" | "fail")
+	setQualityLevel(severity: "good" | "warn" | "fail")
 	{
 		this.data.classList.add(severity)
 	}

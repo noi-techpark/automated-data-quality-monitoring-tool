@@ -9,6 +9,7 @@ import {API3, catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__r
 import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
+import { LabelAndData } from "./LabelAndData.js";
 
 export class DatasetCategories extends HTMLElement
 {
@@ -36,7 +37,7 @@ export class DatasetCategories extends HTMLElement
 							}
 							.category {
 								border: 1px solid gray;
-								width: 10rem;
+								width: 12rem;
 								display: inline-block;
 								margin: 1rem;
 							}
@@ -58,6 +59,9 @@ export class DatasetCategories extends HTMLElement
 								height: 100px;
 								margin: auto;
 							}
+							details > *:nth-child(even) {
+							  background-color: #ccc;
+							}
 						</style>
 						<div class="frame">
 							<div class="content"></div>
@@ -69,8 +73,10 @@ export class DatasetCategories extends HTMLElement
 								<canvas class="chart"></canvas>
 							</div>
 							<div class="category_name">Completeness</div>
-							<span>bla bla bla bla</span>
-							<div class="nr_records">123</div>
+							<span></span>
+							<cs-label-and-data label="failed recs" class="nr_records"></cs-label-and-data>
+							<cs-label-and-data label="last update" class="last_update"></cs-label-and-data>
+							<!-- <div class="nr_records">123</div> -->
 							<details>
 								<summary>failed check list</summary>
 							</details>
@@ -101,8 +107,20 @@ export class DatasetCategories extends HTMLElement
 			this.setup_chart(cat, resp[i])
 			const cat_name = cs_cast(HTMLElement, cat.querySelector('.category_name'))
 			cat_name.textContent = resp[i].check_category
-			cs_cast(HTMLElement, cat.querySelector('.nr_records')).textContent = 'failed ' + resp[i].failed_records + ' / '
-			+ resp[i].tot_records
+			const failedelement = cs_cast(LabelAndData, cat.querySelector('.nr_records'))
+			failedelement.setData('' + resp[i].failed_records)
+			const last_update = cs_cast(LabelAndData, cat.querySelector('.last_update'))
+			const date = new Date(p_session_start_ts)
+					
+			const dateformat = new Intl.DateTimeFormat('it-IT', {
+						year: 'numeric',
+						month: '2-digit',
+						day: '2-digit',
+						hour: '2-digit',
+						minute: "2-digit",
+						timeZone: 'Europe/Rome'
+					}).format(date)
+			last_update.setData(dateformat)
 			this.content.appendChild(cat)
 			
 			cat_name.onclick = () => {
