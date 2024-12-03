@@ -26,18 +26,41 @@ export class DatasetIssuesDetail extends HTMLElement
 	
 	sroot
 	
-	connected_promise
-	connected_func: (s: null) => void = s => null
+	canvas
+	
+	// connected_promise
+	// connected_func: (s: null) => void = s => null
+	
+	chartjs_success: (s: Chart) => void
+	chartjs_promise: Promise<Chart>
 
 	connectedCallback()
 	{
-		console.log('connected')
-		this.connected_func(null)
+		// chartjs need to be created when element is attached into the dom
+		const chart = new Chart(this.canvas, {
+			type: 'line',
+			data: {
+				labels: ['-5','-4','-3', '-2', '-1'],
+				datasets: []
+			},
+			options: {
+				scales: {
+					y: {
+						stacked: true,
+						beginAtZero: true
+					}
+					
+				}
+				
+			}
+		});
+		
+		this.chartjs_success(chart)
 	}
 	
 	constructor() {
 		super()
-		this.connected_promise = new Promise(s => this.connected_func = s)
+		this.chartjs_promise = new Promise(s => this.chartjs_success = s)
 		this.sroot = this.attachShadow({ mode: 'open' })
 		this.sroot.innerHTML = `
 				<style>
@@ -100,36 +123,9 @@ export class DatasetIssuesDetail extends HTMLElement
 				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records)
 		}
 		
-		const canvas = cs_cast(HTMLCanvasElement, this.sroot.querySelector('canvas'));
+		this.canvas = cs_cast(HTMLCanvasElement, this.sroot.querySelector('canvas'));
 		
-		(async () => {
-			await this.connected_promise
-			new Chart(canvas, {
-				type: 'line',
-				data: {
-					labels: ['oct', 'nov', 'dic'],
-					datasets: [{
-						label: 'good trend',
-						data: [1,3,2],
-						fill: true,
-						backgroundColor: '#8f8'
-					},
-					{
-						label: 'fail trend',
-						data: [3,1,2],
-						fill: true,
-						backgroundColor: '#f88'
-					}]
-				},
-				options: {
-					scales: {
-						y: {
-							stacked: true
-						}
-					}
-				}
-			});
-		})();
+		
 
 	}
 	
@@ -182,7 +178,47 @@ export class DatasetIssuesDetail extends HTMLElement
 		
 		console.log(p_session_start_ts)
 		console.log(p_dataset_name)
-		console.log(p_category_name)
+		console.log(p_category_name);
+		
+		(async () => {
+					
+					
+					const data = await API3.list__catchsolve_noiodh__test_dataset_history_vw({
+						dataset_name: this.last_dataset_name!,
+						check_category: this.last_check_category!
+					})
+					
+					const goodarr = []
+					const failarr = []
+					
+					for (let x = 0; x < data.length; x++)
+					{
+						goodarr.push(data[x].tested_records - data[x].failed_recs)
+						failarr.push(data[x].failed_recs)
+					}
+					
+					console.log(goodarr)
+					console.log(failarr)
+					
+					console.log(data)
+					
+					const chartjs = await this.chartjs_promise
+					chartjs.data.datasets = [{
+												label: 'good trend',
+												data: goodarr,
+												fill: true,
+												backgroundColor: '#8f8'
+											},						
+											{
+												label: 'fail trend',
+												data: failarr,
+												fill: true,
+												backgroundColor: '#f88'
+											}]
+											
+					chartjs.update()
+									
+				})();
 		
 		const category = cs_cast(DatasetIssueCategory, this.sroot.querySelector('cs-dataset-issue-category'))
 		category.refresh(

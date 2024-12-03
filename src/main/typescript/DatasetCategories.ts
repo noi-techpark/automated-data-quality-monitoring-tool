@@ -89,7 +89,7 @@ export class DatasetCategories extends HTMLElement
 		for (let i = 0; i < resp.length; i++)
 		{
 			const category = new DatasetIssueCategory();
-			this.sroot.appendChild(category);
+			this.content.appendChild(category);
 			category.refresh(resp[i])
 			
 		}

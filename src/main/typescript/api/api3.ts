@@ -13,7 +13,7 @@ export class API3 {
 
 		// https://www.catch-solve.tech/noi-odh-testing-tool/api?
 		// http://localhost:8080/api?
-		const resp = await fetch('https://www.catch-solve.tech/noi-odh-testing-tool/api?' + params.toString());
+		const resp = await fetch('api?' + params.toString());
 		const respjson = await resp.json();
 		// wait for debug pourpose
 		// await new Promise((s) =>  { setTimeout(s, 1000)})
@@ -70,6 +70,16 @@ export class API3 {
 		return resp;
 	}
 
+	static async list__catchsolve_noiodh__test_dataset_history_vw
+	(filter: catchsolve_noiodh__test_dataset_history_vw__byexample):
+	 Promise<catchsolve_noiodh__test_dataset_history_vw__row[]>
+	{
+		const resp = await API3.call('catchsolve_noiodh.test_dataset_history_vw', filter)
+		return resp;
+	}
+	
+	
+
 	// end crudl methods
 }
 
@@ -121,6 +131,14 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 	record_json: string
 	record_jsonpath: string
 	session_start_ts: string
+}
+
+export interface catchsolve_noiodh__test_dataset_history_vw__row {
+	check_category: string
+	dataset_name: string
+	failed_recs: number
+	session_start_ts: string
+	tested_records: number
 }
 
 export interface catchsolve_noiodh__test_dataset_max_ts_vw__row {
@@ -187,6 +205,14 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 	record_json?: string
 	record_jsonpath?: string
 	session_start_ts?: string
+}
+
+export interface catchsolve_noiodh__test_dataset_history_vw__byexample {
+	check_category?: string
+	dataset_name?: string
+	failed_recs?: number
+	session_start_ts?: string
+	tested_records?: number
 }
 
 export interface catchsolve_noiodh__test_dataset_max_ts_vw__byexample {
