@@ -55,7 +55,18 @@ export class DatasetIssueCategory extends HTMLElement
 								width:  100px;
 								height: 100px;
 								margin: auto;
+								position: relative;
 							}
+							
+							.chartdiv .perc {
+								position: absolute;
+								top:  calc(50% - 0.8rem);
+								left: calc(50% - 1.6rem);
+								font-size: 1.5rem;
+								font-weight: bold;
+								color: #000;
+							}
+							
 							details > *:nth-child(even) {
 							  background-color: #ccc;
 							}
@@ -63,6 +74,7 @@ export class DatasetIssueCategory extends HTMLElement
 						<div class="category">
 							<!-- <img src="kpi-pie-chart.png"> -->
 							<div class="chartdiv">
+								<div class="perc">12%</div>
 								<canvas class="chart"></canvas>
 							</div>
 							<div class="category_name">Completeness</div>
@@ -91,6 +103,9 @@ export class DatasetIssueCategory extends HTMLElement
 		failedelement.setData('' + data.failed_records)
 		const last_update = cs_cast(LabelAndData, cat.querySelector('.last_update'))
 		const date = new Date(data.session_start_ts)
+		
+		const perc = cs_cast(HTMLElement, cat.querySelector('.perc'))
+		perc.textContent = '' + (data.failed_records * 100 / data.tot_records)
 				
 		const dateformat = new Intl.DateTimeFormat('it-IT', {
 					year: 'numeric',
@@ -136,12 +151,13 @@ export class DatasetIssueCategory extends HTMLElement
 						    datasets: [
 						      {
 						        label: 'Dataset 1',
-						        data: [arg1.tot_records - arg1.failed_records, arg1.failed_records],
-								backgroundColor: ['#8f8', '#f88']
+						        data: [arg1.failed_records, arg1.tot_records - arg1.failed_records, ],
+								backgroundColor: ['#222', '#fff']
 						      }
 						    ]
 						  },
 						  options: {
+							cutout: '80%',
 						    responsive: true,
 						    plugins: {
 						      legend: {

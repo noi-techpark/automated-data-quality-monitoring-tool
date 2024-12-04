@@ -29,27 +29,35 @@ export class LabelAndData extends HTMLElement
 			span.label {
 				flex-grow: 1;
 				margin-right: 0.3rem;
+				padding: 0.2rem
 			}
 			span.data {
-				font-weight: bold;
 				padding: 0.2rem;
 				border-radius: 0.3rem;
+				margin-right: 0.3rem;
+				background-color: var(--dark-background);
+				color: #ddd;
+				min-width: 2rem;
+				text-align: right;
 			}
-			span.data.fail {
-				background-color: #fcc;
-				color: #833;
+			:host(.fail) span.label {
+				background-color: #faa;
+				color: #400;
+				font-weight: bold;
 			}
-			span.data.good {
-				background-color: #cfc;
-				color: #383;
+			:host(.good) span.label {
+				background-color: #afa;
+				color: #040;
+				font-weight: bold;
 			}
-			span.data.warn {
-				background-color: #ffc;
-				color: #883;
+			:host(.warn) span.label {
+				background-color: #ffa;
+				color: #440;
+				font-weight: bold;
 			}
 		</style>
-		<span class="label"></span>
 		<span class="data">.</span>
+		<span class="label"></span>
 		`
 		
 		this.label = cs_cast(HTMLSpanElement, sroot.querySelector('.label'))
@@ -70,7 +78,7 @@ export class LabelAndData extends HTMLElement
 	
 	setQualityLevel(severity: "good" | "warn" | "fail")
 	{
-		this.data.classList.add(severity)
+		this.classList.add(severity)
 	}
 	
 }

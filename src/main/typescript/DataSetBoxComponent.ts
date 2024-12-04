@@ -24,33 +24,53 @@ export class DataSetBoxComponent extends HTMLElement
 		sroot.innerHTML = `
 			<style>
 				:host {
-					padding: 0.5rem;
 					border: 1px solid #ccc;
 					margin: 0.5rem;
 					border-radius: 4px;
 					cursor: pointer;
-					width: 14rem;
+					width: 13rem;
 				}
 				.title {
 					font-weight: bold;
+					margin-top: .7rem;
 					margin-bottom: 1rem;
+					text-align: center;
+					overflow: hidden;
 				}
+				
+				/*
 				:host(:hover) .title {
 					text-decoration: underline;
 				}
+				 */
+				
 				.ts {
 					font-size: 0.7rem
+				}
+				
+				.view_dashboard {
+					background-color: var(--dark-background);
+					color: #ddd;
+					text-align: center;
+					padding: 0.6rem;
+				}
+				
+				.wrapper {
+					padding: 0.4rem;
 				}
 				
 				
 				
 			</style>
 			<img class="img">
-			<div class="title">XXX</div>
-			<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
-			<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
-			<cs-label-and-data class="totissues" xstyle="display: none">total issues</cs-label-and-data>
-			<cs-label-and-data class="lastupdate">total issues</cs-label-and-data>
+			<div class="wrapper">
+				<div class="title">XXX</div>
+				<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
+				<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
+				<cs-label-and-data class="totissues" xstyle="display: none">total issues</cs-label-and-data>
+				<cs-label-and-data class="lastupdate">total issues</cs-label-and-data>
+			</div>
+			<div class="view_dashboard">View dashboard</div>
 		`
 
 		customElements.upgrade(sroot)

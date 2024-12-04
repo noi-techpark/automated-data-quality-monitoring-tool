@@ -203,18 +203,24 @@ export class DatasetIssuesDetail extends HTMLElement
 					console.log(data)
 					
 					const chartjs = await this.chartjs_promise
-					chartjs.data.datasets = [{
-												label: 'good trend',
-												data: goodarr,
-												fill: true,
-												backgroundColor: '#8f8'
-											},						
-											{
-												label: 'fail trend',
-												data: failarr,
-												fill: true,
-												backgroundColor: '#f88'
-											}]
+					chartjs.data.datasets = [
+												{
+													label: 'fail trend',
+													data: failarr,
+													fill: false,
+													backgroundColor: '#222',
+													borderColor: '#222',
+													tension: 0.1
+												},
+												{
+													label: 'total trend',
+													data: goodarr,
+													fill: false,
+													backgroundColor: '#aaa'
+													borderColor: '#aaa',
+													tension: 0.1
+												},						
+											]
 											
 					chartjs.update()
 									
