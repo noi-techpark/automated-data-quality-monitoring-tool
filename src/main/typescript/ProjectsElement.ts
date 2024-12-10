@@ -23,7 +23,7 @@ export class ProjectsElement extends HTMLElement
 		this.sroot.innerHTML = `
 			<link rel="stylesheet" href="index.css">
 			<div class="ProjectsElement">
-				<div class="title">standard dashboards</div>
+				<div class="title" style="padding: 1rem">standard dashboards</div>
 				<input>
 				<!-- <img src="dashitems.png" style="max-width: 100%"> --> 
 				<div class="container"></div>

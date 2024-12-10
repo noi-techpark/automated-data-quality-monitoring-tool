@@ -31,6 +31,11 @@ export class MenuElement extends HTMLElement
 		this.sroot = this.attachShadow({ mode: 'open' })
 		this.sroot.innerHTML = `
 			<style>
+
+				.title {
+					padding: 0.4rem;
+				}
+
 				div.submenus {
 					padding-left: 1rem;
 				}
@@ -44,7 +49,7 @@ export class MenuElement extends HTMLElement
 					color: white;
 				}
 			</style>
-			<div class="title">standard dashboards</div>
+			<div class="title">▲ standard dashboards</div>
 			<div class="submenus"></div>
 		`;
 		this.submenus = cs_cast(HTMLElement, this.sroot.querySelector('div.submenus'));
