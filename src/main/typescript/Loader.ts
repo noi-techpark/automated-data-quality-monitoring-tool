@@ -17,7 +17,7 @@ export class Loader extends HTMLElement
 						margin: 2rem;
 					}
 					div.loader {
-						color: #888;
+						color: #222;
 					}
 					
 				</style>

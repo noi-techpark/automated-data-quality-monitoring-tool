@@ -18,6 +18,8 @@ export class DatasetIssueCategory extends HTMLElement
 	connected_promise
 	connected_func: (s: null) => void = s => null
 	
+	more_div
+	
 	connectedCallback()
 	{
 		console.log('connected')
@@ -70,6 +72,13 @@ export class DatasetIssueCategory extends HTMLElement
 							details > *:nth-child(even) {
 							  background-color: #ccc;
 							}
+							
+							.view_details {
+								background-color: var(--dark-background);
+								color: #ddd;
+								text-align: center;
+								padding: 0.6rem;
+							}
 						</style>
 						<div class="category">
 							<!-- <img src="kpi-pie-chart.png"> -->
@@ -82,14 +91,22 @@ export class DatasetIssueCategory extends HTMLElement
 							<cs-label-and-data label="failed recs" class="nr_records"></cs-label-and-data>
 							<cs-label-and-data label="last update" class="last_update"></cs-label-and-data>
 							<!-- <div class="nr_records">123</div> -->
-							<details>
-								<summary>failed check list</summary>
-							</details>
+							<div class="more">
+								<details>
+									<summary>failed check list</summary>
+								</details>
+								<div class="view_details">View details</div>
+							</div>
 						</div>
 						`;
 
 		customElements.upgrade(sroot);
 		this.template = cs_cast(HTMLElement, sroot.querySelector('.category'));
+		this.more_div = cs_cast(HTMLElement, sroot.querySelector('.more'));
+	}
+	
+	hideMoreDiv()  {
+		this.more_div.style.display = 'none'
 	}
 	
 	async refresh(data: {dataset_name: string, tot_records: number, failed_records: number, check_category: string, session_start_ts: string})
@@ -117,7 +134,9 @@ export class DatasetIssueCategory extends HTMLElement
 				}).format(date)
 		last_update.setData(dateformat)
 		
-		cat_name.onclick = () => {
+		const view_details = cs_cast(HTMLElement, cat.querySelector('.view_details'))
+		
+		view_details.onclick = () => {
 			location.hash = '#page=summary&session_start_ts=' + data.session_start_ts + '&dataset_name=' + data.dataset_name + '&category_name=' + data.check_category +
 							'&failed_records=' + data.failed_records + '&tot_records=' + data.tot_records 
 		}

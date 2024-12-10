@@ -56,7 +56,7 @@ export class DataSetBoxComponent extends HTMLElement
 				}
 				
 				.wrapper {
-					padding: 0.4rem;
+					padding: 1rem;
 				}
 				
 				

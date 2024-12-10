@@ -216,7 +216,7 @@ export class DatasetIssuesDetail extends HTMLElement
 													label: 'total trend',
 													data: goodarr,
 													fill: false,
-													backgroundColor: '#aaa'
+													backgroundColor: '#aaa',
 													borderColor: '#aaa',
 													tension: 0.1
 												},						
@@ -227,6 +227,7 @@ export class DatasetIssuesDetail extends HTMLElement
 				})();
 		
 		const category = cs_cast(DatasetIssueCategory, this.sroot.querySelector('cs-dataset-issue-category'))
+		category.hideMoreDiv()
 		category.refresh(
 		{
 			dataset_name: p_dataset_name,
