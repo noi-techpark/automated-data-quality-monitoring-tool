@@ -58,9 +58,12 @@ export class DataSetBoxComponent extends HTMLElement
 				.wrapper {
 					padding: 1rem;
 				}
-				
-				
-				
+
+				.lastupdate {
+					margin-top: 0.4rem;
+					font-size: 0.7rem;
+				}
+	
 			</style>
 			<img class="img">
 			<div class="wrapper">
@@ -68,7 +71,10 @@ export class DataSetBoxComponent extends HTMLElement
 				<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
 				<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
 				<cs-label-and-data class="totissues" xstyle="display: none">total issues</cs-label-and-data>
-				<cs-label-and-data class="lastupdate">total issues</cs-label-and-data>
+				<div class="lastupdate">
+					<span class="data"></span>
+					<span></span>
+				</div>
 			</div>
 			<div class="view_dashboard">View dashboard</div>
 		`
@@ -80,14 +86,13 @@ export class DataSetBoxComponent extends HTMLElement
 		this.failedrecs  = cs_cast(LabelAndData,     sroot.querySelector('.totissues'))
 		this.dtitle     = cs_cast(HTMLDivElement,    sroot.querySelector('.title'))
 		this.img        = cs_cast(HTMLImageElement,  sroot.querySelector('.img'))
-		this.lastupdate = cs_cast(LabelAndData,      sroot.querySelector('.lastupdate'))
+		this.lastupdate = cs_cast(HTMLSpanElement,      sroot.querySelector('.lastupdate .data'))
 				
 		this.img.style.display = 'none';
 		
 		this.checkrecs.setLabel('checked recs')
 		this.checkattr.setLabel('checked attrs')
 		this.failedrecs.setLabel('failed recs')
-		this.lastupdate.setLabel('last update')
 		
 		// this.failedrecs.setSeverity("fail")
 		// this.failedrecs.setData('123')
@@ -120,7 +125,7 @@ export class DataSetBoxComponent extends HTMLElement
 			this.failedrecs.setQualityLevel("warn")
 		else
 			this.failedrecs.setQualityLevel("fail")
-		this.lastupdate.setData(dateformat)
+		this.lastupdate.textContent = dateformat
 		this.onclick = () => {
 			location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name + "&session_start_ts=" + dataset.session_start_ts
 		}

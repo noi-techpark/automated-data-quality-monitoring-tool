@@ -45,6 +45,9 @@ export class DatasetIssueCategory extends HTMLElement
 							}
 							.category .category_name {
 								font-weight: bold;
+								text-align: center;
+								margin-top: 0.4rem;
+								margin-bottom: 0.4rem;
 							}
 							.frame {
 								display: flex
@@ -58,6 +61,7 @@ export class DatasetIssueCategory extends HTMLElement
 								height: 100px;
 								margin: auto;
 								position: relative;
+								margin-top: 0.4rem;
 							}
 							
 							.chartdiv .perc {
@@ -79,6 +83,20 @@ export class DatasetIssueCategory extends HTMLElement
 								text-align: center;
 								padding: 0.6rem;
 							}
+
+							.lastupdate {
+								margin-top: 0.4rem;
+								font-size: 0.7rem;
+								margin-bottom: 0.4rem;
+								margin-left: 0.4rem;
+								margin-right: 0.4rem;
+							}
+							
+							.nr_records, details {
+								margin-left: 0.4rem;
+								margin-right: 0.4rem;
+							}
+
 						</style>
 						<div class="category">
 							<!-- <img src="kpi-pie-chart.png"> -->
@@ -89,7 +107,10 @@ export class DatasetIssueCategory extends HTMLElement
 							<div class="category_name">Completeness</div>
 							<span></span>
 							<cs-label-and-data label="failed recs" class="nr_records"></cs-label-and-data>
-							<cs-label-and-data label="last update" class="last_update"></cs-label-and-data>
+							<div class="lastupdate">
+								<span class="data"></span>
+								<span></span>
+							</div>
 							<!-- <div class="nr_records">123</div> -->
 							<div class="more">
 								<details>
@@ -118,7 +139,7 @@ export class DatasetIssueCategory extends HTMLElement
 		cat_name.textContent = data.check_category
 		const failedelement = cs_cast(LabelAndData, cat.querySelector('.nr_records'))
 		failedelement.setData('' + data.failed_records)
-		const last_update = cs_cast(LabelAndData, cat.querySelector('.last_update'))
+		const last_update = cs_cast(HTMLSpanElement, cat.querySelector('.lastupdate .data'))
 		const date = new Date(data.session_start_ts)
 		
 		const perc = cs_cast(HTMLElement, cat.querySelector('.perc'))
@@ -132,8 +153,9 @@ export class DatasetIssueCategory extends HTMLElement
 					minute: "2-digit",
 					timeZone: 'Europe/Rome'
 				}).format(date)
-		last_update.setData(dateformat)
-		
+
+		last_update.textContent = dateformat
+
 		const view_details = cs_cast(HTMLElement, cat.querySelector('.view_details'))
 		
 		view_details.onclick = () => {
