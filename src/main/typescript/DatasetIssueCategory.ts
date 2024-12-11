@@ -73,6 +73,11 @@ export class DatasetIssueCategory extends HTMLElement
 								color: #000;
 							}
 							
+							details {
+								margin-top: 0.4rem;
+								margin-bottom: 0.4rem;
+							}
+							
 							details > *:nth-child(even) {
 							  background-color: #ccc;
 							}
