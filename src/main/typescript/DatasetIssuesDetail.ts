@@ -34,6 +34,9 @@ export class DatasetIssuesDetail extends HTMLElement
 	chartjs_success: (s: Chart) => void
 	chartjs_promise: Promise<Chart>
 
+	issues: HTMLSpanElement;
+	records: HTMLSpanElement;
+
 	connectedCallback()
 	{
 		// chartjs need to be created when element is attached into the dom
@@ -82,6 +85,27 @@ export class DatasetIssuesDetail extends HTMLElement
 					.header .chart {
 						width: 50%;
 					}
+					
+					.actions {
+						border: 1px solid black;
+						width: 10rem;
+						margin-left: auto;
+						display: flex;
+						border-radius: 0.4rem;
+						margin-bottom: 0.5rem;
+					}
+					
+					.actions span.selected {
+						color: white;
+						background-color: black;
+					}
+					
+					.actions span {
+						flex-grow: 50;
+						text-align: center;
+						cursor: pointer;
+					}
+					
 				</style>
 				<!-- <img src="kpi-detail.png" style="max-width: 100%"> -->
 				<div class="header">
@@ -94,9 +118,9 @@ export class DatasetIssuesDetail extends HTMLElement
 					<div><img src="kpi-general-info.png"></div>
 				</div>
 				<div style="width: calc(100% - 20px)">
-					<div style="text-align: right">
-						<button class="issues">Issues</button>
-						<button class="records">Records</button>
+					<div style="text-align: right" class="actions">
+						<span class="issues">Issues</span>
+						<span class="records">Records</span>
 					</div>
 					<div class="container"></div>
 				</div>
@@ -106,17 +130,17 @@ export class DatasetIssuesDetail extends HTMLElement
 
 		this.container = cs_cast(HTMLDivElement, this.sroot.querySelector('.container'))
 		
-		const issues = cs_cast(HTMLButtonElement, this.sroot.querySelector('.issues'))
-		const records = cs_cast(HTMLButtonElement, this.sroot.querySelector('.records'))
+		this.issues = cs_cast(HTMLSpanElement, this.sroot.querySelector('.issues'))
+		this.records = cs_cast(HTMLSpanElement, this.sroot.querySelector('.records'))
 		
-		issues.onclick = () => {
+		this.issues.onclick = () => {
 			this.current_tab = 'issues'
 			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null
 				&& this.last_failed_records != null && this.last_tot_records != null)
 				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records)
 		}
 		
-		records.onclick = () => {
+		this.records.onclick = () => {
 			this.current_tab = 'records'
 			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null
 				&& this.last_failed_records != null && this.last_tot_records != null)
@@ -224,7 +248,7 @@ export class DatasetIssuesDetail extends HTMLElement
 											
 					chartjs.update()
 									
-				})();
+		})();
 		
 		const category = cs_cast(DatasetIssueCategory, this.sroot.querySelector('cs-dataset-issue-category'))
 		category.hideMoreDiv()
@@ -241,6 +265,9 @@ export class DatasetIssuesDetail extends HTMLElement
 		
 		if (this.current_tab === 'issues')
 		{
+			this.records.classList.remove('selected')
+			this.issues.classList.add('selected')
+			
 			const loader = new Loader();
 			this.container.appendChild(loader)
 		
@@ -314,6 +341,8 @@ export class DatasetIssuesDetail extends HTMLElement
 		
 		if (this.current_tab === 'records')
 		{
+			this.issues.classList.remove('selected')
+			this.records.classList.add('selected')
 			
 			const loader = new Loader();
 			this.container.appendChild(loader)
