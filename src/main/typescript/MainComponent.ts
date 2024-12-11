@@ -74,7 +74,9 @@ export class MainComponent extends HTMLElement
 				const params = new URLSearchParams(location.hash.substring(1));
 				const session_start_ts = cs_notnull(params.get('session_start_ts'))
 				const dataset_name = cs_notnull(params.get('dataset_name'))
-				detail.refresh(session_start_ts, dataset_name);
+				const failed_records = parseInt(cs_notnull(params.get('failed_records')))
+				const tested_records = parseInt(cs_notnull(params.get('tested_records')))
+				detail.refresh(session_start_ts, dataset_name, failed_records, tested_records);
 				menu.selectItem(dataset_name)
 			}
 			

@@ -127,7 +127,10 @@ export class DataSetBoxComponent extends HTMLElement
 			this.failedrecs.setQualityLevel("fail")
 		this.lastupdate.textContent = dateformat
 		this.onclick = () => {
-			location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name + "&session_start_ts=" + dataset.session_start_ts
+			location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name 
+							+ "&session_start_ts=" + dataset.session_start_ts
+							+ "&failed_records=" + dataset.failed_records
+							+ "&tested_records=" + dataset.tested_records
 		}
 	}
 }

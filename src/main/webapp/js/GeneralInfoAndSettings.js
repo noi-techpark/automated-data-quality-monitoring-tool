@@ -1,0 +1,17 @@
+/*
+ * (C) 2024 Catch Solve di Davide Montesin
+ * License: AGPL
+ */
+export class GeneralInfoAndSettings extends HTMLElement {
+    constructor() {
+        super();
+        const sroot = this.attachShadow({ mode: 'open' });
+        sroot.innerHTML = `
+		<style>
+		</style>
+		<div class="title">General Info &amp; Setting</div>
+		`;
+    }
+}
+customElements.define('cs-general-info-and-settings', GeneralInfoAndSettings);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiR2VuZXJhbEluZm9BbmRTZXR0aW5ncy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3R5cGVzY3JpcHQvR2VuZXJhbEluZm9BbmRTZXR0aW5ncy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7O0dBR0c7QUFJSCxNQUFNLE9BQU8sc0JBQXVCLFNBQVEsV0FBVztJQUd0RDtRQUVDLEtBQUssRUFBRSxDQUFDO1FBQ1IsTUFBTSxLQUFLLEdBQUcsSUFBSSxDQUFDLFlBQVksQ0FBQyxFQUFDLElBQUksRUFBRSxNQUFNLEVBQUMsQ0FBQyxDQUFDO1FBQ2hELEtBQUssQ0FBQyxTQUFTLEdBQUc7Ozs7R0FJakIsQ0FBQTtJQUVGLENBQUM7Q0FFRDtBQUVELGNBQWMsQ0FBQyxNQUFNLENBQUMsOEJBQThCLEVBQUUsc0JBQXNCLENBQUMsQ0FBQSIsInNvdXJjZXNDb250ZW50IjpbIi8qXG4gKiAoQykgMjAyNCBDYXRjaCBTb2x2ZSBkaSBEYXZpZGUgTW9udGVzaW5cbiAqIExpY2Vuc2U6IEFHUExcbiAqL1xuXG5pbXBvcnQgeyBjc19jYXN0LCB0aHJvd05QRSB9IGZyb20gXCIuL3F1YWxpdHkuanNcIjtcblxuZXhwb3J0IGNsYXNzIEdlbmVyYWxJbmZvQW5kU2V0dGluZ3MgZXh0ZW5kcyBIVE1MRWxlbWVudFxue1xuXHRcblx0Y29uc3RydWN0b3IoKVxuXHR7XG5cdFx0c3VwZXIoKTtcblx0XHRjb25zdCBzcm9vdCA9IHRoaXMuYXR0YWNoU2hhZG93KHttb2RlOiAnb3Blbid9KTtcblx0XHRzcm9vdC5pbm5lckhUTUwgPSBgXG5cdFx0PHN0eWxlPlxuXHRcdDwvc3R5bGU+XG5cdFx0PGRpdiBjbGFzcz1cInRpdGxlXCI+R2VuZXJhbCBJbmZvICZhbXA7IFNldHRpbmc8L2Rpdj5cblx0XHRgXG5cdFx0XG5cdH1cblxufVxuXG5jdXN0b21FbGVtZW50cy5kZWZpbmUoJ2NzLWdlbmVyYWwtaW5mby1hbmQtc2V0dGluZ3MnLCBHZW5lcmFsSW5mb0FuZFNldHRpbmdzKVxuIl19

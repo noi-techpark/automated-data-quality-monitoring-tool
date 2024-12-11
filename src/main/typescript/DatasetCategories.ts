@@ -11,6 +11,7 @@ import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
 import { LabelAndData } from "./LabelAndData.js";
 import { DatasetIssueCategory } from "./DatasetIssueCategory.js";
+import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
 
 export class DatasetCategories extends HTMLElement
 {
@@ -27,6 +28,8 @@ export class DatasetCategories extends HTMLElement
 	}
 	
 	sroot
+	
+	info_and_settings
 	
 	constructor() {
 		super()
@@ -66,15 +69,17 @@ export class DatasetCategories extends HTMLElement
 						</style>
 						<div class="frame">
 							<div class="content"></div>
+							<cs-general-info-and-settings></cs-general-info-and-settings>
 							<img src="kpi-general-info.png">
 						</div>
 						`;
-		        customElements.upgrade(this.sroot);
-		        this.content = cs_cast(HTMLElement, this.sroot.querySelector('.content'));
+		customElements.upgrade(this.sroot);
+		this.content = cs_cast(HTMLElement, this.sroot.querySelector('.content'));
+		this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
 
 	}
 	
-	async refresh(p_session_start_ts: string, p_dataset_name: string) {
+	async refresh(p_session_start_ts: string, p_dataset_name: string, p_failed_records: number, p_tot_records: number) {
 		
 		console.log(p_session_start_ts)
 		console.log(p_dataset_name)
