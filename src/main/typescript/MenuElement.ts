@@ -70,7 +70,12 @@ export class MenuElement extends HTMLElement
 				this.menuitemByName[dataset.dataset_name] = menu1_submenu
 				this.submenus.appendChild(menu1_submenu);
 				menu1_submenu.onclick = () => {
-					location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name + "&session_start_ts=" + dataset.session_start_ts
+					location.hash = '#page=dataset-categories' +
+					                '&dataset_name=' + dataset.dataset_name + 
+									'&session_start_ts=' + dataset.session_start_ts 
+									+ "&failed_records=" + dataset.failed_records
+									+ "&tested_records=" + dataset.tested_records
+
 				}
 			}
 			loader.remove();

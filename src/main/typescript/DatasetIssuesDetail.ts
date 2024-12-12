@@ -10,6 +10,7 @@ import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
 import { DatasetIssueCategory } from "./DatasetIssueCategory.js";
 import Chart = require("chart.js");
+import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
 
 export class DatasetIssuesDetail extends HTMLElement
 {
@@ -36,6 +37,7 @@ export class DatasetIssuesDetail extends HTMLElement
 
 	issues: HTMLSpanElement;
 	records: HTMLSpanElement;
+    info_and_settings: GeneralInfoAndSettings;
 
 	connectedCallback()
 	{
@@ -115,7 +117,7 @@ export class DatasetIssuesDetail extends HTMLElement
 					<div class="chart">
 						<canvas></canvas>
 					</div>
-					<div><img src="kpi-general-info.png"></div>
+					<cs-general-info-and-settings></cs-general-info-and-settings>
 				</div>
 				<div style="width: calc(100% - 20px)">
 					<div style="text-align: right" class="actions">
@@ -149,7 +151,8 @@ export class DatasetIssuesDetail extends HTMLElement
 		
 		this.canvas = cs_cast(HTMLCanvasElement, this.sroot.querySelector('canvas'));
 		
-		
+		this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
+
 
 	}
 	
@@ -199,6 +202,8 @@ export class DatasetIssuesDetail extends HTMLElement
 		this.last_check_category = p_category_name
 		this.last_failed_records = p_failed_records
 		this.last_tot_records = p_tot_records
+		
+		this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records)
 		
 		console.log(p_session_start_ts)
 		console.log(p_dataset_name)

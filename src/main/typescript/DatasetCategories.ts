@@ -70,7 +70,7 @@ export class DatasetCategories extends HTMLElement
 						<div class="frame">
 							<div class="content"></div>
 							<cs-general-info-and-settings></cs-general-info-and-settings>
-							<img src="kpi-general-info.png">
+							<!--<img src="kpi-general-info.png">-->
 						</div>
 						`;
 		customElements.upgrade(this.sroot);
@@ -81,8 +81,8 @@ export class DatasetCategories extends HTMLElement
 	
 	async refresh(p_session_start_ts: string, p_dataset_name: string, p_failed_records: number, p_tot_records: number) {
 		
-		console.log(p_session_start_ts)
-		console.log(p_dataset_name)
+		this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records);
+		
 		const loader = new Loader()
 		this.content.appendChild(loader)
 		const resp = await API3.list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw({
