@@ -9,7 +9,7 @@ import { Loader } from './Loader.js';
 import { API3 } from './api/api3.js';
 import { cs_cast } from './quality.js';
 
-export class ProjectsElement extends HTMLElement
+export class StandardDashboardsComponent extends HTMLElement
 {
 	sroot
 	
@@ -53,4 +53,4 @@ export class ProjectsElement extends HTMLElement
 	} 
 }
 
-customElements.define('cs-projects-element', ProjectsElement)
+customElements.define('cs-standard-dashboards-element', StandardDashboardsComponent)

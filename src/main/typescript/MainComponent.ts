@@ -4,7 +4,7 @@
  */
 
 import {MenuElement} from './MenuElement.js'
-import {ProjectsElement} from './ProjectsElement.js'
+import {StandardDashboardsComponent} from './StandardDashboardsComponent.js'
 
 
 import {DatasetIssuesDetail} from './DatasetIssuesDetail.js'
@@ -15,7 +15,7 @@ export class MainComponent extends HTMLElement
 {
 	sroot
 	
-	projectsComponent: ProjectsElement|null = null;
+	dashboards: StandardDashboardsComponent|null = null;
 	
 	changingSection
 	
@@ -57,12 +57,12 @@ export class MainComponent extends HTMLElement
 			
 			if (location.hash == '')
 			{
-				if (this.projectsComponent == null)
+				if (this.dashboards == null)
 				{
-					this.projectsComponent = new ProjectsElement();
-					this.projectsComponent.refresh();
+					this.dashboards = new StandardDashboardsComponent();
+					this.dashboards.refresh();
 				}
-				this.changingSection.appendChild(this.projectsComponent)
+				this.changingSection.appendChild(this.dashboards)
 				menu.selectItem('')
 			}
 
