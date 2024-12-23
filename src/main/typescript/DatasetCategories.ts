@@ -13,7 +13,7 @@ import { LabelAndData } from "./LabelAndData.js";
 import { DatasetIssueCategory } from "./DatasetIssueCategory.js";
 import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
 
-export class DatasetCategories extends HTMLElement
+export class DatasetIssuesByCategories extends HTMLElement
 {
 	
 	content
@@ -103,5 +103,5 @@ export class DatasetCategories extends HTMLElement
 
 }
 
-customElements.define('cs-dataset-categories', DatasetCategories)
+customElements.define('cs-dataset-categories', DatasetIssuesByCategories)
 

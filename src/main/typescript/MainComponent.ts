@@ -9,7 +9,7 @@ import {StandardDashboardsComponent} from './StandardDashboardsComponent.js'
 
 import {DatasetIssuesDetail} from './DatasetIssuesDetail.js'
 import { cs_cast, cs_notnull } from './quality.js';
-import { DatasetCategories } from './DatasetCategories.js';
+import { DatasetIssuesByCategories } from './DatasetCategories.js';
 
 export class MainComponent extends HTMLElement
 {
@@ -69,7 +69,7 @@ export class MainComponent extends HTMLElement
 			if (location.hash.indexOf('#page=dataset-categories&') == 0)
 			{
 				this.changingSection.textContent = ''
-				const detail = new DatasetCategories();
+				const detail = new DatasetIssuesByCategories();
 				this.changingSection.appendChild(detail)
 				const params = new URLSearchParams(location.hash.substring(1));
 				const session_start_ts = cs_notnull(params.get('session_start_ts'))
