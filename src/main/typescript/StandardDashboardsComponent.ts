@@ -3,8 +3,7 @@
  * License: AGPL
  */
 
-import {Component} from './Component.js'
-import { DataSetBoxComponent } from './DataSetBoxComponent.js';
+import { DatasetCardComponent } from './DatasetCardComponent.js';
 import { Loader } from './Loader.js';
 import { API3 } from './api/api3.js';
 import { cs_cast } from './quality.js';
@@ -45,7 +44,7 @@ export class StandardDashboardsComponent extends HTMLElement
 		console.log(json)
 		for (let dataset of json)
 		{
-			const box = new DataSetBoxComponent();
+			const box = new DatasetCardComponent();
 			this.boxContainer.appendChild(box)
 			box.refresh(dataset)
 		}

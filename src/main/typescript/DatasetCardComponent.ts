@@ -8,7 +8,7 @@ import { cs_cast, throwNPE } from "./quality.js";
 import { LabelAndData } from "./LabelAndData.js"
 import { catchsolve_noiodh__test_dataset_max_ts_vw__row } from "./api/api3.js";
 
-export class DataSetBoxComponent extends HTMLElement
+export class DatasetCardComponent extends HTMLElement
 {
 	dtitle
 	img
@@ -136,4 +136,4 @@ export class DataSetBoxComponent extends HTMLElement
 }
 
 
-customElements.define('cs-dataset-box', DataSetBoxComponent)
+customElements.define('cs-dataset-box', DatasetCardComponent)
