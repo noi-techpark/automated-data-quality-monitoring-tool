@@ -10,7 +10,7 @@ import { API3, catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__
 import { cs_cast } from "./quality.js"
 
 
-export class DatasetIssueCategory extends HTMLElement
+export class DatasetIssueCategoryComponent extends HTMLElement
 {
 	
 	template
@@ -223,4 +223,4 @@ export class DatasetIssueCategory extends HTMLElement
 
 }
 
-customElements.define('cs-dataset-issue-category', DatasetIssueCategory)
+customElements.define('cs-dataset-issue-category', DatasetIssueCategoryComponent)

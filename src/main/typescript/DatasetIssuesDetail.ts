@@ -8,7 +8,7 @@ import {API3, catchsolve_noiodh__test_dataset_record_check_failed__row} from './
 import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
-import { DatasetIssueCategory } from "./DatasetIssueCategory.js";
+import { DatasetIssueCategoryComponent } from "./DatasetIssueCategory.js";
 import Chart = require("chart.js");
 import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
 
@@ -255,7 +255,7 @@ export class DatasetIssuesDetail extends HTMLElement
 									
 		})();
 		
-		const category = cs_cast(DatasetIssueCategory, this.sroot.querySelector('cs-dataset-issue-category'))
+		const category = cs_cast(DatasetIssueCategoryComponent, this.sroot.querySelector('cs-dataset-issue-category'))
 		category.hideMoreDiv()
 		category.refresh(
 		{

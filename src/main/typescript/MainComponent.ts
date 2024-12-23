@@ -9,7 +9,7 @@ import {StandardDashboardsComponent} from './StandardDashboardsComponent.js'
 
 import {DatasetIssuesDetail} from './DatasetIssuesDetail.js'
 import { cs_cast, cs_notnull } from './quality.js';
-import { DatasetIssuesByCategories } from './DatasetCategories.js';
+import { DatasetIssuesByCategories } from './DatasetIssuesByCategories.js';
 
 export class MainComponent extends HTMLElement
 {

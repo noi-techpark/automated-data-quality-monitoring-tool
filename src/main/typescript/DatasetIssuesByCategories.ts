@@ -10,7 +10,7 @@ import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
 import { LabelAndData } from "./LabelAndData.js";
-import { DatasetIssueCategory } from "./DatasetIssueCategory.js";
+import { DatasetIssueCategoryComponent } from "./DatasetIssueCategory.js";
 import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
 
 export class DatasetIssuesByCategories extends HTMLElement
@@ -93,7 +93,7 @@ export class DatasetIssuesByCategories extends HTMLElement
 		console.log(resp) 
 		for (let i = 0; i < resp.length; i++)
 		{
-			const category = new DatasetIssueCategory();
+			const category = new DatasetIssueCategoryComponent();
 			this.content.appendChild(category);
 			category.refresh(resp[i])
 			
