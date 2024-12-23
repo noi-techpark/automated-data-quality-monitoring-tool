@@ -16,7 +16,7 @@ https://stackoverflow.com/questions/28664207/importing-styles-into-a-web-compone
 
  */
 
-export class MenuElement extends HTMLElement
+export class MenuComponent extends HTMLElement
 {
 	sroot
 	submenus
@@ -102,4 +102,4 @@ export class MenuElement extends HTMLElement
 	}
 }
 
-customElements.define('cs-menu-element', MenuElement)
+customElements.define('cs-menu-element', MenuComponent)

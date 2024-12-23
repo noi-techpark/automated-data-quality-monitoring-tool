@@ -3,7 +3,7 @@
  * License: AGPL
  */
 
-import {MenuElement} from './MenuElement.js'
+import {MenuComponent} from './MenuComponent.js'
 import {StandardDashboardsComponent} from './StandardDashboardsComponent.js'
 
 
@@ -43,7 +43,7 @@ export class MainComponent extends HTMLElement
 			location.hash = ''
 		}
 		
-		const menu: MenuElement = new MenuElement();
+		const menu: MenuComponent = new MenuComponent();
 		menu.refresh()
 		this.changingSection.parentElement!.prepend(menu);
 		
