@@ -9,10 +9,6 @@
 	<servlet>
 		<servlet-name>APIServlet</servlet-name>
 		<servlet-class>it.bz.noi.automated.data.quality.monitoring.tool.APIServlet</servlet-class>
-		<init-param>
-			<param-name>apiClass</param-name>
-			<param-value>it.bz.noi.automated.data.quality.monitoring.tool.API</param-value>
-		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
