@@ -8,7 +8,7 @@ import {API3, catchsolve_noiodh__test_dataset_record_check_failed__row} from './
 import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
-import { DatasetIssueCategoryComponent } from "./DatasetIssueCategory.js";
+import { DatasetIssueCategoryComponent } from "./DatasetIssueCategoryComponent.js";
 import Chart = require("chart.js");
 import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
 

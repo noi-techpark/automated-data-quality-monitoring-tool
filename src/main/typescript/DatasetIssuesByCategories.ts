@@ -10,7 +10,7 @@ import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
 import { LabelAndData } from "./LabelAndData.js";
-import { DatasetIssueCategoryComponent } from "./DatasetIssueCategory.js";
+import { DatasetIssueCategoryComponent } from "./DatasetIssueCategoryComponent.js";
 import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
 
 export class DatasetIssuesByCategories extends HTMLElement
