@@ -45,7 +45,14 @@ cd automated-data-quality-monitoring-tool
 
 ### Build
 
-Build the project:
+Build the typescript code:
+
+```bash
+npm install typescript     # if not already installed
+tsc
+```
+
+Build the java project:
 
 ```bash
 mvn clean package
@@ -61,6 +68,13 @@ This is a maven project and will produce a war that can be deployed in any j2ee 
 ```bash
 mvn clean package
 ```
+
+* create a postgres instance and initialize the database using
+
+```bash
+psql ... < database/database.sql
+```
+
 
 * confiure environment variable JDBC_URL=jdbc:postgresql://server/database?user=xxx&password=yyy to point the postgres database
 * deploy the war to a j2ee container like tomcat or jetty
