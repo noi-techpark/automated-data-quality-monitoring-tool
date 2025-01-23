@@ -57,6 +57,7 @@ export class DatasetIssuesByCategories extends HTMLElement
 							.frame .content {
 								flex-grow: 100;
 								display: flex;
+								align-items: start;
 							}
 							.chartdiv {
 								width:  100px;

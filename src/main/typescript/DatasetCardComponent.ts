@@ -142,6 +142,7 @@ export class DatasetCardComponent extends HTMLElement
 							+ "&session_start_ts=" + dataset.session_start_ts
 							+ "&failed_records=" + dataset.failed_records
 							+ "&tested_records=" + dataset.tested_records
+			window.scrollTo(0,0);
 		}
 	}
 }

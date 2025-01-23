@@ -82,10 +82,11 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 								margin-bottom: 0.4rem;
 							}
 							
-							details > *:nth-child(even) {
-							  background-color: #ccc;
+							details > * {
+								padding: 0.5em;
+								border-bottom: 1px solid #ccc;
 							}
-							
+														
 							.view_details {
 								background-color: var(--dark-background);
 								color: #ddd;
