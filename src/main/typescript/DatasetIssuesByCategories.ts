@@ -66,6 +66,11 @@ export class DatasetIssuesByCategories extends HTMLElement
 							details > *:nth-child(even) {
 							  background-color: #ccc;
 							}
+							
+							.content > * {
+								margin-top: 1rem;
+								margin-left: 1rem;
+							}
 						</style>
 						<div class="frame">
 							<div class="content"></div>

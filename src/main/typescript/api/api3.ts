@@ -86,6 +86,7 @@ export class API3 {
 // begin interfaces
 
 export interface catchsolve_noiodh__test_dataset__row {
+	dataset_img_url: string
 	dataset_name: string
 	id: number
 	session_start_ts: string
@@ -142,6 +143,7 @@ export interface catchsolve_noiodh__test_dataset_history_vw__row {
 }
 
 export interface catchsolve_noiodh__test_dataset_max_ts_vw__row {
+	dataset_img_url: string
 	dataset_name: string
 	failed_records: number
 	session_start_ts: string
@@ -154,12 +156,14 @@ export interface catchsolve_noiodh__test_dataset_record_check_failed__row {
 	dataset_name: string
 	id: number
 	impacted_attributes_csv: string
+	problem_hint: string
 	record_json: string
 	record_jsonpath: string
 	session_start_ts: string
 }
 
 export interface catchsolve_noiodh__test_dataset__byexample {
+	dataset_img_url?: string
 	dataset_name?: string
 	id?: number
 	session_start_ts?: string
@@ -216,6 +220,7 @@ export interface catchsolve_noiodh__test_dataset_history_vw__byexample {
 }
 
 export interface catchsolve_noiodh__test_dataset_max_ts_vw__byexample {
+	dataset_img_url?: string
 	dataset_name?: string
 	failed_records?: number
 	session_start_ts?: string
@@ -228,6 +233,7 @@ export interface catchsolve_noiodh__test_dataset_record_check_failed__byexample 
 	dataset_name?: string
 	id?: number
 	impacted_attributes_csv?: string
+	problem_hint?: string
 	record_json?: string
 	record_jsonpath?: string
 	session_start_ts?: string

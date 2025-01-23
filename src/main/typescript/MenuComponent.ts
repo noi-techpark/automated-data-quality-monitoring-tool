@@ -38,6 +38,7 @@ export class MenuComponent extends HTMLElement
 
 				div.submenus {
 					padding-left: 1rem;
+					overflow: hidden;
 				}
 				div.submenus > * {
 					margin:  0.4rem;

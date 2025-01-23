@@ -29,13 +29,16 @@ export class DatasetCardComponent extends HTMLElement
 					border-radius: 4px;
 					cursor: pointer;
 					width: 13rem;
+					box-shadow: 4px 4px #ccc;
 				}
 				.title {
 					font-weight: bold;
 					margin-top: .7rem;
-					margin-bottom: 1rem;
+					margin-bottom: 0.3rem;
 					text-align: center;
 					overflow: hidden;
+					height: 2rem;
+					line-height: 1rem;
 				}
 				
 				/*
@@ -63,16 +66,23 @@ export class DatasetCardComponent extends HTMLElement
 					margin-top: 0.4rem;
 					font-size: 0.7rem;
 				}
+				
+				img {
+					height: 100px;
+					width: 100%;
+					object-fit: contain;
+					margin-bottom: 0.5rem;
+				}
 	
 			</style>
-			<img class="img">
 			<div class="wrapper">
 				<div class="title">XXX</div>
+				<img class="img">
 				<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
 				<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
 				<cs-label-and-data class="totissues" xstyle="display: none">total issues</cs-label-and-data>
 				<div class="lastupdate">
-					<span class="data"></span>
+					🕑 <span class="data"></span>
 					<span></span>
 				</div>
 			</div>
@@ -83,12 +93,12 @@ export class DatasetCardComponent extends HTMLElement
 
 		this.checkrecs  = cs_cast(LabelAndData,      sroot.querySelector('.checktrec'))
 		this.checkattr  = cs_cast(LabelAndData,      sroot.querySelector('.checkattr'))
-		this.failedrecs  = cs_cast(LabelAndData,     sroot.querySelector('.totissues'))
+		this.failedrecs = cs_cast(LabelAndData,     sroot.querySelector('.totissues'))
 		this.dtitle     = cs_cast(HTMLDivElement,    sroot.querySelector('.title'))
 		this.img        = cs_cast(HTMLImageElement,  sroot.querySelector('.img'))
 		this.lastupdate = cs_cast(HTMLSpanElement,      sroot.querySelector('.lastupdate .data'))
 				
-		this.img.style.display = 'none';
+		// this.img.style.display = 'none';
 		
 		this.checkrecs.setLabel('checked recs')
 		this.checkattr.setLabel('checked attrs')
@@ -115,6 +125,7 @@ export class DatasetCardComponent extends HTMLElement
 		}).format(date)
 		
 		this.dtitle.textContent = dataset.dataset_name
+		this.img.src = dataset.dataset_img_url.length > 0 ? dataset.dataset_img_url : 'dataset-placeholder.png'
 		this.checkrecs.setData('' + dataset.tested_records)
 		this.checkattr.setData('123')
 		this.failedrecs.setData('' + dataset.failed_records)

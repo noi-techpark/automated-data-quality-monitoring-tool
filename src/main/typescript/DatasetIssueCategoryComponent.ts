@@ -33,12 +33,14 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 		sroot.innerHTML = `
 						<style>
 							:host {
+								display: inline-block;
+								box-shadow: 4px 4px #ccc;
 							}
 							.category {
 								border: 1px solid gray;
 								width: 12rem;
 								display: inline-block;
-								margin: 1rem;
+								/* margin: 1rem; */
 							}
 							.category > img {
 								width: 100%;
@@ -48,6 +50,8 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 								text-align: center;
 								margin-top: 0.4rem;
 								margin-bottom: 0.4rem;
+								line-height: 1rem;
+								height: 2rem;
 							}
 							.frame {
 								display: flex
@@ -148,7 +152,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 		const date = new Date(data.session_start_ts)
 		
 		const perc = cs_cast(HTMLElement, cat.querySelector('.perc'))
-		perc.textContent = '' + (data.failed_records * 100 / data.tot_records)
+		perc.textContent = '' + ((data.tot_records - data.failed_records) * 100 / data.tot_records).toFixed(1)
 				
 		const dateformat = new Intl.DateTimeFormat('it-IT', {
 					year: 'numeric',
@@ -197,8 +201,8 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 						    datasets: [
 						      {
 						        label: 'Dataset 1',
-						        data: [arg1.failed_records, arg1.tot_records - arg1.failed_records, ],
-								backgroundColor: ['#222', '#fff']
+						        data: [arg1.tot_records - arg1.failed_records, arg1.failed_records, ],
+								backgroundColor: ['#0a0', '#222', ]
 						      }
 						    ]
 						  },

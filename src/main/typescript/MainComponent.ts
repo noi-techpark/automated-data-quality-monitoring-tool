@@ -27,6 +27,11 @@ export class MainComponent extends HTMLElement
 		this.sroot = this.attachShadow({ mode: 'open' })
 		this.sroot.innerHTML = `
 			<link rel="stylesheet" href="index.css">
+			<style>
+				cs-menu-element {
+					width: 12rem;
+				}
+			</style>
 			<div class="MainComponent">
 				<div class="header">
 					<img class="logo" src="NOI_OPENDATAHUB_NEW_BK_nospace-01.svg">

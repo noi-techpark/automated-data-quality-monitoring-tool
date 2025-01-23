@@ -289,7 +289,7 @@ export class DatasetIssuesDetail extends HTMLElement
 				const issue = json[i]
 				// console.log(issue)
 				const section = new OpenCloseSection()
-				section.refresh(issue.check_name, '' + issue.nr_records + ' records')
+				section.refresh('failed: ' + issue.check_name, '' + issue.nr_records + ' records')
 				this.container.appendChild(section)
 				
 				section.onopen = async () => {
@@ -310,7 +310,8 @@ export class DatasetIssuesDetail extends HTMLElement
 						{
 							const sectionRow2 = new SectionRow();
 							section.addElementToContentArea(sectionRow2)
-							sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
+							// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
+							sectionRow2.refresh(list[k2].problem_hint)
 							sectionRow2.onclick = () => {
 								alert(list[k2].record_json)
 							}
@@ -330,7 +331,8 @@ export class DatasetIssuesDetail extends HTMLElement
 								{
 									const sectionRow2 = new SectionRow();
 									sectionRow.addElementToContentArea(sectionRow2)
-									sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
+									// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
+									sectionRow2.refresh(list[k2].problem_hint)
 									sectionRow2.onclick = () => {
 										alert(list[k2].record_json)
 									}
@@ -383,7 +385,7 @@ export class DatasetIssuesDetail extends HTMLElement
 						{
 							const sectionRow = new SectionRow();
 							sectionRow2.addElementToContentArea(sectionRow)
-							sectionRow.refresh(json2[k].check_name)
+							sectionRow.refresh("failed: " + json2[k].check_name)
 						}
 					}
 				}
