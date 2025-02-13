@@ -31,6 +31,8 @@ export class DatasetIssuesByCategories extends HTMLElement
 	
 	info_and_settings
 	
+	noissues
+	
 	constructor() {
 		super()
 		this.connected_promise = new Promise(s => this.connected_func = s)
@@ -52,7 +54,8 @@ export class DatasetIssuesByCategories extends HTMLElement
 								font-weight: bold;
 							}
 							.frame {
-								display: flex
+								display: flex;
+								align-items: start;
 							}
 							.frame .content {
 								flex-grow: 100;
@@ -72,8 +75,12 @@ export class DatasetIssuesByCategories extends HTMLElement
 								margin-top: 1rem;
 								margin-left: 1rem;
 							}
+							.noissues {
+								display: none;
+							}
 						</style>
 						<div class="frame">
+							<div class="noissues">sound good, no problems found here!</div>
 							<div class="content"></div>
 							<cs-general-info-and-settings></cs-general-info-and-settings>
 							<!--<img src="kpi-general-info.png">-->
@@ -83,6 +90,7 @@ export class DatasetIssuesByCategories extends HTMLElement
 		this.content = cs_cast(HTMLElement, this.sroot.querySelector('.content'));
 		this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
 
+		this.noissues = cs_cast(HTMLDivElement, this.sroot.querySelector('.noissues'))
 	}
 	
 	async refresh(p_session_start_ts: string, p_dataset_name: string, p_failed_records: number, p_tot_records: number) {
@@ -102,8 +110,9 @@ export class DatasetIssuesByCategories extends HTMLElement
 			const category = new DatasetIssueCategoryComponent();
 			this.content.appendChild(category);
 			category.refresh(resp[i])
-			
 		}
+		this.noissues.style.display = resp.length == 0 ? 'block' : 'none';
+			
 	}
 
 
