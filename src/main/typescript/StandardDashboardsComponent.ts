@@ -13,6 +13,9 @@ export class StandardDashboardsComponent extends HTMLElement
 	sroot
 	
 	boxContainer;
+	
+	boxes: DatasetCardComponent[] = []
+	titles: string[] = []
 
 	constructor()
 	{
@@ -23,19 +26,40 @@ export class StandardDashboardsComponent extends HTMLElement
 			<link rel="stylesheet" href="index.css">
 			<div class="ProjectsElement">
 				<div class="title" style="padding: 1rem">standard dashboards</div>
-				<input>
-				<!-- <img src="dashitems.png" style="max-width: 100%"> --> 
+				<div class="searchbar">
+					<input> 🔍 <span class="clearinput">✕</span>
+				</div>
 				<div class="container"></div>
 			</div>
 		`
 		this.boxContainer = cs_cast(HTMLDivElement, this.sroot.querySelector('.container'))
 
 		this.boxContainer.textContent = ("loading ...");
+		
+		const refreshlist = () => {
+			for (let b = 0; b < this.titles.length; b++)
+				if (this.titles[b].toLowerCase().indexOf(input.value.toLowerCase()) >= 0)
+					this.boxes[b].style.display = 'block'
+				else
+					this.boxes[b].style.display = 'none'
+		}
+
+		const input = this.sroot.querySelector('input')!
+		input.oninput = refreshlist
+		
+		const clearinput = <HTMLSpanElement> this.sroot.querySelector('.clearinput')!
+		clearinput.onclick = () => {
+			input.value = ''
+			refreshlist()
+		}
+		
 	}
 	
 
 	async refresh()
 	{
+		this.boxes = []
+		this.titles = []
 		this.boxContainer.textContent = ('');
 		const loader = new Loader();
 		this.boxContainer.appendChild(loader)
@@ -47,6 +71,8 @@ export class StandardDashboardsComponent extends HTMLElement
 			const box = new DatasetCardComponent();
 			this.boxContainer.appendChild(box)
 			box.refresh(dataset)
+			this.boxes.push(box)
+			this.titles.push(dataset.dataset_name)
 		}
 		
 	} 
