@@ -44,6 +44,17 @@ export class OpenCloseSection extends HTMLElement
 						transition: transform 1s;
 						transform-origin: top;
 					}
+					
+					span.label::before {
+					  content: "";
+					  display: inline-block;
+					  width: 8px;
+					  height: 8px;
+					  background-color: red;
+					  border-radius: 50%;
+					  margin-right: 5px;
+					}
+					
 				</style>
 				<div class="header">
 				<span class="label">title</span>

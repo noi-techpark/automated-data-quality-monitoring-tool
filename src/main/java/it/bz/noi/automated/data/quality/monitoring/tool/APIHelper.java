@@ -120,7 +120,7 @@ public class APIHelper
 				  from catchsolve_noiodh.test_dataset_history_vw
 				 where dataset_name = ?
 				   and check_category = ?
-				 order by dataset_name, session_start_ts desc
+				 order by dataset_name, session_start_ts asc
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
 		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());

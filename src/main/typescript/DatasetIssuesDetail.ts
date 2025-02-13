@@ -220,10 +220,13 @@ export class DatasetIssuesDetail extends HTMLElement
 					const goodarr = []
 					const failarr = []
 					
+					const labels  = []
+					
 					for (let x = 0; x < data.length; x++)
 					{
 						goodarr.push(data[x].tested_records - data[x].failed_recs)
 						failarr.push(data[x].failed_recs)
+						labels.push(data[x].session_start_ts.slice(0,16).replace('T', ' '))
 					}
 					
 					console.log(goodarr)
@@ -232,6 +235,7 @@ export class DatasetIssuesDetail extends HTMLElement
 					console.log(data)
 					
 					const chartjs = await this.chartjs_promise
+					chartjs.data.labels = labels
 					chartjs.data.datasets = [
 												{
 													label: 'fail trend',
