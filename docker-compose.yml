@@ -1,0 +1,8 @@
+services:
+  api:
+    build:
+      dockerfile: infrastructure/docker/Dockerfile
+      context: .
+      target: build
+    ports:
+      - 8080:8080
