@@ -9,7 +9,6 @@ import { OpenCloseSection } from "./OpenCloseSection.js";
 import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
 import { DatasetIssueCategoryComponent } from "./DatasetIssueCategoryComponent.js";
-import Chart = require("chart.js");
 import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
 
 export class DatasetIssuesDetail extends HTMLElement
@@ -65,6 +64,7 @@ export class DatasetIssuesDetail extends HTMLElement
 	
 	constructor() {
 		super()
+		this.chartjs_success = (s) => {} // dummy initialization, next line will init chartjs_success but compiler don't understand this!
 		this.chartjs_promise = new Promise(s => this.chartjs_success = s)
 		this.sroot = this.attachShadow({ mode: 'open' })
 		this.sroot.innerHTML = `

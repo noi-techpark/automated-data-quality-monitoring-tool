@@ -3,9 +3,7 @@
  * License: AGPL
  */
 
-import Chart = require("chart.js")
 import { LabelAndData } from "./LabelAndData.js"
-import { Loader } from "./Loader.js"
 import { API3, catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__row } from "./api/api3.js"
 import { cs_cast } from "./quality.js"
 

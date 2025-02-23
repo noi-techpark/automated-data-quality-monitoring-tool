@@ -8,7 +8,6 @@
 
 # node
 /node_modules/
-/package-lock.json
 /src/main/java/tmp/
 /src/main/java/it/bz/noi/automated/data/quality/monitoring/tool/tester/
 
