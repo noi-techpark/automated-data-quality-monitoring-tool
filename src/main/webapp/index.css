@@ -3,10 +3,16 @@
  * License: AGPL
  */
 
+
+@font-face {
+    font-family: 'SourceSansPro';
+    src: url('SourceSansPro-Regular.ttf');
+}
+
 html {
 	color: #555;
 	font-size: 16px;
-	font-family: sans
+	font-family: SourceSansPro
 }
 
 .MainComponent .logo {
@@ -53,7 +59,7 @@ html {
 .ProjectsElement .container {
 	display: inline-flex;
 	flex-wrap: wrap;
-	justify-content: space-around;
+	justify-content: flex-start;
 }
 
 .ProjectsElement > .title {
