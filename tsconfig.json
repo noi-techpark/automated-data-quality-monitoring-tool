@@ -1,7 +1,3 @@
-/*
- * (C) 2024 Catch Solve di Davide Montesin
- * License: AGPL
- */
 {
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */

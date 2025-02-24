@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # Automated data quality monitoring tool
 
 
