@@ -2,10 +2,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-/*
- * (C) 2024 Catch Solve di Davide Montesin
- * License: AGPL
- */
 
 import { LabelAndData } from "./LabelAndData.js"
 import { API3, catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__row } from "./api/api3.js"

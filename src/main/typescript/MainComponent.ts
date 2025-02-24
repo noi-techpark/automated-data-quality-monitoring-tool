@@ -2,10 +2,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-/*
- * (C) 2024 Catch Solve di Davide Montesin
- * License: AGPL
- */
 
 import {MenuComponent} from './MenuComponent.js'
 import {StandardDashboardsComponent} from './StandardDashboardsComponent.js'
