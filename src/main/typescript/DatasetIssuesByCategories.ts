@@ -29,7 +29,7 @@ export class DatasetIssuesByCategories extends HTMLElement
 	
 	sroot
 	
-	info_and_settings
+	// info_and_settings
 	
 	noissues
 	
@@ -82,20 +82,20 @@ export class DatasetIssuesByCategories extends HTMLElement
 						<div class="frame">
 							<div class="noissues">sound good, no problems found here!</div>
 							<div class="content"></div>
-							<cs-general-info-and-settings></cs-general-info-and-settings>
+							<!--<cs-general-info-and-settings></cs-general-info-and-settings>-->
 							<!--<img src="kpi-general-info.png">-->
 						</div>
 						`;
 		customElements.upgrade(this.sroot);
 		this.content = cs_cast(HTMLElement, this.sroot.querySelector('.content'));
-		this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
+		// this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
 
 		this.noissues = cs_cast(HTMLDivElement, this.sroot.querySelector('.noissues'))
 	}
 	
 	async refresh(p_session_start_ts: string, p_dataset_name: string, p_failed_records: number, p_tot_records: number) {
 		
-		this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records);
+		// this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records);
 		
 		const loader = new Loader()
 		this.content.appendChild(loader)
