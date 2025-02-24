@@ -136,10 +136,9 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 
 export interface catchsolve_noiodh__test_dataset_history_vw__row {
 	check_category: string
+	check_stats: string
 	dataset_name: string
-	failed_recs: number
 	session_start_ts: string
-	tested_records: number
 }
 
 export interface catchsolve_noiodh__test_dataset_max_ts_vw__row {
@@ -213,10 +212,9 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 
 export interface catchsolve_noiodh__test_dataset_history_vw__byexample {
 	check_category?: string
+	check_stats?: string
 	dataset_name?: string
-	failed_recs?: number
 	session_start_ts?: string
-	tested_records?: number
 }
 
 export interface catchsolve_noiodh__test_dataset_max_ts_vw__byexample {

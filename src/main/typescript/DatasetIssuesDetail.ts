@@ -36,7 +36,7 @@ export class DatasetIssuesDetail extends HTMLElement
 
 	issues: HTMLSpanElement;
 	records: HTMLSpanElement;
-    info_and_settings: GeneralInfoAndSettings;
+    // info_and_settings: GeneralInfoAndSettings;
 
 	connectedCallback()
 	{
@@ -117,7 +117,7 @@ export class DatasetIssuesDetail extends HTMLElement
 					<div class="chart">
 						<canvas></canvas>
 					</div>
-					<cs-general-info-and-settings></cs-general-info-and-settings>
+					<!--<cs-general-info-and-settings></cs-general-info-and-settings>-->
 				</div>
 				<div style="width: calc(100% - 20px)">
 					<div style="text-align: right" class="actions">
@@ -151,7 +151,7 @@ export class DatasetIssuesDetail extends HTMLElement
 		
 		this.canvas = cs_cast(HTMLCanvasElement, this.sroot.querySelector('canvas'));
 		
-		this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
+		// this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
 
 
 	}
@@ -203,7 +203,7 @@ export class DatasetIssuesDetail extends HTMLElement
 		this.last_failed_records = p_failed_records
 		this.last_tot_records = p_tot_records
 		
-		this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records)
+		// this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records)
 		
 		console.log(p_session_start_ts)
 		console.log(p_dataset_name)
@@ -217,25 +217,54 @@ export class DatasetIssuesDetail extends HTMLElement
 						check_category: this.last_check_category!
 					})
 					
-					const goodarr = []
-					const failarr = []
+					// const goodarr  = []
+					// const failarr  = []
 					
-					const labels  = []
+					const labels   = []
+					const datasets = []
 					
 					for (let x = 0; x < data.length; x++)
 					{
+						const row = data[x]
+						labels.push(row.session_start_ts.slice(0,16).replace('T', ' '))
+						const check_stats = JSON.parse(row.check_stats);
+						console.log(check_stats)
+						for (let c = 0; c < check_stats.length; c++)
+						{
+							const check_stat = check_stats[c]
+							let found = false;
+							for (let d = 0; d < datasets.length; d++)
+							{
+								if (datasets[d].label == check_stat.check_name)
+								{
+									datasets[d].data.push(check_stat.failed_recs)
+									found = true
+									break;
+								}
+							}
+							if (!found)
+							{
+								datasets.push({
+									label: check_stat.check_name,
+									data: [check_stat.failed_recs],
+									fill: false,
+									backgroundColor: '#aaa',
+									borderColor: '#aaa',
+									tension: 0.1
+								})
+							}
+						}
+						/*
 						goodarr.push(data[x].tested_records - data[x].failed_recs)
 						failarr.push(data[x].failed_recs)
-						labels.push(data[x].session_start_ts.slice(0,16).replace('T', ' '))
+						 */
 					}
-					
-					console.log(goodarr)
-					console.log(failarr)
-					
-					console.log(data)
 					
 					const chartjs = await this.chartjs_promise
 					chartjs.data.labels = labels
+					chartjs.data.datasets = datasets
+					
+					/*
 					chartjs.data.datasets = [
 												{
 													label: 'fail trend',
@@ -254,6 +283,7 @@ export class DatasetIssuesDetail extends HTMLElement
 													tension: 0.1
 												},						
 											]
+					*/
 											
 					chartjs.update()
 									
