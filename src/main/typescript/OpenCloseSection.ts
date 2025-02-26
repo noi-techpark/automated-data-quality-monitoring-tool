@@ -45,6 +45,7 @@ export class OpenCloseSection extends HTMLElement
 						transform-origin: top;
 					}
 					
+					/*
 					span.label::before {
 					  content: "";
 					  display: inline-block;
@@ -54,6 +55,15 @@ export class OpenCloseSection extends HTMLElement
 					  border-radius: 50%;
 					  margin-right: 5px;
 					}
+					 */
+					
+					.nextpagebutton {
+															margin: auto;
+															display: block;
+															background-color: black;
+															color: white;
+														}
+														
 					
 				</style>
 				<div class="header">

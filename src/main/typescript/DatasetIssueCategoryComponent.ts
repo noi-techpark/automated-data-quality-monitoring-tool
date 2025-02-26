@@ -86,10 +86,16 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 							}
 														
 							.view_details {
-								background-color: var(--dark-background);
+								/* background-color: var(--dark-background); */
+								background-color: rgb(71, 105, 41);
 								color: #ddd;
 								text-align: center;
 								padding: 0.6rem;
+								cursor: pointer;
+							}
+							
+							.view_details:hover {
+								background-color: rgb(35, 75, 20);
 							}
 
 							.lastupdate {
@@ -114,7 +120,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 							</div>
 							<div class="category_name">Completeness</div>
 							<span></span>
-							<cs-label-and-data label="failed recs" class="nr_records"></cs-label-and-data>
+							<cs-label-and-data label="quality-assured recs" class="nr_records"></cs-label-and-data>
 							<div class="lastupdate">
 								<span class="data"></span>
 								<span></span>
@@ -122,7 +128,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 							<!-- <div class="nr_records">123</div> -->
 							<div class="more">
 								<details>
-									<summary>failed check list</summary>
+									<summary>carried out tests</summary>
 								</details>
 								<div class="view_details">View details</div>
 							</div>
@@ -146,7 +152,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 		const cat_name = cs_cast(HTMLElement, cat.querySelector('.category_name'))
 		cat_name.textContent = data.check_category
 		const failedelement = cs_cast(LabelAndData, cat.querySelector('.nr_records'))
-		failedelement.setData('' + data.failed_records)
+		failedelement.setData('' + (data.tot_records - data.failed_records))
 		const last_update = cs_cast(HTMLSpanElement, cat.querySelector('.lastupdate .data'))
 		const date = new Date(data.session_start_ts)
 		

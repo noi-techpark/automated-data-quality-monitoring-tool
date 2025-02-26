@@ -52,10 +52,14 @@ export class DatasetCardComponent extends HTMLElement
 				}
 				
 				.view_dashboard {
-					background-color: var(--dark-background);
+					/* background-color: var(--dark-background); */
+					background-color: rgb(71, 105, 41);
 					color: #ddd;
 					text-align: center;
 					padding: 0.6rem;
+				}
+				.view_dashboard:hover {
+					background-color: rgb(35, 75, 20);
 				}
 				
 				.wrapper {
@@ -102,7 +106,7 @@ export class DatasetCardComponent extends HTMLElement
 		
 		this.checkrecs.setLabel('checked recs')
 		this.checkattr.setLabel('checked attrs')
-		this.failedrecs.setLabel('failed recs')
+		this.failedrecs.setLabel('quality-assured recs')
 		
 		// this.failedrecs.setSeverity("fail")
 		// this.failedrecs.setData('123')
@@ -128,7 +132,7 @@ export class DatasetCardComponent extends HTMLElement
 		this.img.src = dataset.dataset_img_url.length > 0 ? dataset.dataset_img_url : 'dataset-placeholder.png'
 		this.checkrecs.setData('' + dataset.tested_records)
 		this.checkattr.setData('123')
-		this.failedrecs.setData('' + dataset.failed_records)
+		this.failedrecs.setData('' + (dataset.tested_records - dataset.failed_records))
 		const quality_ratio = dataset.tested_records == 0 ? 100 : dataset.failed_records / dataset.tested_records
 		if (quality_ratio < 0.1)
 			this.failedrecs.setQualityLevel("good")

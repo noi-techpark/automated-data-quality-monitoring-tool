@@ -108,6 +108,16 @@ export class DatasetIssuesDetail extends HTMLElement
 						cursor: pointer;
 					}
 					
+					.nextpagebutton {
+															margin: auto;
+															display: block;
+															background-color: black;
+															color: white;
+														}
+														
+					
+
+				
 				</style>
 				<!-- <img src="kpi-detail.png" style="max-width: 100%"> -->
 				<div class="header">
@@ -159,7 +169,7 @@ export class DatasetIssuesDetail extends HTMLElement
 	extractHumanReadableName(record_jsonpath: string, json: string): string
 	{
 		let ret = '';
-		for (let fn of ['mvalidtime', 'mvalue', 'AccoDetail.de.Name', 'Detail.de.Title'])
+		for (let fn of ['sname', 'mvalidtime', 'mvalue', 'AccoDetail.de.Name', 'Detail.de.Title'])
 		{
 			const fn_parts = fn.split('.')
 			let val = JSON.parse(json)
@@ -323,10 +333,45 @@ export class DatasetIssuesDetail extends HTMLElement
 				const issue = json[i]
 				// console.log(issue)
 				const section = new OpenCloseSection()
-				section.refresh('failed: ' + issue.check_name, '' + issue.nr_records + ' records')
+				section.refresh(issue.check_name, 'failed: ' + issue.nr_records + ' records')
 				this.container.appendChild(section)
 				
 				section.onopen = async () => {
+					
+					const moreButton = document.createElement('button')
+					moreButton.classList.add('nextpagebutton')
+					moreButton.textContent = 'next 100'
+					section.addElementToContentArea(moreButton)
+					let list_offset = 0
+					const nextFun = async () => {
+						
+						const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
+														session_start_ts: p_session_start_ts,
+														dataset_name: p_dataset_name,
+														check_category: p_category_name,
+														check_name: issue.check_name,
+														limit: 100,
+														offset: list_offset
+											});
+						
+						// const list = groupBy[keys[0]]
+						for (let k2 = 0; k2 < json2.length; k2++)
+						{
+							const sectionRow2 = new SectionRow();
+							// section.addElementToContentArea(sectionRow2)
+							moreButton.parentElement!.insertBefore(sectionRow2, moreButton)
+							sectionRow2.refresh(this.extractHumanReadableName(json2[k2].record_jsonpath, json2[k2].record_json))
+							// sectionRow2.refresh(json2[k2].problem_hint)
+							sectionRow2.onclick = () => {
+								alert(json2[k2].record_json)
+							}
+						}
+						list_offset += 100
+					}
+					moreButton.onclick = nextFun
+					nextFun()
+					
+					/*
 					//console.log('sezione aperta, ricarico!')
 					const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
 								session_start_ts: p_session_start_ts,
@@ -339,17 +384,24 @@ export class DatasetIssuesDetail extends HTMLElement
 					console.log(keys)
 					if (keys.length == 1 && keys[0] == '')
 					{
-						const list = groupBy[keys[0]]
-						for (let k2 = 0; k2 < list.length; k2++)
-						{
-							const sectionRow2 = new SectionRow();
-							section.addElementToContentArea(sectionRow2)
-							// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
-							sectionRow2.refresh(list[k2].problem_hint)
-							sectionRow2.onclick = () => {
-								alert(list[k2].record_json)
+						const moreButton = document.createElement('button')
+						moreButton.textContent = 'next 10'
+						section.addElementToContentArea(moreButton)
+						const nextFun = () => {
+							const list = groupBy[keys[0]]
+							for (let k2 = 0; k2 < list.length; k2++)
+							{
+								const sectionRow2 = new SectionRow();
+								section.addElementToContentArea(sectionRow2)
+								// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
+								sectionRow2.refresh(list[k2].problem_hint)
+								sectionRow2.onclick = () => {
+									alert(list[k2].record_json)
+								}
 							}
+							
 						}
+						moreButton.onclick = nextFun
 					}
 					else
 					{
@@ -374,6 +426,7 @@ export class DatasetIssuesDetail extends HTMLElement
 							}
 						}
 					}
+					*/
 				}
 			}
 					
@@ -385,17 +438,55 @@ export class DatasetIssuesDetail extends HTMLElement
 			this.issues.classList.remove('selected')
 			this.records.classList.add('selected')
 			
-			const loader = new Loader();
-			this.container.appendChild(loader)
+			const moreButton = document.createElement('button')
+			moreButton.classList.add('nextpagebutton')
+			moreButton.textContent = 'next 100'
+			this.container.appendChild(moreButton)
+			let list_offset = 0
+			const nextFun = async () => {
 
-			const json = await API3.list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw({
-				session_start_ts: p_session_start_ts,
-				dataset_name: p_dataset_name,
-				check_category: p_category_name
-			});
-			
-			loader.remove();
+				const loader = new Loader();
+				this.container.appendChild(loader)
 
+				const list = await API3.list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw({
+					session_start_ts: p_session_start_ts,
+					dataset_name: p_dataset_name,
+					check_category: p_category_name,
+					offset: list_offset,
+					limit: 100
+				});
+				loader.remove();
+				for (let k2 = 0; k2 < list.length; k2++)
+				{
+					const sectionRow2 = new OpenCloseSection();
+					// this.container.appendChild(sectionRow2)
+					moreButton.parentElement!.insertBefore(sectionRow2, moreButton)
+					sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), '' + list[k2].nr_check_names + ' check failed')
+					
+					
+					sectionRow2.onclick = async () => {
+							const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
+														session_start_ts: p_session_start_ts,
+														dataset_name: p_dataset_name,
+														check_category: p_category_name,
+														record_jsonpath: list[k2].record_jsonpath
+												});
+
+						for (let k = 0; k < json2.length; k++)
+						{
+							const sectionRow = new SectionRow();
+							sectionRow2.addElementToContentArea(sectionRow)
+							sectionRow.refresh("failed: " + json2[k].check_name)
+						}
+					}
+				}
+				list_offset += 100
+			}
+			moreButton.onclick = nextFun
+			nextFun()
+
+	
+			/*
 			const groupBy = this.groupRecords(json)
 			const keys = Object.keys(groupBy)
 			console.log(keys)
@@ -459,6 +550,7 @@ export class DatasetIssuesDetail extends HTMLElement
 					}
 				}
 			}
+			 */
 		}
 	}
 }

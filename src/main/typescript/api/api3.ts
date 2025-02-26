@@ -208,6 +208,8 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 	record_json?: string
 	record_jsonpath?: string
 	session_start_ts?: string
+	offset?: number
+	limit? : number
 }
 
 export interface catchsolve_noiodh__test_dataset_history_vw__byexample {
@@ -235,6 +237,8 @@ export interface catchsolve_noiodh__test_dataset_record_check_failed__byexample 
 	record_json?: string
 	record_jsonpath?: string
 	session_start_ts?: string
+	offset?: number
+	limit? : number
 }
 
 // end interfaces
