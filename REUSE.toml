@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2025 NOI Techpark <digital@noi.bz.it>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+version = 1
+SPDX-PackageName = "automated-data-quality-monitoring-tool"
+SPDX-PackageSupplier = "NOI Techpark <digital@noi.bz.it>"
+SPDX-PackageDownloadLocation = "https://github.com/noi-techpark/automated-data-quality-monitoring-tool"
+
+[[annotations]]
+path = ["package.json", "package-lock.json", "tsconfig.json", "COPYRIGHT"]
+SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
+SPDX-License-Identifier = "CC0-1.0"
+
+# [[annotations]]
+# SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
+# SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+
+

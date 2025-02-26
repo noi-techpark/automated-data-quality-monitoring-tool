@@ -1,7 +1,9 @@
 <!--
- * (C) 2024 Catch Solve di Davide Montesin
- * License: AGPL
- -->
+SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">

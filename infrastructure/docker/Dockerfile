@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 NOI Techpark <digital@noi.bz.it>
+#
+# SPDX-License-Identifier: CC0-1.0
+
 FROM maven:3-eclipse-temurin-21-alpine AS build-env
 
 WORKDIR /app

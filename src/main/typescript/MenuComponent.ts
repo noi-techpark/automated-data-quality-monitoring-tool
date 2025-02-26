@@ -1,7 +1,7 @@
-/*
- * (C) 2024 Catch Solve di Davide Montesin
- * License: AGPL
- */
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 
 import { Loader } from './Loader.js';
 import {API3} from './api/api3.js';
