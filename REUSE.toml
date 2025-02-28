@@ -8,9 +8,15 @@ SPDX-PackageSupplier = "NOI Techpark <digital@noi.bz.it>"
 SPDX-PackageDownloadLocation = "https://github.com/noi-techpark/automated-data-quality-monitoring-tool"
 
 [[annotations]]
-path = ["package.json", "package-lock.json", "tsconfig.json", "COPYRIGHT"]
+path = ["infrastructure/**"]
+SPDX-FileCopyrightText = "2025 NOI Techpark <ditigal@noi.bz.it>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["package.json", "package-lock.json", "tsconfig.json", "COPYRIGHT", "src/main/webapp/*"]
 SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
 SPDX-License-Identifier = "CC0-1.0"
+precedence = "closest"
 
 # [[annotations]]
 # SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
