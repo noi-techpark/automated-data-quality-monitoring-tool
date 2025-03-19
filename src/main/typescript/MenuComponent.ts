@@ -49,14 +49,30 @@ export class MenuComponent extends HTMLElement
 					background: #666;
 					color: white;
 				}
+				.title.close ~ .submenus {
+					display: none;
+				}
+				.openclose {
+					cursor: pointer;
+				}
+				.openclose:before {
+					content: "▲"
+				}
+				.title.close .openclose:before {
+					content: "▼"
+				}
 			</style>
-			<div class="title">▲ standard dashboards</div>
+			<div class="title"><span class="openclose"></span> standard dashboards</div>
 			<div class="submenus"></div>
 		`;
 		this.submenus = cs_cast(HTMLElement, this.sroot.querySelector('div.submenus'));
 		const title = cs_cast(HTMLElement, this.sroot.querySelector('div.title'))
 		this.menuitemByName[''] = title
+		
 		title.onclick = () => { location.hash = ''}
+		
+		const openclose = cs_cast(HTMLElement, this.sroot.querySelector('span.openclose'));
+		openclose.onclick = () => { title.classList.toggle('close') }
 
 		let menuready_fun: (x: null) => void
 		this.menuready_promise = new Promise(s => menuready_fun = s)
