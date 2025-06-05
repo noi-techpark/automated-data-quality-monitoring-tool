@@ -1,0 +1,8 @@
+These JSON files can be imported in keycloak to create the two clients needed by the tool
+
+# web
+After import, update the URLs to reflect your deployment domain
+
+# job
+After import, create a new client_secret and share it with the tool operator.
+Access roles for the OpenDataHub apis have to be assigned manually to the service account.
