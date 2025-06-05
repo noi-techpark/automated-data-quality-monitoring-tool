@@ -63,7 +63,8 @@
     "profile",
     "roles",
     "email",
-    "odh-timeseries-api"
+    "odh-timeseries-api",
+    "odh-api-core-scope"
   ],
   "optionalClientScopes": [
     "address",
