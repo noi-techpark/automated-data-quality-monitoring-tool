@@ -33,10 +33,19 @@ export class MainComponent extends HTMLElement
 				}
 			</style>
 			<div class="MainComponent">
-				<div class="header">
-					<img class="logo" src="NOI_OPENDATAHUB_NEW_BK_nospace-01.svg">
+				<div class="header" style="position: relative">
+					<img class="logo" src="NOI_OPENDATAHUB_NEW_BK_nospace-01.svg" >
+
+					<a 
+						href="https://europa.provincia.bz.it/it/informazione-e-visibilita-fesr"
+					>
+						<img src="https://databrowser.impact.digital.noi.bz.it/EFRmod.png"
+							alt="Autonomous Province of Bolzano"
+							style="position: absolute; top: 10px; right: 20px; height: 30px; " 
+						>
+					</a>
 				</div>
-				<div class="body">
+				<div class="body" style="margin-top: 20px">
 					<div class="projects"></div>
 				</div>
 			</div>

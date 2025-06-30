@@ -4,6 +4,9 @@
 
 /target/
 
+.env
+.vscode/
+
 # eclipse files
 /.settings/
 /.project
