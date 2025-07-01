@@ -59,6 +59,7 @@ jobs:
         env:
             SERVER_PORT: 1101
             DOCKER_IMAGE: ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}-app-impact
+            PROJECT_NAME: data-quality-monitoring-impact
         steps:
             - name: Checkout source code
               uses: actions/checkout@v2
@@ -66,8 +67,8 @@ jobs:
             - name: Create .env file
               uses: noi-techpark/github-actions/env-file@v2
               env:
-                  X_COMPOSE_PROJECT_NAME: ${{ env.PROJECT_NAME }}-impact
-                  X_DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}-impact
+                  X_COMPOSE_PROJECT_NAME: ${{ env.PROJECT_NAME }}
+                  X_DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}
                   X_DOCKER_TAG: ${{ env.DOCKER_TAG }}
 
                   X_SERVER_PORT: ${{ env.SERVER_PORT}}
