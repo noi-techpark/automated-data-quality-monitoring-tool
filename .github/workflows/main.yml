@@ -57,7 +57,7 @@ jobs:
             group: deploy-impact
             cancel-in-progress: true
         env:
-            SERVER_PORT: 1101
+            SERVER_PORT: 1024
             DOCKER_IMAGE: ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}-app-impact
             PROJECT_NAME: data-quality-monitoring-impact
         steps:
