@@ -13,7 +13,13 @@ SPDX-FileCopyrightText = "2025 NOI Techpark <ditigal@noi.bz.it>"
 SPDX-License-Identifier = "CC0-1.0"
 
 [[annotations]]
-path = ["package.json", "package-lock.json", "tsconfig.json", "COPYRIGHT", "src/main/webapp/*"]
+path = [
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "COPYRIGHT",
+    "src/main/webapp/*",
+]
 SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
 SPDX-License-Identifier = "CC0-1.0"
 precedence = "closest"
@@ -22,5 +28,19 @@ precedence = "closest"
 # SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
 # SPDX-License-Identifier = "AGPL-3.0-or-later"
 
-
-
+[[annotations]]
+path = [
+    "backend/README.md",
+    "backend/package.json",
+    "backend/package-lock.json",
+    "backend/tsconfig.json",
+    "backend/index.ts",
+    "backend/lib/**",
+    "backend/types/**",
+    "backend/prisma/**",
+    "backend/docker**",
+    "backend/.**",
+]
+SPDX-FileCopyrightText = "2025 SysWhiteDev <commercial@syswhite.dev>"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+precedence = "closest"

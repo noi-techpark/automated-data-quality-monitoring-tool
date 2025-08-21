@@ -1,0 +1,66 @@
+
+let cachedToken: string | null = null;
+let tokenExpiry: number | null = null;
+interface KeycloakTokenResponse {
+  access_token: string;
+  expires_in: number;
+  refresh_expires_in: number;
+  token_type: string;
+  'not-before-policy': number;
+  scope: string;
+  [key: string]: unknown;
+}
+
+export async function getKeycloakToken(headers: Record<string, string> = {}): Promise<string | null> {
+  if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
+    return `Bearer ${cachedToken}`;
+  }
+
+  const url = `${process.env.KEYCLOAK_BASE_URL}realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`;
+
+  const body = new URLSearchParams({
+    client_id: process.env.KEYCLOAK_CLIENT_ID ?? '',
+    client_secret: process.env.KEYCLOAK_CLIENT_SECRET ?? '',
+    grant_type: 'client_credentials',
+  });
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        ...headers,
+      },
+      body,
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch token: ${response.status} ${response.statusText}`);
+      return null;
+    }
+
+    const data = (await response.json()) as KeycloakTokenResponse;
+
+    if (data.access_token && data.expires_in) {
+      cachedToken = data.access_token;
+      tokenExpiry = Date.now() + data.expires_in * 1000 - 30000;
+      return `Bearer ${cachedToken}`;
+    } else {
+      console.error('No access token received from Keycloak');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching Keycloak token:', error);
+    return null;
+  }
+}
+
+export function clearTokenCache() {
+  cachedToken = null;
+  tokenExpiry = null;
+}
+
+
+
+
+

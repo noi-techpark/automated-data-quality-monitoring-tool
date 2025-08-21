@@ -1,0 +1,23 @@
+{
+  "name": "odh-data-checker",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^24.0.13",
+    "prisma": "^6.11.0",
+    "tsx": "^4.20.3"
+  },
+  "scripts": {
+    "dev": "npx tsx watch ./index.ts",
+    "start": "npx tsx ./index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.11.0",
+    "isolated-vm": "^6.0.0",
+    "wildcard-match": "^5.1.4"
+  }
+}
