@@ -14,11 +14,11 @@ SPDX-License-Identifier = "CC0-1.0"
 
 [[annotations]]
 path = [
-    "package.json",
-    "package-lock.json",
-    "tsconfig.json",
     "COPYRIGHT",
-    "src/main/webapp/*",
+    "frontend/package.json",
+    "frontend/package-lock.json",
+    "frontend/tsconfig.json",
+    "frontend/src/main/webapp/*",
 ]
 SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
 SPDX-License-Identifier = "CC0-1.0"
