@@ -131,7 +131,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		<name>mvalidtime not older than 30 day</name>
 		<category>freshness quality</category>
 		<description>
-			this check that ...
+			This check verifies how many of the records associated to a station have a timestamp which is "fresh", i.e. within the last 30 days.
 		</description>
 		<!-- dataset shortname, if empty is tested on all datasets -->
 		<dataset_shortname></dataset_shortname>
