@@ -30,16 +30,7 @@ precedence = "closest"
 
 [[annotations]]
 path = [
-    "backend/README.md",
-    "backend/package.json",
-    "backend/package-lock.json",
-    "backend/tsconfig.json",
-    "backend/index.ts",
-    "backend/lib/**",
-    "backend/types/**",
-    "backend/prisma/**",
-    "backend/docker**",
-    "backend/.**",
+    "backend/**",
 ]
 SPDX-FileCopyrightText = "2025 SysWhiteDev <commercial@syswhite.dev>"
 SPDX-License-Identifier = "AGPL-3.0-or-later"

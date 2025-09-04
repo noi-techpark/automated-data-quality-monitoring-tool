@@ -1,4 +1,3 @@
-
 let cachedToken: string | null = null;
 let tokenExpiry: number | null = null;
 interface KeycloakTokenResponse {
@@ -60,7 +59,10 @@ export function clearTokenCache() {
   tokenExpiry = null;
 }
 
-
-
-
-
+export const censorKey = (s: string) => {
+  if (!s) return s;
+  const len = s.length;
+  const keepCount = Math.ceil(len * 0.3);
+  const maskedCount = Math.max(0, len - keepCount);
+  return s.slice(0, keepCount) + "*".repeat(maskedCount);
+};
