@@ -2,6 +2,7 @@ import wildcardMatch from "wildcard-match";
 import prisma from "./db";
 import { getDatasetContent } from "./odhDatasets";
 import ivm from "isolated-vm";
+import { censorKey } from "./auth";
 
 const isolate = new ivm.Isolate({ memoryLimit: 128 });
 
@@ -9,7 +10,10 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
     const rules = await prisma.rules.findMany({});
     const dataset_name = json.Shortname || datasetName || "unknown_dataset";
 
-    let passedRules: { dataset_name: string; check_name: string }[] = [];
+    let passedRules: {
+        dataset_name: string; check_name: string,
+        used_key: string;
+    }[] = [];
     let failedRules: {
         dataset_name: string;
         record_jsonpath: string;
@@ -18,12 +22,14 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
         problem_hint: string;
         impacted_attributes_csv: string;
         check_category: string;
+        used_key: string;
     }[] = [];
 
     async function onRuleMatch(rule: any, key: string, keyValue: unknown, keyPath: string) {
         passedRules.push({
             dataset_name: dataset_name,
-            check_name: rule.name
+            check_name: rule.name,
+            used_key: censorKey(process.env.KEYCLOAK_CLIENT_SECRET as string) ?? "public"
         });
         console.log(`Rule "${rule.name}" Passed ✅ for key "${key}" at path "${keyPath}" with value:`, keyValue);
     }
@@ -37,6 +43,7 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
             problem_hint: hint ?? `Rule "${rule.name}" failed for key "${key}" with value: ${keyValue}`,
             impacted_attributes_csv: key,
             check_category: rule.type || "unknown",
+            used_key: censorKey(process.env.KEYCLOAK_CLIENT_SECRET as string) ?? "public"
         });
         console.log(`Rule "${rule.name}" Failed ❌ for key "${key}" at path "${keyPath}" with value:`, keyValue);
     }
@@ -74,8 +81,21 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
                 return;
             }
             seenDatasets.add(keyValue);
-            const datasetContent = await getDatasetContent(keyValue);
-            await recursiveJsonChecks(datasetContent, seenDatasets, dataset_name);
+            let pageNumber = 1;
+            while (true) {
+                const datasetContent = await getDatasetContent(keyValue, pageNumber);
+                await recursiveJsonChecks(datasetContent, seenDatasets, dataset_name);
+                if (datasetContent.TotalPages) {
+                    if (datasetContent.TotalPages == datasetContent.CurrentPage) {
+                        pageNumber = 1;
+                        break;
+                    } else {
+                        pageNumber++;
+                    }
+                } else {
+                    break;
+                }
+            }
             return;
         } else if (keyValueType === "object" && json[key] !== null) {
             await recursiveJsonChecks(json[key], seenDatasets, dataset_name, [...path, key]);
@@ -142,9 +162,7 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
                             const context = isolate.createContextSync();
                             const isolatedEnv = context.global;
                             isolatedEnv.setSync('log', (...args: any[]) => {
-                                console.log("-------- DEBUG ----------");
                                 console.log(...args);
-                                console.log("-------- END DEBUG ----------");
                             });
                             isolatedEnv.setSync('getKey', () => key);
                             isolatedEnv.setSync('getKeyValue', () => keyValue);
