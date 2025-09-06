@@ -44,11 +44,15 @@ The ODHDataChecker can be run natively or as a Docker container (recommended).
 
 ## Rules
 
-The ODHDataChecker validates data using a flexible rule system. Each rule specifies a `search filter`, a `type`, and a `value`, and is evaluated against data.
+The ODHDataChecker validates data using a flexible rule system. Each rule specifies a `search filter`, a `dataset_name_search_filter`, a `type`, and a `value`, and is evaluated against data.
 
 ### Search Filter
 
 The search filter is a wildcard pattern that matches keys in the data. If the key matches the pattern, the rule is applied to the corresponding data. This can be useful for running rules on specific keys or groups of keys in the data.
+
+### Dataset Search Filter
+
+The dataset search filter is a wildcard pattern matched against dataset names. If a dataset’s name matches the pattern, the rule is applied to that dataset’s data.
 
 ### Rule Types
 
