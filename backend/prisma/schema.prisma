@@ -9,28 +9,29 @@ datasource db {
 }
 
 model rules {
-  id           String   @id @default(uuid())
-  name         String
-  searchFilter String
-  type         String
-  value        String
-  createdAt    DateTime @default(now())
+  id                      String   @id @default(uuid())
+  name                    String
+  datasetNameSearchFilter String
+  searchFilter            String
+  type                    String
+  value                   String
+  createdAt               DateTime @default(now())
 }
 
 model test_dataset {
-  id BigInt @id @default(autoincrement())
-  session_start_ts DateTime @default(now())
-  dataset_name String
+  id                BigInt   @id @default(autoincrement())
+  session_start_ts  DateTime @default(now())
+  dataset_name      String
   dataset_dataspace String
-  tested_records Int @default(0)
-  dataset_img_url String
-  errors String @default("")
+  tested_records    Int      @default(0)
+  dataset_img_url   String
+  errors            String   @default("")
 
   @@unique([dataset_name, dataset_dataspace])
 }
 
 model test_dataset_check {
-  id             BigInt   @id @default(autoincrement())
+  id               BigInt   @id @default(autoincrement())
   session_start_ts DateTime @default(now())
   dataset_name     String
   check_name       String
@@ -40,16 +41,16 @@ model test_dataset_check {
 }
 
 model test_dataset_record_check_failed {
-  id                        BigInt   @id @default(autoincrement())
-  session_start_ts          DateTime @default(now())
-  dataset_name              String
-  record_jsonpath           String
-  check_name                String
-  record_json               String
-  impacted_attributes_csv   String
-  check_category            String
-  problem_hint              String
-  used_key                  String
+  id                      BigInt   @id @default(autoincrement())
+  session_start_ts        DateTime @default(now())
+  dataset_name            String
+  record_jsonpath         String
+  check_name              String
+  record_json             String
+  impacted_attributes_csv String
+  check_category          String
+  problem_hint            String
+  used_key                String
 
   @@map("test_dataset_record_check_failed")
 }
