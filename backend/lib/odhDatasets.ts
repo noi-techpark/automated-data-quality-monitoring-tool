@@ -54,7 +54,6 @@ export async function getDatasetLists(page?: number) {
                 await new Promise(resolve => setTimeout(resolve, waitSeconds * delayMultiplier * 1000));
                 delayMultiplier++;
             }
-            console.log(rawList)
         }
 
         return list;
@@ -87,11 +86,16 @@ export async function getDatasetContent(datasetLink: string, pageNumber: number 
                 delayMultiplier = 0;
                 break;
             } else {
-                const waitTime = rawContent.headers.get("Retry-After");
-                const waitSeconds = waitTime ? parseInt(waitTime, 10) : 5;
-                console.log(`⚠️ Rate limited. Waiting for ${waitSeconds * delayMultiplier} seconds before retrying...`);
-                await new Promise(resolve => setTimeout(resolve, waitSeconds * delayMultiplier * 1000));
-                delayMultiplier++;
+                if (rawContent.status === 429) {
+                    const waitTime = rawContent.headers.get("Retry-After");
+                    const waitSeconds = waitTime ? parseInt(waitTime, 10) : 5;
+                    console.log(`⚠️ Rate limited. Waiting for ${waitSeconds * delayMultiplier} seconds before retrying...`);
+                    await new Promise(resolve => setTimeout(resolve, waitSeconds * delayMultiplier * 1000));
+                    delayMultiplier++;
+                } else {
+                    console.log(`❌ Failed to fetch dataset content from ${datasetLinkWithPagination}. Status: ${rawContent.status}`);
+                    break;
+                }
             }
         }
 
