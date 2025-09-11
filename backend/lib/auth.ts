@@ -14,7 +14,6 @@ export async function getKeycloakToken(headers: Record<string, string> = {}): Pr
   if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
     return `Bearer ${cachedToken}`;
   }
-
   const url = `${process.env.KEYCLOAK_BASE_URL}realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`;
 
   const body = new URLSearchParams({
@@ -32,10 +31,10 @@ export async function getKeycloakToken(headers: Record<string, string> = {}): Pr
       },
       body,
     });
-
     if (!response.ok) {
-      console.error(`Failed to fetch token: ${response.status} ${response.statusText}`);
-      return null;
+      const errorText = await response.text();
+      console.error(`❌ Failed to fetch token: ${response.status} ${response.statusText}\nResponse: ${errorText}`);
+      process.exit(1);
     }
 
     const data = (await response.json()) as KeycloakTokenResponse;
@@ -46,11 +45,11 @@ export async function getKeycloakToken(headers: Record<string, string> = {}): Pr
       return `Bearer ${cachedToken}`;
     } else {
       console.error('No access token received from Keycloak');
-      return null;
+      process.exit(1);
     }
   } catch (error) {
     console.error('Error fetching Keycloak token:', error);
-    return null;
+    process.exit(1);
   }
 }
 
