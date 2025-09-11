@@ -26,6 +26,7 @@ model test_dataset {
   tested_records    Int      @default(0)
   dataset_img_url   String
   errors            String   @default("")
+  used_key          String
 
   @@unique([dataset_name, dataset_dataspace])
 }

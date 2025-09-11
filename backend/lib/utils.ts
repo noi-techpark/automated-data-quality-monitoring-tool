@@ -4,16 +4,73 @@ import { getDatasetContent } from "./odhDatasets";
 import ivm from "isolated-vm";
 import { censorKey } from "./auth";
 
-const isolate = new ivm.Isolate({ memoryLimit: 128});
+const isolate = new ivm.Isolate({ memoryLimit: 128 });
 
 let nrDataset = 0;
 let totalNrDatasets;
 async function getTotalDatasetsCount() {
     if (totalNrDatasets) return totalNrDatasets;
     const count = await prisma.test_dataset.count();
-    totalNrDatasets = count.toString();
-    return count.toString();
+    totalNrDatasets = count;
+    return count;
 }
+
+async function validateRules() {
+    const rules = await prisma.rules.findMany({});
+    let invalidFound = false;
+    if (rules.length === 0) {
+        console.warn("⚠️  No rules found. Exiting. Add rules to the database to enable rule checks.");
+        invalidFound = true;
+    } else {
+        for (const rule of rules) {
+            if (!rule.name || !rule.type || !rule.value || !rule.searchFilter) {
+                console.log(`❌ Invalid rule detected: ${JSON.stringify(rule)}`);
+                invalidFound = true;
+                break;
+            }
+            const validTypes = ["matches-wildcard", "null-check", "math-check", "javascript"];
+            if (!validTypes.includes(rule.type)) {
+                console.log(`❌ Invalid rule type: ${rule.type} in rule ${rule.name}`);
+                invalidFound = true;
+                break;
+            }
+            if (rule.type === "null-check" && !["no-null", "only-null"].includes(rule.value)) {
+                console.log(`❌ Invalid null-check value: ${rule.value} in rule ${rule.name}`);
+                invalidFound = true;
+                break;
+            }
+            if (rule.type === "math-check" && !/^(>=|<=|==|!=|>|<|=)\s*\d+(\.\d+)?$/.test(rule.value)) {
+                console.log(`❌ Invalid math-check value: ${rule.value} in rule ${rule.name}`);
+                invalidFound = true;
+                break;
+            }
+            if (rule.type === "javascript") {
+                try {
+                    const context = isolate.createContextSync();
+                    const isolatedEnv = context.global;
+                    isolatedEnv.setSync('log', () => { });
+                    isolatedEnv.setSync('getKey', () => 'testKey');
+                    isolatedEnv.setSync('getKeyValue', () => 'testValue');
+                    isolatedEnv.setSync('getKeyPath', () => 'test.path');
+                    isolatedEnv.setSync('getValueType', () => 'string');
+                    const code = `(function() { ${rule.value} })()`;
+                    context.evalSync(code);
+                    context.release();
+                } catch (e) {
+                    console.log(`❌ Invalid javascript in rule "${rule.name}". Error:`, e);
+                    invalidFound = true;
+                    break;
+                }
+            }
+        }
+    }
+    if (invalidFound) {
+        console.log("🚫 Exiting due to invalid rule set.");
+        process.exit(1);
+    }
+    console.log(`✅ All ${rules.length} rules validated successfully.`);
+};
+validateRules();
 
 let passedRules: {
     dataset_name: string; check_name: string,
@@ -48,14 +105,14 @@ async function ruleFlush() {
             failedRules = [];
         }
     } catch (e: any) {
-        console.log(e);
+        console.log("❌ Something went wrong while flushing new results: ", e);
         // should handle this better
         passedRules = [];
         failedRules = [];
         return;
     } finally {
-        const total = Number(await getTotalDatasetsCount()) || 0;
-        if (nrDataset <= total) {
+        const total = await getTotalDatasetsCount() || 0;
+        if ((nrDataset < total) || (nrDataset === 0 && total === 0)) {
             setTimeout(() => {
                 ruleFlush().catch(err => console.error('Scheduled ruleFlush error:', err));
             }, 10 * 1000);
@@ -66,9 +123,10 @@ async function ruleFlush() {
 }
 ruleFlush();
 
-export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, datasetName?: string, path: string[] = []) {
+export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, datasetName?: string, datasetDataSpace?: string, path: string[] = []) {
     const rules = await prisma.rules.findMany({});
     const dataset_name = json.Shortname || datasetName || "unknown_dataset";
+    const dataset_data_space = json.Dataspace || "unknown_dataspace";
 
     async function onRuleMatch(rule: any, key: string, keyValue: unknown, keyPath: string) {
         passedRules.push({
@@ -76,7 +134,9 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
             check_name: String(rule.name),
             used_key: String(censorKey(process.env.KEYCLOAK_CLIENT_SECRET as string) ?? "public")
         });
-        console.log(`Rule "${rule.name}" Passed ✅ for key "${key}" at path "${keyPath}" with value:`, keyValue);
+        if (process.env.LOG_LEVEL == "extended") {
+            console.log(`Rule "${rule.name}" Passed ✅ for key "${key}" at path "${keyPath}" with value:`, keyValue);
+        }
     }
 
     async function onRuleFail(rule: any, key: string, keyValue: unknown, keyPath: string, hint?: string) {
@@ -125,7 +185,9 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
             // don't let push errors break the scan
             console.error("Error preparing failed rule entry:", e);
         }
-        console.log(`Rule "${rule.name}" Failed ❌ for key "${key}" at path "${keyPath}" with value:`, keyValue);
+        if (process.env.LOG_LEVEL == "extended") {
+            console.log(`Rule "${rule.name}" Failed ❌ for key "${key}" at path "${keyPath}" with value:`, keyValue);
+        }
     }
 
     await Promise.all(Object.keys(json).map(async (key) => {
@@ -139,7 +201,7 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
             seenDatasets.add(String(keyValue).trim());
             let pageNumber = 1;
             while (true) {
-                const datasetContent = await getDatasetContent(keyValue, pageNumber);
+                const datasetContent = await getDatasetContent(dataset_name, dataset_data_space, keyValue, pageNumber);
                 await recursiveJsonChecks(datasetContent, seenDatasets, dataset_name);
                 if (datasetContent.TotalPages) {
                     if ((datasetContent.TotalPages == datasetContent.CurrentPage) || (datasetContent.CurrentPage >= Number(process.env.DATASET_CONTENT_PAGE_LIMIT))) {
@@ -152,10 +214,10 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
                     break;
                 }
             }
-            console.log(`✅ Processed dataset ${nrDataset++}/${await getTotalDatasetsCount()} - ${dataset_name}`);
+            console.log(`✅ Processed dataset ${++nrDataset}/${await getTotalDatasetsCount()} - ${dataset_name}`);
             return;
         } else if (keyValueType === "object" && json[key] !== null) {
-            await recursiveJsonChecks(json[key], seenDatasets, dataset_name, [...path, key]);
+            await recursiveJsonChecks(json[key], seenDatasets, dataset_name, dataset_data_space, [...path, key]);
             return;
         } else {
             await Promise.all(rules.map(async rule => {

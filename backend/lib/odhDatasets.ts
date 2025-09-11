@@ -1,6 +1,6 @@
 import type { DatasetsList } from "../types/odhResponses";
 import prisma from "./db";
-import { getKeycloakToken } from "./auth";
+import { censorKey, getKeycloakToken } from "./auth";
 
 export async function getDatasetLists(page?: number) {
     try {
@@ -35,6 +35,7 @@ export async function getDatasetLists(page?: number) {
                             dataset_name: dataset.Shortname || "",
                             dataset_dataspace: dataset.Dataspace || "",
                             dataset_img_url: Array.isArray(dataset.ImageGallery) && dataset.ImageGallery?.length > 0 ? dataset.ImageGallery[0]?.ImageUrl || "" : "",
+                            used_key: String(censorKey(process.env.KEYCLOAK_CLIENT_SECRET as string) ?? "public")
                         },
                         update: {
                             dataset_name: dataset.Shortname || "",
@@ -47,7 +48,7 @@ export async function getDatasetLists(page?: number) {
                 list = tempList;
                 delayMultiplier = 0;
                 break;
-            } else {
+            } else if (rawList.status == 429) {
                 const waitTime = rawList.headers.get("Retry-After");
                 const waitSeconds = waitTime ? parseInt(waitTime, 10) : 5;
                 console.log(`⚠️ Rate limited. Waiting for ${waitSeconds * delayMultiplier} seconds before retrying...`);
@@ -55,14 +56,14 @@ export async function getDatasetLists(page?: number) {
                 delayMultiplier++;
             }
         }
-
         return list;
-    } catch {
+    } catch (e) {
+        console.error(`❌ Error fetching dataset list:`, e);
         return {} as DatasetsList
     }
 }
 
-export async function getDatasetContent(datasetLink: string, pageNumber: number = 1) {
+export async function getDatasetContent(datasetName: string, datasetDataSpace: string, datasetLink: string, pageNumber: number = 1) {
     try {
         let data;
         let delayMultiplier = 0;
@@ -93,15 +94,27 @@ export async function getDatasetContent(datasetLink: string, pageNumber: number 
                     await new Promise(resolve => setTimeout(resolve, waitSeconds * delayMultiplier * 1000));
                     delayMultiplier++;
                 } else {
-                    console.log(`❌ Failed to fetch dataset content from ${datasetLinkWithPagination}. Status: ${rawContent.status}`);
-                    break;
+                    throw new Error(`Failed to fetch dataset content from ${datasetLinkWithPagination}`);
                 }
             }
         }
 
         const content = await JSON.parse(data);
         return content;
-    } catch {
+    } catch (e) {
+        console.error(`❌ Error fetching dataset content from ${datasetLink}:`, e);
+        console.log(`Dataset Name: ${datasetName}, Dataset DataSpace: ${datasetDataSpace}`);
+        await prisma.test_dataset.update({
+            where: {
+                dataset_name_dataset_dataspace: {
+                    dataset_name: datasetName,
+                    dataset_dataspace: datasetDataSpace
+                }
+            },
+            data: {
+                errors: String(e)
+            }
+        })
         return {}
     }
 }
