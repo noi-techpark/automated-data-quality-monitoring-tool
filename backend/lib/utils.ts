@@ -6,7 +6,7 @@ import { censorKey } from "./auth";
 
 const isolate = new ivm.Isolate({ memoryLimit: 128});
 
-let nrDataset = 1;
+let nrDataset = 0;
 let totalNrDatasets;
 async function getTotalDatasetsCount() {
     if (totalNrDatasets) return totalNrDatasets;
