@@ -44,7 +44,7 @@ export async function getKeycloakToken(headers: Record<string, string> = {}): Pr
       tokenExpiry = Date.now() + data.expires_in * 1000 - 30000;
       return `Bearer ${cachedToken}`;
     } else {
-      console.error('No access token received from Keycloak');
+      console.error('❌ No access token received from Keycloak, exiting...');
       process.exit(1);
     }
   } catch (error) {

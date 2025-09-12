@@ -5,7 +5,7 @@
   "private": true,
   "devDependencies": {
     "@types/node": "^24.3.1",
-    "prisma": "^6.11.0",
+    "prisma": "^6.16.1",
     "tsx": "^4.20.3"
   },
   "scripts": {
@@ -16,7 +16,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@prisma/client": "^6.11.0",
+    "@prisma/client": "^6.16.1",
     "isolated-vm": "^6.0.0",
     "wildcard-match": "^5.1.4"
   }
