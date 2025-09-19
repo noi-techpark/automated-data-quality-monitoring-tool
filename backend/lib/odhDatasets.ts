@@ -1,49 +1,32 @@
 import type { DatasetsList } from "../types/odhResponses";
 import prisma from "./db";
+import { writeFile } from "fs/promises";
 import { censorKey, getKeycloakToken } from "./auth";
+import { getSessionStartTimestamp } from "./session";
 
-export async function getDatasetLists(page?: number) {
+export async function getDatasetLists() {
     try {
-        let rawList;
         let list;
         let delayMultiplier = 0;
+        const sessionStartTs = getSessionStartTimestamp();
         while (true) {
-            if (process.env.KEYCLOAK_CLIENT_SECRET) {
-                const token = await getKeycloakToken({});
-                rawList = await fetch(`https://tourism.api.opendatahub.com/v1/MetaData?pagesize=100&pagenumber=${page ? page : 1}&origin=webcomp-datasets-list`,
-                    {
-                        headers: {
-                            "Authorization": token!
-                        }
-                    }
-                );
-            } else {
-                rawList = await fetch(`https://tourism.api.opendatahub.com/v1/MetaData?pagesize=100&pagenumber=${page ? page : 1}&origin=webcomp-datasets-list`);
-            }
+
+            const metadataUrl = process.env.METADATA_BASE_URL!
+            const rawList = await fetch(metadataUrl);
+            
             if (rawList.status === 200) {
                 const data = await rawList.text()
                 const tempList = (await JSON.parse(data)) as DatasetsList;
                 tempList.Items.map(async (dataset) => {
-                    await prisma.test_dataset.upsert({
-                        where: {
-                            dataset_name_dataset_dataspace: {
-                                dataset_name: dataset.Shortname || "",
-                                dataset_dataspace: dataset.Dataspace || ""
-                            }
-                        },
-                        create: {
+                    await prisma.test_dataset.create({
+                        data: {
+                            session_start_ts: sessionStartTs,
                             dataset_name: dataset.Shortname || "",
                             dataset_dataspace: dataset.Dataspace || "",
                             dataset_img_url: Array.isArray(dataset.ImageGallery) && dataset.ImageGallery?.length > 0 ? dataset.ImageGallery[0]?.ImageUrl || "" : "",
-                            used_key: String(censorKey(process.env.KEYCLOAK_CLIENT_SECRET as string) ?? "public")
-                        },
-                        update: {
-                            dataset_name: dataset.Shortname || "",
-                            dataset_dataspace: dataset.Dataspace || "",
-                            dataset_img_url: Array.isArray(dataset.ImageGallery) && dataset.ImageGallery?.length > 0 ? dataset.ImageGallery[0]?.ImageUrl || "" : "",
-                            session_start_ts: new Date()
+                            used_key: process.env.KEYCLOAK_CLIENT_ID || "public"
                         }
-                    })
+                    });
                 });
                 list = tempList;
                 delayMultiplier = 0;
@@ -63,13 +46,13 @@ export async function getDatasetLists(page?: number) {
     }
 }
 
-export async function getDatasetContent(datasetName: string, datasetDataSpace: string, datasetLink: string, pageNumber: number = 1) {
+export async function getDatasetContent(datasetName: string, datasetLink: string, pageNumber: number = 1) {
     try {
         let data;
         let delayMultiplier = 0;
         while (true) {
             let rawContent;
-            const datasetLinkWithPagination = datasetLink.includes("?") ? `${datasetLink}&pagesize=100&pagenumber=${pageNumber}` : `${datasetLink}?pagesize=100&pagenumber=${pageNumber}`;
+            const datasetLinkWithPagination = datasetLink + ( datasetLink.includes("?") ? '&' : '?' ) + `pagesize=1&pagenumber=${pageNumber}`;
             if (process.env.KEYCLOAK_CLIENT_SECRET) {
                 const token = await getKeycloakToken({});
                 rawContent = await fetch(datasetLinkWithPagination,
@@ -84,6 +67,8 @@ export async function getDatasetContent(datasetName: string, datasetDataSpace: s
             }
             if (rawContent.status === 200) {
                 data = await rawContent.text();
+                // Writes the content to a temporary file to verify differences with or without the key...
+                // await writeFile("/tmp/a.json", data, "utf-8");
                 delayMultiplier = 0;
                 break;
             } else {
@@ -103,12 +88,12 @@ export async function getDatasetContent(datasetName: string, datasetDataSpace: s
         return content;
     } catch (e) {
         console.error(`❌ Error fetching dataset content from ${datasetLink}:`, e);
-        console.log(`Dataset Name: ${datasetName}, Dataset DataSpace: ${datasetDataSpace}`);
+        console.log(`Dataset Name: ${datasetName}`);
         await prisma.test_dataset.update({
             where: {
-                dataset_name_dataset_dataspace: {
+                session_start_ts_dataset_name: {
+                    session_start_ts: getSessionStartTimestamp(),
                     dataset_name: datasetName,
-                    dataset_dataspace: datasetDataSpace
                 }
             },
             data: {
