@@ -136,7 +136,7 @@ ruleFlush();
 */ 
 
 
-export async function recursiveJsonDatasetChecks(json: any, dataset_name:string, record_jsonpath: string, recursive_key_prefix: string) {
+export async function recursiveJsonDatasetChecks(full_record:any, json: any, dataset_name:string, record_jsonpath: string, recursive_key_prefix: string) {
     const rules = await prisma.rules.findMany({});
 
     function onRuleMatch(rule: any, key: string, keyValue: unknown, record_jsonpath: string, keyPath: string) {
@@ -194,7 +194,7 @@ export async function recursiveJsonDatasetChecks(json: any, dataset_name:string,
                 dataset_name: safeDatasetName,
                 record_jsonpath: record_jsonpath,
                 check_name: safeCheckName,
-                record_json: safeRecordJson,
+                record_json: JSON.stringify(full_record),
                 problem_hint: safeHint,
                 impacted_attributes_csv: keyPath,
                 check_category: safeCategory,
@@ -228,7 +228,7 @@ export async function recursiveJsonDatasetChecks(json: any, dataset_name:string,
             // An Array is an object in JavaScript, so Object.keys(...) works for both
             // plain objects and arrays (returns string indices for arrays).
             // Internally arrays have string indices
-            await recursiveJsonDatasetChecks(keyValue, dataset_name, record_jsonpath, keyPath + '.');
+            await recursiveJsonDatasetChecks(full_record, keyValue, dataset_name, record_jsonpath, keyPath + '.');
             continue
         }
 

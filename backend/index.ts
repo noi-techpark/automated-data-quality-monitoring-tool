@@ -16,7 +16,7 @@ for (let dataset_meta of datasetsList.Items)
     let nr_records = 0;
     for (let record of datasetContent.Items)
     {
-        await recursiveJsonDatasetChecks(record, dataset_meta.Shortname, 'Items.' + nr_records, '');
+        await recursiveJsonDatasetChecks(record, record, dataset_meta.Shortname, 'Items.' + nr_records, '');
         nr_records++
     }
 
@@ -34,7 +34,7 @@ for (let dataset_meta of datasetsList.Items)
 
 }
 
-console.log('fine index.ts')
+console.log('end index.ts')
 
 /*
  const keyValueType = typeof json[key];
