@@ -1,0 +1,7 @@
+/node_modules/
+/target/
+/src/main/java/tmp/
+/package.json
+/package-lock.json
+/tsc+parcel.sh
+/.vscode/
