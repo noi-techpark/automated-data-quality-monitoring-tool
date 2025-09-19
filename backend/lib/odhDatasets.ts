@@ -2,13 +2,15 @@ import type { DatasetsList } from "../types/odhResponses";
 import prisma from "./db";
 import { writeFile } from "fs/promises";
 import { censorKey, getKeycloakToken } from "./auth";
+import { getSessionStartTimestamp } from "./session";
 
 export async function getDatasetLists() {
     try {
         let list;
         let delayMultiplier = 0;
+        const sessionStartTs = getSessionStartTimestamp();
         while (true) {
-        
+
             const metadataUrl = process.env.METADATA_BASE_URL!
             const rawList = await fetch(metadataUrl);
             
@@ -16,26 +18,15 @@ export async function getDatasetLists() {
                 const data = await rawList.text()
                 const tempList = (await JSON.parse(data)) as DatasetsList;
                 tempList.Items.map(async (dataset) => {
-                    await prisma.test_dataset.upsert({
-                        where: {
-                            dataset_name_dataset_dataspace: {
-                                dataset_name: dataset.Shortname || "",
-                                dataset_dataspace: dataset.Dataspace || ""
-                            }
-                        },
-                        create: {
+                    await prisma.test_dataset.create({
+                        data: {
+                            session_start_ts: sessionStartTs,
                             dataset_name: dataset.Shortname || "",
                             dataset_dataspace: dataset.Dataspace || "",
                             dataset_img_url: Array.isArray(dataset.ImageGallery) && dataset.ImageGallery?.length > 0 ? dataset.ImageGallery[0]?.ImageUrl || "" : "",
                             used_key: String(censorKey(process.env.KEYCLOAK_CLIENT_SECRET as string) ?? "public")
-                        },
-                        update: {
-                            dataset_name: dataset.Shortname || "",
-                            dataset_dataspace: dataset.Dataspace || "",
-                            dataset_img_url: Array.isArray(dataset.ImageGallery) && dataset.ImageGallery?.length > 0 ? dataset.ImageGallery[0]?.ImageUrl || "" : "",
-                            session_start_ts: new Date()
                         }
-                    })
+                    });
                 });
                 list = tempList;
                 delayMultiplier = 0;
@@ -100,9 +91,9 @@ export async function getDatasetContent(datasetName: string, datasetDataSpace: s
         console.log(`Dataset Name: ${datasetName}, Dataset DataSpace: ${datasetDataSpace}`);
         await prisma.test_dataset.update({
             where: {
-                dataset_name_dataset_dataspace: {
+                session_start_ts_dataset_name: {
+                    session_start_ts: getSessionStartTimestamp(),
                     dataset_name: datasetName,
-                    dataset_dataspace: datasetDataSpace
                 }
             },
             data: {

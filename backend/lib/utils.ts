@@ -3,8 +3,11 @@ import prisma from "./db";
 import { getDatasetContent } from "./odhDatasets";
 import ivm from "isolated-vm";
 import { censorKey } from "./auth";
+import { getSessionStartTimestamp } from "./session";
 
 const isolate = new ivm.Isolate({ memoryLimit: 128 });
+
+const sessionStartTs = getSessionStartTimestamp();
 
 let nrDataset = 0;
 let totalNrDatasets;
@@ -73,11 +76,13 @@ async function validateRules() {
 validateRules();
 
 let passedRules: {
+    session_start_ts: Date;
     dataset_name: string; check_name: string,
     used_key: string;
 }[] = [];
 
 let failedRules: {
+    session_start_ts: Date;
     dataset_name: string;
     record_jsonpath: string;
     check_name: string;
@@ -130,6 +135,7 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
 
     async function onRuleMatch(rule: any, key: string, keyValue: unknown, keyPath: string) {
         passedRules.push({
+            session_start_ts: sessionStartTs,
             dataset_name: String(dataset_name),
             check_name: String(rule.name),
             used_key: String(censorKey(process.env.KEYCLOAK_CLIENT_SECRET as string) ?? "public")
@@ -172,6 +178,7 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
             }
 
             failedRules.push({
+                session_start_ts: sessionStartTs,
                 dataset_name: safeDatasetName,
                 record_jsonpath: safeKeyPath,
                 check_name: safeCheckName,
