@@ -24,7 +24,7 @@ export async function getDatasetLists() {
                             dataset_name: dataset.Shortname || "",
                             dataset_dataspace: dataset.Dataspace || "",
                             dataset_img_url: Array.isArray(dataset.ImageGallery) && dataset.ImageGallery?.length > 0 ? dataset.ImageGallery[0]?.ImageUrl || "" : "",
-                            used_key: String(censorKey(process.env.KEYCLOAK_CLIENT_SECRET as string) ?? "public")
+                            used_key: process.env.KEYCLOAK_CLIENT_ID || "public"
                         }
                     });
                 });
@@ -46,7 +46,7 @@ export async function getDatasetLists() {
     }
 }
 
-export async function getDatasetContent(datasetName: string, datasetDataSpace: string, datasetLink: string, pageNumber: number = 1) {
+export async function getDatasetContent(datasetName: string, datasetLink: string, pageNumber: number = 1) {
     try {
         let data;
         let delayMultiplier = 0;
@@ -88,7 +88,7 @@ export async function getDatasetContent(datasetName: string, datasetDataSpace: s
         return content;
     } catch (e) {
         console.error(`❌ Error fetching dataset content from ${datasetLink}:`, e);
-        console.log(`Dataset Name: ${datasetName}, Dataset DataSpace: ${datasetDataSpace}`);
+        console.log(`Dataset Name: ${datasetName}`);
         await prisma.test_dataset.update({
             where: {
                 session_start_ts_dataset_name: {
