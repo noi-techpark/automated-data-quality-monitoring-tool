@@ -104,3 +104,7 @@ html {
 .MenuElement .menu1_submenus {
 	margin-left: 1rem;
 }
+
+.display-none {
+	display: none;
+}
