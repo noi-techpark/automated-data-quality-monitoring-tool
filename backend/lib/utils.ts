@@ -23,7 +23,7 @@ async function validateRules() {
         invalidFound = true;
     } else {
         for (const rule of rules) {
-            if (!rule.name || !rule.type || !rule.value || !rule.searchFilter) {
+            if (!rule.name || !rule.type || !rule.value || !rule.searchfilter) {
                 console.log(`❌ Invalid rule detected: ${JSON.stringify(rule)}`);
                 invalidFound = true;
                 break;
@@ -221,8 +221,8 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
             return;
         } else {
             await Promise.all(rules.map(async rule => {
-                const isSearchFilterMatch = wildcardMatch(rule.searchFilter);
-                const isDatasetNameFilterMatch = wildcardMatch(rule.datasetNameSearchFilter);
+                const isSearchFilterMatch = wildcardMatch(rule.searchfilter);
+                const isDatasetNameFilterMatch = wildcardMatch(rule.datasetname_searchfilter);
                 if (isSearchFilterMatch(keyPath) && isDatasetNameFilterMatch(dataset_name)) {
                     if (rule.type == "matches-wildcard") {
                         const valueWildcardMatch = wildcardMatch(rule.value);
