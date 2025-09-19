@@ -95,7 +95,7 @@ let failedRules: {
     impacted_attributes_csv: string;
     check_category: string;
     used_key: string;
-    impacted_attribute_value: string;
+    impacted_attribute_value: string|null;
 }[] = [];
 
 /*
@@ -199,7 +199,7 @@ export async function recursiveJsonDatasetChecks(json: any, dataset_name:string,
                 impacted_attributes_csv: keyPath,
                 check_category: safeCategory,
                 used_key: process.env.KEYCLOAK_CLIENT_ID || 'public',
-                impacted_attribute_value: String(keyValue)
+                impacted_attribute_value: null
             });
         } catch (e) {
             // don't let push errors break the scan
