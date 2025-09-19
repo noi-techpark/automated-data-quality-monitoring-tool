@@ -12,25 +12,34 @@ if (!process.env.DATABASE_URL || !process.env.KEYCLOAK_BASE_URL || !process.env.
 const datasetsList = await getDatasetLists();
 for (let dataset_meta of datasetsList.Items)
 {
-    const datasetContent = await getDatasetContent(dataset_meta.Shortname, dataset_meta.ApiUrl, 1);
-    let nr_records = 0;
-    for (let record of datasetContent.Items)
-    {
-        await recursiveJsonDatasetChecks(record, record, dataset_meta.Shortname, 'Items.' + nr_records, '');
-        nr_records++
-    }
+    let page = 1
+    while (true) { // page loop
 
-    await prisma.test_dataset.update({
-            where: {
-                session_start_ts_dataset_name: {
-                    session_start_ts: getSessionStartTimestamp(),
-                    dataset_name: dataset_meta.Shortname,
+        const datasetContent = await getDatasetContent(dataset_meta.Shortname, dataset_meta.ApiUrl, page);
+        let nr_records = 0;
+        for (let record of datasetContent.Items)
+        {
+            await recursiveJsonDatasetChecks(record, record, dataset_meta.Shortname, 'Items.' + nr_records, '');
+            nr_records++
+        }
+
+        await prisma.test_dataset.update({
+                where: {
+                    session_start_ts_dataset_name: {
+                        session_start_ts: getSessionStartTimestamp(),
+                        dataset_name: dataset_meta.Shortname,
+                    }
+                },
+                data: {
+                    tested_records: nr_records
                 }
-            },
-            data: {
-                tested_records: nr_records
-            }
-        });
+            });
+        if (page >= Number(process.env.DATASET_CONTENT_PAGE_LIMIT))
+            break;
+        if (datasetContent.NextPage === null)
+            break;
+        page++;
+    }
 
 }
 
