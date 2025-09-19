@@ -7,11 +7,5 @@ if (!process.env.DATABASE_URL || !process.env.KEYCLOAK_BASE_URL || !process.env.
     process.exit(1);
 }
 
-let page = 1;
-while (true) {
-    const datasetsList = await getDatasetLists(page);
-    if (!datasetsList || !datasetsList.Items || datasetsList.Items.length === 0) break;
-    recursiveJsonChecks(datasetsList, new Set<string>());
-    if (datasetsList.Items.length < 100) break;
-    page++;
-}
+const datasetsList = await getDatasetLists();
+recursiveJsonChecks(datasetsList, new Set<string>());
