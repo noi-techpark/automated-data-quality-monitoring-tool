@@ -1,25 +1,17 @@
 import type { DatasetsList } from "../types/odhResponses";
 import prisma from "./db";
+import { writeFile } from "fs/promises";
 import { censorKey, getKeycloakToken } from "./auth";
 
-export async function getDatasetLists(page?: number) {
+export async function getDatasetLists() {
     try {
-        let rawList;
         let list;
         let delayMultiplier = 0;
         while (true) {
-            if (process.env.KEYCLOAK_CLIENT_SECRET) {
-                const token = await getKeycloakToken({});
-                rawList = await fetch(`https://tourism.api.opendatahub.com/v1/MetaData?pagesize=100&pagenumber=${page ? page : 1}&origin=webcomp-datasets-list`,
-                    {
-                        headers: {
-                            "Authorization": token!
-                        }
-                    }
-                );
-            } else {
-                rawList = await fetch(`https://tourism.api.opendatahub.com/v1/MetaData?pagesize=100&pagenumber=${page ? page : 1}&origin=webcomp-datasets-list`);
-            }
+        
+            const metadataUrl = process.env.METADATA_BASE_URL!
+            const rawList = await fetch(metadataUrl);
+            
             if (rawList.status === 200) {
                 const data = await rawList.text()
                 const tempList = (await JSON.parse(data)) as DatasetsList;
@@ -84,6 +76,8 @@ export async function getDatasetContent(datasetName: string, datasetDataSpace: s
             }
             if (rawContent.status === 200) {
                 data = await rawContent.text();
+                // Writes the content to a temporary file to verify differences with or without the key...
+                // await writeFile("/tmp/a.json", data, "utf-8");
                 delayMultiplier = 0;
                 break;
             } else {
