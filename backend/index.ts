@@ -34,7 +34,7 @@ for (let dataset_meta of datasetsList.Items)
 
 }
 
-console.log('fine index.ts')
+console.log('end index.ts')
 
 /*
  const keyValueType = typeof json[key];
