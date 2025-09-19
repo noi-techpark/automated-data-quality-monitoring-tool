@@ -20,7 +20,7 @@ model rules {
 
 model test_dataset {
   id                 BigInt               @unique @default(autoincrement())
-  session_start_ts   DateTime             @default(now()) @db.Timestamptz(6)
+  session_start_ts   DateTime             @db.Timestamptz(6)
   dataset_name       String
   tested_records     Int                  @default(0)
   dataset_img_url    String               @default("")
@@ -46,7 +46,7 @@ model test_dataset_check {
 
 model test_dataset_record_check_failed {
   id                      BigInt   @unique(map: "test_dataset_record_attribute_check_fail_id_key") @default(autoincrement())
-  session_start_ts        DateTime @default(now()) @db.Timestamptz(6)
+  session_start_ts        DateTime @db.Timestamptz(6)
   dataset_name            String
   record_jsonpath         String
   check_name              String
