@@ -207,8 +207,10 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
             }
             seenDatasets.add(String(keyValue).trim());
             let pageNumber = 1;
+            let nr_records = 0;
             while (true) {
                 const datasetContent = await getDatasetContent(dataset_name, dataset_data_space, keyValue, pageNumber);
+                nr_records += datasetContent.Items.length
                 await recursiveJsonChecks(datasetContent, seenDatasets, dataset_name);
                 if (datasetContent.TotalPages) {
                     if ((datasetContent.TotalPages == datasetContent.CurrentPage) || (datasetContent.CurrentPage >= Number(process.env.DATASET_CONTENT_PAGE_LIMIT))) {
@@ -221,6 +223,19 @@ export async function recursiveJsonChecks(json: any, seenDatasets: Set<string>, 
                     break;
                 }
             }
+            
+            await prisma.test_dataset.update({
+                where: {
+                    session_start_ts_dataset_name: {
+                        session_start_ts: sessionStartTs,
+                        dataset_name: dataset_name,
+                    }
+                },
+                data: {
+                    tested_records: nr_records
+                }
+            });
+           
             console.log(`✅ Processed dataset ${++nrDataset}/${await getTotalDatasetsCount()} - ${dataset_name}`);
             return;
         } else if (keyValueType === "object" && json[key] !== null) {

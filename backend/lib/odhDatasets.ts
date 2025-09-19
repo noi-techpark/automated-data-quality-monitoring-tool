@@ -52,7 +52,7 @@ export async function getDatasetContent(datasetName: string, datasetDataSpace: s
         let delayMultiplier = 0;
         while (true) {
             let rawContent;
-            const datasetLinkWithPagination = datasetLink.includes("?") ? `${datasetLink}&pagesize=100&pagenumber=${pageNumber}` : `${datasetLink}?pagesize=100&pagenumber=${pageNumber}`;
+            const datasetLinkWithPagination = datasetLink + ( datasetLink.includes("?") ? '&' : '?' ) + `pagesize=1&pagenumber=${pageNumber}`;
             if (process.env.KEYCLOAK_CLIENT_SECRET) {
                 const token = await getKeycloakToken({});
                 rawContent = await fetch(datasetLinkWithPagination,
