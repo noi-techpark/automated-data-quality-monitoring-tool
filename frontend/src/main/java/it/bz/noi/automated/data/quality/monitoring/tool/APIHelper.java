@@ -157,7 +157,7 @@ public class APIHelper
 	{
 		String sql = """
 				select *
-				  from catchsolve_noiodh.test_dataset_record_check_failed
+				  from catchsolve_noiodh.test_dataset_record_check_failed_impacted_csv_vw
 				 where dataset_name = ?
 				   and session_start_ts = ?
 				   and check_category = ?
