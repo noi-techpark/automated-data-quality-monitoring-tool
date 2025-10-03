@@ -18,6 +18,7 @@ path = [
     "frontend/package.json",
     "frontend/package-lock.json",
     "frontend/tsconfig.json",
+    "frontend/**/*.map",
     "frontend/src/main/webapp/*",
 ]
 SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
