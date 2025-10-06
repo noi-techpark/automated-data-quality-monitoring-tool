@@ -1,8 +1,9 @@
 import { getDatasetContent, getDatasetLists } from "./lib/odhDatasets";
-import { recursiveJsonDatasetChecks } from "./lib/utils";
 import prisma from "./lib/db";
 import { getSessionStartTimestamp } from "./lib/session";
-import fs from "fs";
+
+
+import {fetch_json_with_optional_cache} from "./lib/utils";
 
 console.log("\r\n\r\n          _ _               _           _           \r\n  ___  __| | |_    ___   __| |_  ___ __| |_____ _ _ \r\n \/ _ \\\/ _` | \' \\  |___| \/ _| \' \\\/ -_) _| \/ \/ -_) \'_|\r\n \\___\/\\__,_|_||_|       \\__|_||_\\___\\__|_\\_\\___|_|  \r\n                                                    \r\n\r\n");
 
@@ -67,27 +68,11 @@ interface DatasetPage {
     Items: DatasetPageItem[]
 }
 
-async function fetch_json_with_optional_cache(url: string)
-{
-    const cache_name = `/tmp/ODH-CACHE-${url.replace(/[^a-zA-Z0-9-]/g,'_')}.json`
-    if (DEBUG_MODE_CACHE_ON && fs.existsSync(cache_name))  
-    {
-        console.log(`using cache ${cache_name}`)
-        const content = fs.readFileSync(cache_name).toString()
-        return JSON.parse(content)
-    }
-    const response = await fetch(url);
-    const json = await response.json()
-    fs.writeFileSync(cache_name, JSON.stringify(json, null, 3))
-    return json
-}
+
 
 const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL);
 
-// console.log(metadata_json)
-
 const rules = await prisma.rules.findMany({});
-// console.log(rules)
 
 for (let m = 0; m < metadata_json.Items.length; m++)
 {
