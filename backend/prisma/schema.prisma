@@ -16,6 +16,8 @@ model rules {
   type                     String
   value                    String
   createdat                DateTime @default(now()) @db.Timestamptz(6)
+  active                   Boolean  @default(true)
+  category                 String   @default("")
 }
 
 model test_dataset {
