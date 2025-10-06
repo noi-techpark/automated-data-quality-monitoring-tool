@@ -12,7 +12,7 @@ COPY ./webapp/src /app/src
 
 RUN apk add nodejs npm
 RUN npm install
-RUN npx tsc
+RUN npm run build
 
 RUN mvn clean package
 
