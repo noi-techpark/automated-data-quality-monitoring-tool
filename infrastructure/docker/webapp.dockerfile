@@ -5,10 +5,10 @@
 FROM maven:3-eclipse-temurin-21-alpine AS build-env
 
 WORKDIR /app
-COPY pom.xml .
-COPY tsconfig.json .
-COPY package.json .
-COPY ./src /app/src
+COPY ./webapp/pom.xml .
+COPY ./webapp/tsconfig.json .
+COPY ./webapp/package.json .
+COPY ./webapp/src /app/src
 
 RUN apk add nodejs npm
 RUN npm install

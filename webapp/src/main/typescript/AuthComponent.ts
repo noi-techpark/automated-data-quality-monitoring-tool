@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 NOI Techpark <digital@noi.bz.it>
+// SPDX-FileCopyrightText: 2025 Catch Solve di Davide Montesin
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
