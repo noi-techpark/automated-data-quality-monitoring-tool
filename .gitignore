@@ -18,3 +18,5 @@
 /davide/
 
 /src_bak/
+backend/.env-public
+backend/.env-idm

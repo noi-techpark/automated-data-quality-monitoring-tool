@@ -21,11 +21,13 @@ function requireEnvVar(key: string, defaultValue?: string): string {
   return value;
 }
 
+const KEYCLOAK_CLIENT_ID_OPENDATA = 'opendata';
+
 export const LOG_LEVEL = requireEnvVar('LOG_LEVEL', 'minimal');
 export const DATABASE_URL = requireEnvVar('DATABASE_URL');
 export const KEYCLOAK_BASE_URL = requireEnvVar('KEYCLOAK_BASE_URL');
+export const KEYCLOAK_CLIENT_ID = requireEnvVar('KEYCLOAK_CLIENT_ID', KEYCLOAK_CLIENT_ID_OPENDATA);
 export const KEYCLOAK_REALM = requireEnvVar('KEYCLOAK_REALM');
-export const KEYCLOAK_CLIENT_ID = requireEnvVar('KEYCLOAK_CLIENT_ID');
 export const KEYCLOAK_CLIENT_SECRET = requireEnvVar('KEYCLOAK_CLIENT_SECRET');
 export const METADATA_BASE_URL = requireEnvVar('METADATA_BASE_URL');
 export const DATASET_CONTENT_PAGE_LIMIT = requireEnvVar('DATASET_CONTENT_PAGE_LIMIT');
@@ -104,7 +106,7 @@ for (let m = 0; m < metadata_json.Items.length; m++)
                             dataset_name: metadata_dataset_json.Shortname,
                             dataset_dataspace: metadata_dataset_json.Dataspace,
                             dataset_img_url: metadata_dataset_json.ImageGallery?.[0].ImageUrl,
-                            used_key: process.env.KEYCLOAK_CLIENT_ID // || "public"
+                            used_key: process.env.KEYCLOAK_CLIENT_ID
                         }
                     });
 
