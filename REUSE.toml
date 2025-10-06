@@ -19,7 +19,6 @@ path = [
     "webapp/package-lock.json",
     "webapp/tsconfig.json",
     "webapp/src/main/webapp/*",
-    "webapp/src/main/webapp/js/*.map",
 ]
 SPDX-FileCopyrightText = "2025 Catch Solve di Davide Montesin"
 SPDX-License-Identifier = "CC0-1.0"

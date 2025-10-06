@@ -54,8 +54,8 @@ cd automated-data-quality-monitoring-tool
 Build the typescript code:
 
 ```bash
-npm install typescript     # if not already installed
-tsc
+npm install
+npm run build
 ```
 
 Build the java project:

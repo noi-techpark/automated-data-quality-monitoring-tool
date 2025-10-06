@@ -9,6 +9,7 @@
 /.vscode/
 davide-tmp/
 target/
+/src/main/webapp/js/bundle.js
 
 /.parcel-cache/
 
