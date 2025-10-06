@@ -17,6 +17,7 @@ services:
     build:
       dockerfile: ./infrastructure/docker/job.dockerfile
       context: .
+      target: dev
     environment:
       DATABASE_URL: ${JOB_DATABASE_URL}
       KEYCLOAK_BASE_URL: ${JOB_KEYCLOAK_BASE_URL}

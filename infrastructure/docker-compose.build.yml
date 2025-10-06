@@ -11,3 +11,4 @@ services:
     build:
       context: ../
       dockerfile: infrastructure/docker/job.dockerfile
+      target: build
