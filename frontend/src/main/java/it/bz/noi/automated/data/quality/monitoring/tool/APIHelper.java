@@ -195,14 +195,16 @@ public class APIHelper
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_maxts_vw(ObjectNode filterJson) throws SQLException
+	private static ArrayNode list__catchsolve_noiodh__test_dataset_maxts_vw(ObjectNode filter) throws SQLException
 	{
 		String sql = """
 				select *
 				  from catchsolve_noiodh.test_dataset_max_ts_vw
+				  where used_key = ?
 				 order by dataset_name
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
+		wherevalues.add(((TextNode)filter.get("used_key")).textValue());
 		return execute_query(sql, wherevalues);
 	}
 

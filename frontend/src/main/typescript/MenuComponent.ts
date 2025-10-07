@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 
+import { AuthComponent, keycloak } from './AuthComponent.js';
 import { Loader } from './Loader.js';
 import {API3} from './api/api3.js';
 import { cs_cast } from './quality.js';
@@ -75,8 +76,15 @@ export class MenuComponent extends HTMLElement
 		openclose.onclick = () => { title.classList.toggle('close') }
 
 		let menuready_fun: (x: null) => void
-		this.menuready_promise = new Promise(s => menuready_fun = s)
-		const json_promise = API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({})
+		this.menuready_promise = new Promise(s => menuready_fun = s);
+		//get_current_autenticated_user().then(a => alert(a));
+		//alert (await get_current_autenticated_user())
+		// alert(keycloak.authenticated)
+		keycloak.then(k => {
+		console.log('devo sapere se loggato ' + k.authenticated)
+
+		})
+		const json_promise = API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({used_key:'opendata'})
 		const loader = new Loader();
 		this.sroot.appendChild(loader)
 		json_promise.then(async (json) => {

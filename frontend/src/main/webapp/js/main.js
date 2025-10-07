@@ -8,1385 +8,6 @@
 // SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-class $50fcf601af37099e$export$3b0d6d7590275603 extends HTMLElement {
-    constructor(){
-        super();
-        const sroot = this.attachShadow({
-            mode: 'open'
-        });
-        sroot.innerHTML = `
-				<link rel="stylesheet" href="loader.css">
-				<style>
-					:host {
-						width: 65px;
-						height: 15px;
-						display: inline-block;
-						overflow: hidden;
-						margin: 2rem;
-					}
-					div.loader {
-						color: #222;
-					}
-					
-				</style>
-				<div class="loader" style="margin-top: 0px; margin-left:20px"></div>
-				`;
-        customElements.upgrade(sroot);
-    }
-}
-customElements.define('cs-loader', $50fcf601af37099e$export$3b0d6d7590275603);
-
-
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-class $1e820cf339dfc6f8$export$3a4b11f05d5e029f {
-    static async call(action, json) {
-        const params = new URLSearchParams();
-        params.append('action', action);
-        params.append('filter_byexample', JSON.stringify(json));
-        // https://www.catch-solve.tech/noi-odh-testing-tool/api?
-        // http://localhost:8080/api?
-        const resp = await fetch('api?' + params.toString());
-        const respjson = await resp.json();
-        // wait for debug pourpose
-        // await new Promise((s) =>  { setTimeout(s, 1000)})
-        return respjson;
-    }
-    // begin crudl methods
-    static async list__catchsolve_noiodh__test_dataset_max_ts_vw(filter) {
-        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.catchsolve_noiodh__test_dataset_max_ts_vw', filter);
-        return resp;
-    }
-    static async list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(filter) {
-        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_check_category_failed_recors_vw', filter);
-        return resp;
-    }
-    static async list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(filter) {
-        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_check_category_check_name_failed_recors_vw', filter);
-        return resp;
-    }
-    static async list__catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw(filter) {
-        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw', filter);
-        return resp;
-    }
-    static async list__catchsolve_noiodh__test_dataset_record_check_failed(filter) {
-        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_record_check_failed', filter);
-        return resp;
-    }
-    static async list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw(filter) {
-        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_check_category_record_jsonpath_failed_vw', filter);
-        return resp;
-    }
-    static async list__catchsolve_noiodh__test_dataset_history_vw(filter) {
-        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_history_vw', filter);
-        return resp;
-    }
-}
- // end interfaces
-
-
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-function $372cab4458345058$export$26be2e78a9bc3271() {
-    throw new Error('unexpected null or undefined value');
-}
-function $372cab4458345058$export$d885650843ca84a5(tc, x) {
-    if (x === undefined) throw new Error('runtime cast: x is undefined instead of ' + tc.name);
-    if (x === null) throw new Error('runtime cast: x is null instead of ' + tc.name);
-    if (typeof x !== 'object') throw new Error('runtime cast: this function check only objects <T extends object>, instead of ' + typeof x);
-    if (!(x instanceof tc)) throw new Error('runtime cast: x with type: ' + x.constructor.name + ' does not match required type: ' + tc.name);
-    return x;
-}
-function $372cab4458345058$export$2ddf4623c78330ee(x) {
-    if (x === null) throw new Error('unexpected null value');
-    return x;
-}
-
-
-class $de236afea176a079$export$c0941f68287dbcd1 extends HTMLElement {
-    sroot;
-    submenus;
-    menuitemByName = {};
-    menuready_promise;
-    constructor(){
-        super();
-        this.sroot = this.attachShadow({
-            mode: 'open'
-        });
-        this.sroot.innerHTML = `
-			<style>
-
-				.title {
-					padding: 0.4rem;
-				}
-
-				div.submenus {
-					padding-left: 1rem;
-					overflow: hidden;
-				}
-				div.submenus > * {
-					margin:  0.4rem;
-					padding: 0.2rem;
-					cursor: pointer;
-				}
-				.selected {
-					background: #666;
-					color: white;
-				}
-				.title.close ~ .submenus {
-					display: none;
-				}
-				.openclose {
-					cursor: pointer;
-				}
-				.openclose:before {
-					content: "\u{25B2}"
-				}
-				.title.close .openclose:before {
-					content: "\u{25BC}"
-				}
-			</style>
-			<div class="title"><span class="openclose"></span> standard dashboards</div>
-			<div class="submenus"></div>
-		`;
-        this.submenus = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, this.sroot.querySelector('div.submenus'));
-        const title = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, this.sroot.querySelector('div.title'));
-        this.menuitemByName[''] = title;
-        title.onclick = ()=>{
-            location.hash = '';
-        };
-        const openclose = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, this.sroot.querySelector('span.openclose'));
-        openclose.onclick = ()=>{
-            title.classList.toggle('close');
-        };
-        let menuready_fun;
-        this.menuready_promise = new Promise((s)=>menuready_fun = s);
-        const json_promise = (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_max_ts_vw({});
-        const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
-        this.sroot.appendChild(loader);
-        json_promise.then(async (json)=>{
-            for (let dataset of json){
-                const menu1_submenu = document.createElement('div');
-                menu1_submenu.textContent = dataset.dataset_name;
-                this.menuitemByName[dataset.dataset_name] = menu1_submenu;
-                this.submenus.appendChild(menu1_submenu);
-                menu1_submenu.onclick = ()=>{
-                    location.hash = "#page=dataset-categories&dataset_name=" + dataset.dataset_name + '&session_start_ts=' + dataset.session_start_ts + "&failed_records=" + dataset.failed_records + "&tested_records=" + dataset.tested_records;
-                };
-            }
-            loader.remove();
-            menuready_fun(null);
-        });
-    }
-    async refresh() {}
-    async selectItem(name) {
-        await this.menuready_promise;
-        for(let k in this.menuitemByName){
-            const item = this.menuitemByName[k];
-            if (name == k) item.classList.add('selected');
-            else item.classList.remove('selected');
-        }
-    }
-}
-customElements.define('cs-menu-element', $de236afea176a079$export$c0941f68287dbcd1);
-
-
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
-class $5fa5f0f9910be384$export$1e36da95ba633cee extends HTMLElement {
-    label;
-    data;
-    constructor(){
-        super();
-        const sroot = this.attachShadow({
-            mode: 'open'
-        });
-        sroot.innerHTML = `
-		<style>
-			:host {
-				display: flex;
-				border-top: 1px solid #ccc;
-				padding-top: 0.3rem;
-				padding-bottom: 0.3rem;
-				align-items: center;
-			}
-			span {
-				font-size: 0.7rem;
-			}
-			span.label {
-				flex-grow: 1;
-				margin-right: 0.3rem;
-				padding: 0.2rem
-			}
-			span.data {
-				padding: 0.2rem;
-				border-radius: 0.3rem;
-				margin-right: 0.3rem;
-				background-color: var(--dark-background);
-				color: #ddd;
-				min-width: 2rem;
-				text-align: right;
-			}
-			:host(.fail) span.label {
-				background-color: #faa;
-				color: #400;
-				font-weight: bold;
-			}
-			:host(.good) span.label {
-				background-color: #afa;
-				color: #040;
-				font-weight: bold;
-			}
-			:host(.warn) span.label {
-				background-color: #ffa;
-				color: #440;
-				font-weight: bold;
-			}
-		</style>
-		<span class="data">.</span>
-		<span class="label"></span>
-		`;
-        this.label = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.label'));
-        this.setLabel(this.getAttribute('label') !== null ? this.getAttribute('label') : 'label');
-        this.data = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.data'));
-    }
-    setLabel(s) {
-        this.label.textContent = s;
-    }
-    setData(s) {
-        this.data.textContent = s;
-    }
-    setQualityLevel(severity) {
-        this.classList.add(severity);
-    }
-}
-customElements.define('cs-label-and-data', $5fa5f0f9910be384$export$1e36da95ba633cee);
-
-
-class $8fd4ce611e531164$export$56131fb252e2dabc extends HTMLElement {
-    dtitle;
-    img;
-    checkrecs;
-    checkattr;
-    failedrecs;
-    lastupdate;
-    constructor(){
-        super();
-        const sroot = this.attachShadow({
-            mode: 'open'
-        });
-        sroot.innerHTML = `
-			<style>
-				:host {
-					border: 1px solid #ccc;
-					margin: 0.5rem;
-					border-radius: 4px;
-					cursor: pointer;
-					width: 13rem;
-					box-shadow: 4px 4px #ccc;
-				}
-				.title {
-					font-weight: bold;
-					margin-top: .7rem;
-					margin-bottom: 0.3rem;
-					text-align: center;
-					overflow: hidden;
-					height: 2rem;
-					line-height: 1rem;
-				}
-				
-				/*
-				:host(:hover) .title {
-					text-decoration: underline;
-				}
-				 */
-				
-				.ts {
-					font-size: 0.7rem
-				}
-				
-				.view_dashboard {
-					/* background-color: var(--dark-background); */
-					background-color: rgb(71, 105, 41);
-					color: #ddd;
-					text-align: center;
-					padding: 0.6rem;
-				}
-				.view_dashboard:hover {
-					background-color: rgb(35, 75, 20);
-				}
-				
-				.wrapper {
-					padding: 1rem;
-				}
-
-				.lastupdate {
-					margin-top: 0.4rem;
-					font-size: 0.7rem;
-				}
-				
-				img {
-					height: 100px;
-					width: 100%;
-					object-fit: contain;
-					margin-bottom: 0.5rem;
-				}
-	
-			</style>
-			<div class="wrapper">
-				<div class="title">XXX</div>
-				<img class="img">
-				<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
-				<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
-				<cs-label-and-data class="totissues" xstyle="display: none">total issues</cs-label-and-data>
-				<div class="lastupdate">
-					\u{1F551} <span class="data"></span>
-					<span></span>
-				</div>
-			</div>
-			<div class="view_dashboard">View dashboard</div>
-		`;
-        customElements.upgrade(sroot);
-        this.checkrecs = (0, $372cab4458345058$export$d885650843ca84a5)((0, $5fa5f0f9910be384$export$1e36da95ba633cee), sroot.querySelector('.checktrec'));
-        this.checkattr = (0, $372cab4458345058$export$d885650843ca84a5)((0, $5fa5f0f9910be384$export$1e36da95ba633cee), sroot.querySelector('.checkattr'));
-        this.failedrecs = (0, $372cab4458345058$export$d885650843ca84a5)((0, $5fa5f0f9910be384$export$1e36da95ba633cee), sroot.querySelector('.totissues'));
-        this.dtitle = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, sroot.querySelector('.title'));
-        this.img = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLImageElement, sroot.querySelector('.img'));
-        this.lastupdate = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.lastupdate .data'));
-        // this.img.style.display = 'none';
-        this.checkrecs.setLabel('checked recs');
-        this.checkattr.setLabel('checked attrs');
-        this.failedrecs.setLabel('quality-assured recs');
-    // this.failedrecs.setSeverity("fail")
-    // this.failedrecs.setData('123')
-    }
-    refresh(dataset) {
-        const datestr = dataset.session_start_ts;
-        const date = new Date(datestr);
-        const dateformat = new Intl.DateTimeFormat('it-IT', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: "2-digit",
-            timeZone: 'Europe/Rome'
-        }).format(date);
-        this.dtitle.textContent = dataset.dataset_name;
-        this.img.src = dataset.dataset_img_url.length > 0 ? dataset.dataset_img_url : 'dataset-placeholder.png';
-        this.checkrecs.setData('' + dataset.tested_records);
-        this.checkattr.setData('123');
-        this.failedrecs.setData('' + (dataset.tested_records - dataset.failed_records));
-        const quality_ratio = dataset.tested_records == 0 ? 100 : dataset.failed_records / dataset.tested_records;
-        if (quality_ratio < 0.1) this.failedrecs.setQualityLevel("good");
-        else if (quality_ratio < 0.3) this.failedrecs.setQualityLevel("warn");
-        else this.failedrecs.setQualityLevel("fail");
-        this.lastupdate.textContent = dateformat;
-        this.onclick = ()=>{
-            location.hash = "#page=dataset-categories&dataset_name=" + dataset.dataset_name + "&session_start_ts=" + dataset.session_start_ts + "&failed_records=" + dataset.failed_records + "&tested_records=" + dataset.tested_records;
-            window.scrollTo(0, 0);
-        };
-    }
-}
-customElements.define('cs-dataset-box', $8fd4ce611e531164$export$56131fb252e2dabc);
-
-
-
-
-
-class $8669cd8837fe1d69$export$2bdcae992c3953b6 extends HTMLElement {
-    sroot;
-    boxContainer;
-    boxes = [];
-    titles = [];
-    constructor(){
-        super();
-        this.sroot = this.attachShadow({
-            mode: 'open'
-        });
-        this.sroot.innerHTML = `
-			<link rel="stylesheet" href="index.css">
-			<div class="ProjectsElement">
-				<div class="title" style="padding: 1rem">standard dashboards</div>
-				<div class="searchbar">
-					<input> \u{1F50D} <span class="clearinput">\u{2715}</span>
-				</div>
-				<div class="container"></div>
-			</div>
-		`;
-        this.boxContainer = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, this.sroot.querySelector('.container'));
-        this.boxContainer.textContent = "loading ...";
-        const refreshlist = ()=>{
-            for(let b = 0; b < this.titles.length; b++)if (this.titles[b].toLowerCase().indexOf(input.value.toLowerCase()) >= 0) this.boxes[b].style.display = 'block';
-            else this.boxes[b].style.display = 'none';
-        };
-        const input = this.sroot.querySelector('input');
-        input.oninput = refreshlist;
-        const clearinput = this.sroot.querySelector('.clearinput');
-        clearinput.onclick = ()=>{
-            input.value = '';
-            refreshlist();
-        };
-    }
-    async refresh() {
-        this.boxes = [];
-        this.titles = [];
-        this.boxContainer.textContent = '';
-        const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
-        this.boxContainer.appendChild(loader);
-        const json = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_max_ts_vw({});
-        loader.remove();
-        console.log(json);
-        for (let dataset of json){
-            const box = new (0, $8fd4ce611e531164$export$56131fb252e2dabc)();
-            this.boxContainer.appendChild(box);
-            box.refresh(dataset);
-            this.boxes.push(box);
-            this.titles.push(dataset.dataset_name);
-        }
-    }
-}
-customElements.define('cs-standard-dashboards-element', $8669cd8837fe1d69$export$2bdcae992c3953b6);
-
-
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
-
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
-class $a733ad434eb12a41$export$a31dc9dd1a4cb4b2 extends HTMLElement {
-    content;
-    open = true;
-    openclose;
-    label;
-    actions;
-    onopen = ()=>{};
-    constructor(){
-        super();
-        const sroot = this.attachShadow({
-            mode: 'open'
-        });
-        sroot.innerHTML = `
-				<style>
-					:host {
-						display: block;
-					}
-					.header {
-						display: flex;
-						align-items: center;
-					}
-					.label {
-						flex-grow: 1;
-						cursor: pointer;
-						padding: 0.4rem;
-						user-select: none;
-					}
-					.openclose {
-						cursor: pointer;
-						padding: 0.4rem;
-						user-select: none;
-					}
-					.content {
-						overflow: hidden;
-						transition: transform 1s;
-						transform-origin: top;
-					}
-					
-					/*
-					span.label::before {
-					  content: "";
-					  display: inline-block;
-					  width: 8px;
-					  height: 8px;
-					  background-color: red;
-					  border-radius: 50%;
-					  margin-right: 5px;
-					}
-					 */
-					
-					.nextpagebutton {
-															margin: auto;
-															display: block;
-															background-color: black;
-															color: white;
-														}
-														
-					
-				</style>
-				<div class="header">
-				<span class="label">title</span>
-				<span class="actions">actions</span>
-				<span class="openclose"></span>
-				</div>
-				<div class="content"></div>
-				`;
-        customElements.upgrade(sroot);
-        this.label = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.label'));
-        this.actions = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.actions'));
-        this.content = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, sroot.querySelector('.content'));
-        this.openclose = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.openclose'));
-        this.openclose.onclick = ()=>{
-            this.toggle();
-        };
-        this.label.onclick = this.openclose.onclick;
-        this.toggle();
-    }
-    toggle() {
-        this.open = !this.open;
-        this.content.style.height = !this.open ? '0rem' : 'auto';
-        this.openclose.textContent = !this.open ? "\u25BC" : "\u25B2";
-        if (this.open) {
-            this.content.textContent = '' // svuola la sezione
-            ;
-            this.onopen();
-        }
-    }
-    async refresh(label, actions) {
-        this.label.textContent = label;
-        this.actions.textContent = actions;
-    }
-    addElementToContentArea(e) {
-        this.content.appendChild(e);
-    }
-}
-customElements.define('cs-open-close-section', $a733ad434eb12a41$export$a31dc9dd1a4cb4b2);
-
-
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
-class $909a658809776454$export$f955a0e263c4d7d2 extends HTMLElement {
-    label;
-    constructor(){
-        super();
-        const sroot = this.attachShadow({
-            mode: 'open'
-        });
-        sroot.innerHTML = `
-				<style>
-					:host {
-						display: block;
-						border: 1px solid #eee;
-						padding: 1rem;
-					}
-					
-				</style>
-				<span class="label">title</span>
-				`;
-        customElements.upgrade(sroot);
-        this.label = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.label'));
-    }
-    async refresh(s) {
-        this.label.textContent = s;
-    }
-}
-customElements.define('cs-section-row', $909a658809776454$export$f955a0e263c4d7d2);
-
-
-
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
-
-
-class $ca572d4d6d9b8dd6$export$729e7aa079c22ee6 extends HTMLElement {
-    template;
-    connected_promise;
-    connected_func = (s)=>null;
-    more_div;
-    connectedCallback() {
-        console.log('connected');
-        this.connected_func(null);
-    }
-    constructor(){
-        super();
-        this.connected_promise = new Promise((s)=>this.connected_func = s);
-        const sroot = this.attachShadow({
-            mode: 'open'
-        });
-        sroot.innerHTML = `
-						<style>
-							:host {
-								display: inline-block;
-								box-shadow: 4px 4px #ccc;
-							}
-							.category {
-								border: 1px solid gray;
-								width: 12rem;
-								display: inline-block;
-								/* margin: 1rem; */
-							}
-							.category > img {
-								width: 100%;
-							}
-							.category .category_name {
-								font-weight: bold;
-								text-align: center;
-								margin-top: 0.4rem;
-								margin-bottom: 0.4rem;
-								line-height: 1rem;
-								height: 2rem;
-							}
-							.frame {
-								display: flex
-							}
-							.frame .content {
-								flex-grow: 100;
-								display: flex;
-							}
-							.chartdiv {
-								width:  100px;
-								height: 100px;
-								margin: auto;
-								position: relative;
-								margin-top: 0.4rem;
-							}
-							
-							.chartdiv .perc {
-								position: absolute;
-								top:  calc(50% - 0.8rem);
-								left: calc(50% - 1.6rem);
-								font-size: 1.5rem;
-								font-weight: bold;
-								color: #000;
-							}
-							
-							details {
-								margin-top: 0.4rem;
-								margin-bottom: 0.4rem;
-							}
-							
-							details > * {
-								padding: 0.5em;
-								border-bottom: 1px solid #ccc;
-							}
-														
-							.view_details {
-								/* background-color: var(--dark-background); */
-								background-color: rgb(71, 105, 41);
-								color: #ddd;
-								text-align: center;
-								padding: 0.6rem;
-								cursor: pointer;
-							}
-							
-							.view_details:hover {
-								background-color: rgb(35, 75, 20);
-							}
-
-							.lastupdate {
-								margin-top: 0.4rem;
-								font-size: 0.7rem;
-								margin-bottom: 0.4rem;
-								margin-left: 0.4rem;
-								margin-right: 0.4rem;
-							}
-							
-							.nr_records, details {
-								margin-left: 0.4rem;
-								margin-right: 0.4rem;
-							}
-
-						</style>
-						<div class="category">
-							<!-- <img src="kpi-pie-chart.png"> -->
-							<div class="chartdiv">
-								<div class="perc">12%</div>
-								<canvas class="chart"></canvas>
-							</div>
-							<div class="category_name">Completeness</div>
-							<span></span>
-							<cs-label-and-data label="quality-assured recs" class="nr_records"></cs-label-and-data>
-							<div class="lastupdate">
-								<span class="data"></span>
-								<span></span>
-							</div>
-							<!-- <div class="nr_records">123</div> -->
-							<div class="more">
-								<details>
-									<summary>carried out tests</summary>
-								</details>
-								<div class="view_details">View details</div>
-							</div>
-						</div>
-						`;
-        customElements.upgrade(sroot);
-        this.template = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, sroot.querySelector('.category'));
-        this.more_div = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, sroot.querySelector('.more'));
-    }
-    hideMoreDiv() {
-        this.more_div.style.display = 'none';
-    }
-    async refresh(data) {
-        const cat = this.template;
-        this.setup_chart(cat, data);
-        const cat_name = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, cat.querySelector('.category_name'));
-        cat_name.textContent = data.check_category;
-        const failedelement = (0, $372cab4458345058$export$d885650843ca84a5)((0, $5fa5f0f9910be384$export$1e36da95ba633cee), cat.querySelector('.nr_records'));
-        failedelement.setData('' + (data.tot_records - data.failed_records));
-        const last_update = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, cat.querySelector('.lastupdate .data'));
-        const date = new Date(data.session_start_ts);
-        const perc = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, cat.querySelector('.perc'));
-        perc.textContent = '' + ((data.tot_records - data.failed_records) * 100 / data.tot_records).toFixed(1);
-        const dateformat = new Intl.DateTimeFormat('it-IT', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: "2-digit",
-            timeZone: 'Europe/Rome'
-        }).format(date);
-        last_update.textContent = dateformat;
-        const view_details = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, cat.querySelector('.view_details'));
-        view_details.onclick = ()=>{
-            location.hash = '#page=summary&session_start_ts=' + data.session_start_ts + '&dataset_name=' + data.dataset_name + '&category_name=' + data.check_category + '&failed_records=' + data.failed_records + '&tot_records=' + data.tot_records;
-        };
-        const cat_details = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, cat.querySelector('details'));
-        (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw({
-            session_start_ts: data.session_start_ts,
-            dataset_name: data.dataset_name,
-            check_category: data.check_category
-        }).then((checks)=>{
-            console.log(checks);
-            for(let i2 = 0; i2 < checks.length; i2++){
-                const div = document.createElement('div');
-                div.textContent = checks[i2].check_name // + ' ' + checks[i2].failed_records +  ' / ' + checks[i2].tot_records 
-                ;
-                cat_details.appendChild(div);
-            }
-        });
-    }
-    async setup_chart(cat, arg1) {
-        await this.connected_promise;
-        const chart = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLCanvasElement, cat.querySelector('.chart'));
-        // const context = chart.getContext('2d');
-        new Chart(chart, {
-            type: 'doughnut',
-            data: {
-                labels: [
-                    'ok',
-                    'fail'
-                ],
-                datasets: [
-                    {
-                        label: 'Dataset 1',
-                        data: [
-                            arg1.tot_records - arg1.failed_records,
-                            arg1.failed_records
-                        ],
-                        backgroundColor: [
-                            '#0a0',
-                            '#222'
-                        ]
-                    }
-                ]
-            },
-            options: {
-                cutout: '80%',
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false,
-                        position: 'top'
-                    },
-                    title: {
-                        display: false,
-                        text: 'Chart.js Doughnut Chart'
-                    }
-                }
-            }
-        });
-    }
-}
-customElements.define('cs-dataset-issue-category', $ca572d4d6d9b8dd6$export$729e7aa079c22ee6);
-
-
-class $c8d932129275398d$export$2dcbc072ead0b1fd extends HTMLElement {
-    container;
-    last_session_start_ts = null;
-    last_dataset_name = null;
-    last_check_category = null;
-    last_failed_records = null;
-    last_tot_records = null;
-    current_tab = 'issues';
-    sroot;
-    canvas;
-    // connected_promise
-    // connected_func: (s: null) => void = s => null
-    chartjs_success;
-    chartjs_promise;
-    issues;
-    records;
-    // info_and_settings: GeneralInfoAndSettings;
-    connectedCallback() {
-        // chartjs need to be created when element is attached into the dom
-        const chart = new Chart(this.canvas, {
-            type: 'line',
-            data: {
-                labels: [
-                    '-5',
-                    '-4',
-                    '-3',
-                    '-2',
-                    '-1'
-                ],
-                datasets: []
-            },
-            options: {
-                scales: {
-                    y: {
-                        stacked: true,
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-        this.chartjs_success(chart);
-    }
-    constructor(){
-        super();
-        this.chartjs_success = (s)=>{} // dummy initialization, next line will init chartjs_success but compiler don't understand this!
-        ;
-        this.chartjs_promise = new Promise((s)=>this.chartjs_success = s);
-        this.sroot = this.attachShadow({
-            mode: 'open'
-        });
-        this.sroot.innerHTML = `
-				<style>
-					:host {
-						padding: 0.5rem;
-						display: block;
-					}
-					.container {
-						border: 1px solid #ccc;
-						border-radius: 0.3rem;
-					}
-					
-					.container > * {
-						border-bottom: 1px solid #ccc;
-					}
-					.header {
-						display: flex;
-					}
-					.header .chart {
-						width: 50%;
-					}
-					
-					.actions {
-						border: 1px solid black;
-						width: 10rem;
-						margin-left: auto;
-						display: flex;
-						border-radius: 0.4rem;
-						margin-bottom: 0.5rem;
-					}
-					
-					.actions span.selected {
-						color: white;
-						background-color: black;
-					}
-					
-					.actions span {
-						flex-grow: 50;
-						text-align: center;
-						cursor: pointer;
-					}
-					
-					.nextpagebutton {
-															margin: auto;
-															display: block;
-															background-color: black;
-															color: white;
-														}
-														
-					
-
-				
-				</style>
-				<!-- <img src="kpi-detail.png" style="max-width: 100%"> -->
-				<div class="header">
-					<div>
-						<cs-dataset-issue-category></cs-dataset-issue-category>
-					</div>
-					<div class="chart">
-						<canvas></canvas>
-					</div>
-					<!--<cs-general-info-and-settings></cs-general-info-and-settings>-->
-				</div>
-				<div style="width: calc(100% - 20px)">
-					<div style="text-align: right" class="actions">
-						<span class="issues">Issues</span>
-						<span class="records">Records</span>
-					</div>
-					<div class="container"></div>
-				</div>
-				`;
-        customElements.upgrade(this.sroot);
-        this.container = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, this.sroot.querySelector('.container'));
-        this.issues = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, this.sroot.querySelector('.issues'));
-        this.records = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, this.sroot.querySelector('.records'));
-        this.issues.onclick = ()=>{
-            this.current_tab = 'issues';
-            if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null && this.last_failed_records != null && this.last_tot_records != null) this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records);
-        };
-        this.records.onclick = ()=>{
-            this.current_tab = 'records';
-            if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null && this.last_failed_records != null && this.last_tot_records != null) this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records);
-        };
-        this.canvas = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLCanvasElement, this.sroot.querySelector('canvas'));
-    // this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
-    }
-    extractHumanReadableName(record_jsonpath, json) {
-        let ret = '';
-        for (let fn of [
-            'sname',
-            'mvalidtime',
-            'mvalue',
-            'AccoDetail.de.Name',
-            'Detail.de.Title'
-        ]){
-            const fn_parts = fn.split('.');
-            let val = JSON.parse(json);
-            for (let p of fn_parts){
-                val = val[p];
-                if (val === undefined) break;
-            }
-            // const val = start[fn] 
-            if (val !== undefined) ret += (ret === '' ? '' : ', ') + fn + '=' + JSON.stringify(val);
-        }
-        if (ret == '') ret = record_jsonpath;
-        return ret;
-    }
-    groupRecords(list) {
-        const groupBy = {};
-        for(let k = 0; k < list.length; k++){
-            const json = JSON.parse(list[k].record_json);
-            let sname = json['sname'];
-            if (typeof sname !== 'string') sname = '';
-            let prev_arr = groupBy[sname];
-            prev_arr = prev_arr === undefined ? [] : prev_arr;
-            prev_arr.push(list[k]);
-            groupBy[sname] = prev_arr;
-        }
-        return groupBy;
-    }
-    async refresh(p_session_start_ts, p_dataset_name, p_category_name, p_failed_records, p_tot_records) {
-        this.last_session_start_ts = p_session_start_ts;
-        this.last_dataset_name = p_dataset_name;
-        this.last_check_category = p_category_name;
-        this.last_failed_records = p_failed_records;
-        this.last_tot_records = p_tot_records;
-        // this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records)
-        console.log(p_session_start_ts);
-        console.log(p_dataset_name);
-        console.log(p_category_name);
-        (async ()=>{
-            const data = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_history_vw({
-                dataset_name: this.last_dataset_name,
-                check_category: this.last_check_category
-            });
-            // const goodarr  = []
-            // const failarr  = []
-            const labels = [];
-            const datasets = [];
-            for(let x = 0; x < data.length; x++){
-                const row = data[x];
-                labels.push(row.session_start_ts.slice(0, 16).replace('T', ' '));
-                const check_stats = JSON.parse(row.check_stats);
-                console.log(check_stats);
-                for(let c = 0; c < check_stats.length; c++){
-                    const check_stat = check_stats[c];
-                    let found = false;
-                    for(let d = 0; d < datasets.length; d++)if (datasets[d].label == check_stat.check_name) {
-                        datasets[d].data.push(check_stat.failed_recs);
-                        found = true;
-                        break;
-                    }
-                    if (!found) datasets.push({
-                        label: check_stat.check_name,
-                        data: [
-                            check_stat.failed_recs
-                        ],
-                        fill: false,
-                        backgroundColor: '#aaa',
-                        borderColor: '#aaa',
-                        tension: 0.1
-                    });
-                }
-            /*
-						goodarr.push(data[x].tested_records - data[x].failed_recs)
-						failarr.push(data[x].failed_recs)
-						 */ }
-            const chartjs = await this.chartjs_promise;
-            chartjs.data.labels = labels;
-            chartjs.data.datasets = datasets;
-            /*
-					chartjs.data.datasets = [
-												{
-													label: 'fail trend',
-													data: failarr,
-													fill: false,
-													backgroundColor: '#222',
-													borderColor: '#222',
-													tension: 0.1
-												},
-												{
-													label: 'total trend',
-													data: goodarr,
-													fill: false,
-													backgroundColor: '#aaa',
-													borderColor: '#aaa',
-													tension: 0.1
-												},						
-											]
-					*/ chartjs.update();
-        })();
-        const category = (0, $372cab4458345058$export$d885650843ca84a5)((0, $ca572d4d6d9b8dd6$export$729e7aa079c22ee6), this.sroot.querySelector('cs-dataset-issue-category'));
-        category.hideMoreDiv();
-        category.refresh({
-            dataset_name: p_dataset_name,
-            session_start_ts: p_session_start_ts,
-            check_category: p_category_name,
-            failed_records: p_failed_records,
-            tot_records: p_tot_records
-        });
-        this.container.textContent = '';
-        if (this.current_tab === 'issues') {
-            this.records.classList.remove('selected');
-            this.issues.classList.add('selected');
-            const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
-            this.container.appendChild(loader);
-            const json = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw({
-                session_start_ts: p_session_start_ts,
-                dataset_name: p_dataset_name,
-                check_category: p_category_name
-            });
-            loader.remove();
-            for(let i = 0; i < json.length; i++){
-                const issue = json[i];
-                // console.log(issue)
-                const section = new (0, $a733ad434eb12a41$export$a31dc9dd1a4cb4b2)();
-                section.refresh(issue.check_name, 'failed: ' + issue.nr_records + ' records');
-                this.container.appendChild(section);
-                section.onopen = async ()=>{
-                    const moreButton = document.createElement('button');
-                    moreButton.classList.add('nextpagebutton');
-                    moreButton.textContent = 'next 100';
-                    section.addElementToContentArea(moreButton);
-                    let list_offset = 0;
-                    const nextFun = async ()=>{
-                        const json2 = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_record_check_failed({
-                            session_start_ts: p_session_start_ts,
-                            dataset_name: p_dataset_name,
-                            check_category: p_category_name,
-                            check_name: issue.check_name,
-                            limit: 100,
-                            offset: list_offset
-                        });
-                        // const list = groupBy[keys[0]]
-                        for(let k2 = 0; k2 < json2.length; k2++){
-                            const sectionRow2 = new (0, $909a658809776454$export$f955a0e263c4d7d2)();
-                            // section.addElementToContentArea(sectionRow2)
-                            moreButton.parentElement.insertBefore(sectionRow2, moreButton);
-                            sectionRow2.refresh(this.extractHumanReadableName(json2[k2].record_jsonpath, json2[k2].record_json));
-                            // sectionRow2.refresh(json2[k2].problem_hint)
-                            sectionRow2.onclick = ()=>{
-                                alert(json2[k2].record_json);
-                            };
-                        }
-                        list_offset += 100;
-                    };
-                    moreButton.onclick = nextFun;
-                    nextFun();
-                /*
-					//console.log('sezione aperta, ricarico!')
-					const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
-								session_start_ts: p_session_start_ts,
-								dataset_name: p_dataset_name,
-								check_category: p_category_name,
-								check_name: issue.check_name
-					});
-					const groupBy = this.groupRecords(json2)
-					const keys = Object.keys(groupBy)
-					console.log(keys)
-					if (keys.length == 1 && keys[0] == '')
-					{
-						const moreButton = document.createElement('button')
-						moreButton.textContent = 'next 10'
-						section.addElementToContentArea(moreButton)
-						const nextFun = () => {
-							const list = groupBy[keys[0]]
-							for (let k2 = 0; k2 < list.length; k2++)
-							{
-								const sectionRow2 = new SectionRow();
-								section.addElementToContentArea(sectionRow2)
-								// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
-								sectionRow2.refresh(list[k2].problem_hint)
-								sectionRow2.onclick = () => {
-									alert(list[k2].record_json)
-								}
-							}
-							
-						}
-						moreButton.onclick = nextFun
-					}
-					else
-					{
-						for (let k = 0; k < keys.length; k++)
-						{
-							const sectionRow = new OpenCloseSection();
-							section.addElementToContentArea(sectionRow)
-							sectionRow.refresh(keys[k], '' + groupBy[keys[k]].length + ' records')
-							sectionRow.onclick = () => {
-								const list = groupBy[keys[k]]
-								console.log(list)
-								for (let k2 = 0; k2 < list.length; k2++)
-								{
-									const sectionRow2 = new SectionRow();
-									sectionRow.addElementToContentArea(sectionRow2)
-									// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
-									sectionRow2.refresh(list[k2].problem_hint)
-									sectionRow2.onclick = () => {
-										alert(list[k2].record_json)
-									}
-								}
-							}
-						}
-					}
-					*/ };
-            }
-        }
-        if (this.current_tab === 'records') {
-            this.issues.classList.remove('selected');
-            this.records.classList.add('selected');
-            const moreButton = document.createElement('button');
-            moreButton.classList.add('nextpagebutton');
-            moreButton.textContent = 'next 100';
-            this.container.appendChild(moreButton);
-            let list_offset = 0;
-            const nextFun = async ()=>{
-                const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
-                this.container.appendChild(loader);
-                const list = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw({
-                    session_start_ts: p_session_start_ts,
-                    dataset_name: p_dataset_name,
-                    check_category: p_category_name,
-                    offset: list_offset,
-                    limit: 100
-                });
-                loader.remove();
-                for(let k2 = 0; k2 < list.length; k2++){
-                    const sectionRow2 = new (0, $a733ad434eb12a41$export$a31dc9dd1a4cb4b2)();
-                    // this.container.appendChild(sectionRow2)
-                    moreButton.parentElement.insertBefore(sectionRow2, moreButton);
-                    sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), '' + list[k2].nr_check_names + ' check failed');
-                    sectionRow2.onclick = async ()=>{
-                        const json2 = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_record_check_failed({
-                            session_start_ts: p_session_start_ts,
-                            dataset_name: p_dataset_name,
-                            check_category: p_category_name,
-                            record_jsonpath: list[k2].record_jsonpath
-                        });
-                        for(let k = 0; k < json2.length; k++){
-                            const sectionRow = new (0, $909a658809776454$export$f955a0e263c4d7d2)();
-                            sectionRow2.addElementToContentArea(sectionRow);
-                            sectionRow.refresh("failed: " + json2[k].check_name);
-                        }
-                    };
-                }
-                list_offset += 100;
-            };
-            moreButton.onclick = nextFun;
-            nextFun();
-        /*
-			const groupBy = this.groupRecords(json)
-			const keys = Object.keys(groupBy)
-			console.log(keys)
-			if (keys.length == 1 && keys[0] == '')
-			{
-				const list = groupBy[keys[0]]
-				for (let k2 = 0; k2 < list.length; k2++)
-				{
-					const sectionRow2 = new OpenCloseSection();
-					this.container.appendChild(sectionRow2)
-					sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), '' + list[k2].nr_check_names + ' check failed')
-					sectionRow2.onclick = async () => {
-						const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
-													session_start_ts: p_session_start_ts,
-													dataset_name: p_dataset_name,
-													check_category: p_category_name,
-													record_jsonpath: list[k2].record_jsonpath
-											});
-
-						for (let k = 0; k < json2.length; k++)
-						{
-							const sectionRow = new SectionRow();
-							sectionRow2.addElementToContentArea(sectionRow)
-							sectionRow.refresh("failed: " + json2[k].check_name)
-						}
-					}
-				}
-			}
-			else
-			{
-				for (let k = 0; k < keys.length; k++)
-				{
-					const sectionRow = new OpenCloseSection();
-					this.container.appendChild(sectionRow)
-					sectionRow.refresh(keys[k], '' + groupBy[keys[k]].length + ' records')
-					sectionRow.onclick = () => {
-						const list = groupBy[keys[k]]
-						console.log(list)
-						for (let k2 = 0; k2 < list.length; k2++)
-						{
-							const sectionRow2 = new OpenCloseSection();
-							sectionRow.addElementToContentArea(sectionRow2)
-							sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), list[k2].nr_check_names)
-							sectionRow2.onclick = async (e) => {
-								e.stopPropagation()
-								const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
-																					session_start_ts: p_session_start_ts,
-																					dataset_name: p_dataset_name,
-																					check_category: p_category_name,
-																					record_jsonpath: list[k2].record_jsonpath
-													});
-								for (let k = 0; k < json2.length; k++)
-								{
-									const sectionRow = new SectionRow();
-									sectionRow2.addElementToContentArea(sectionRow)
-									sectionRow.refresh(json2[k].check_name)
-								}
-								
-							}
-						}
-					}
-				}
-			}
-			 */ }
-    }
-}
-customElements.define('cs-dataset-issues-detail', $c8d932129275398d$export$2dcbc072ead0b1fd);
-
-
-
-// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
-//
-// SPDX-License-Identifier: AGPL-3.0-or-later
-
-
-
-
-class $37b7d08b4187bf8a$export$1b80eba8896b3ede extends HTMLElement {
-    content;
-    connected_promise;
-    connected_func = (s)=>null;
-    connectedCallback() {
-        console.log('connected');
-        this.connected_func(null);
-    }
-    sroot;
-    // info_and_settings
-    noissues;
-    constructor(){
-        super();
-        this.connected_promise = new Promise((s)=>this.connected_func = s);
-        this.sroot = this.attachShadow({
-            mode: 'open'
-        });
-        this.sroot.innerHTML = `
-						<style>
-							:host {
-							}
-							.category {
-								border: 1px solid gray;
-								width: 12rem;
-								display: inline-block;
-								margin: 1rem;
-							}
-							.category > img {
-								width: 100%;
-							}
-							.category .category_name {
-								font-weight: bold;
-							}
-							.frame {
-								display: flex;
-								align-items: start;
-							}
-							.frame .content {
-								flex-grow: 100;
-								display: flex;
-								align-items: start;
-							}
-							.chartdiv {
-								width:  100px;
-								height: 100px;
-								margin: auto;
-							}
-							details > *:nth-child(even) {
-							  background-color: #ccc;
-							}
-							
-							.content > * {
-								margin-top: 1rem;
-								margin-left: 1rem;
-							}
-							.noissues {
-								display: none;
-							}
-						</style>
-						<div class="frame">
-							<div class="noissues">sound good, no problems found here!</div>
-							<div class="content"></div>
-							<!--<cs-general-info-and-settings></cs-general-info-and-settings>-->
-							<!--<img src="kpi-general-info.png">-->
-						</div>
-						`;
-        customElements.upgrade(this.sroot);
-        this.content = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, this.sroot.querySelector('.content'));
-        // this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
-        this.noissues = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, this.sroot.querySelector('.noissues'));
-    }
-    async refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records) {
-        // this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records);
-        const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
-        this.content.appendChild(loader);
-        const resp = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw({
-            session_start_ts: p_session_start_ts,
-            dataset_name: p_dataset_name
-        });
-        loader.remove();
-        console.log(resp);
-        for(let i = 0; i < resp.length; i++){
-            const category = new (0, $ca572d4d6d9b8dd6$export$729e7aa079c22ee6)();
-            this.content.appendChild(category);
-            category.refresh(resp[i]);
-        }
-        this.noissues.style.display = resp.length == 0 ? 'block' : 'none';
-    }
-}
-customElements.define('cs-dataset-categories', $37b7d08b4187bf8a$export$1b80eba8896b3ede);
-
-
 /*
  * Copyright 2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
@@ -2731,9 +1352,20 @@ function $646b7289fb27eacc$export$fa1e2fb699b7861e(token, options) {
 }
 
 
+const $d96156a0a1b95fa8$export$1186fbcaae027bf4 = new Promise(async (s)=>{
+    const kc = new (0, $0a57ee69e1387252$export$2e2bcd8739ae039)({
+        url: "https://auth.opendatahub.testingmachine.eu/auth/",
+        realm: "noi",
+        clientId: "odh-data-quality-web"
+    });
+    await kc.init({
+        redirectUri: 'http://localhost:8080'
+    });
+    console.log('init fatto!');
+    s(kc);
+});
 class $d96156a0a1b95fa8$export$7da08f6375958bbe extends HTMLElement {
     sroot;
-    keycloak;
     div_unauthenticated;
     div_authenticated;
     button_login;
@@ -2822,21 +1454,16 @@ class $d96156a0a1b95fa8$export$7da08f6375958bbe extends HTMLElement {
         this.button_login = this.sroot.querySelector('.unauthenticated button');
         this.user_button = this.sroot.querySelector('.user-button');
         this.user_menu = this.sroot.querySelector('.user-menu');
-        this.keycloak = new (0, $0a57ee69e1387252$export$2e2bcd8739ae039)({
-            url: "https://auth.opendatahub.testingmachine.eu/auth/",
-            realm: "noi",
-            clientId: "odh-data-quality-web"
-        });
-        this.button_login.onclick = ()=>{
-            this.keycloak.login();
+        this.button_login.onclick = async ()=>{
+            (await $d96156a0a1b95fa8$export$1186fbcaae027bf4).login();
         };
         this.user_button.onclick = (e)=>{
             e.stopPropagation(); // 🔥 blocca la chiusura immediata
             this.user_menu.classList.toggle('show');
         };
         const logout_button = this.sroot.querySelector('.logout-button');
-        logout_button.onclick = ()=>{
-            this.keycloak.logout();
+        logout_button.onclick = async ()=>{
+            (await $d96156a0a1b95fa8$export$1186fbcaae027bf4).logout();
         };
         // Listener globale per chiudere il menu se si clicca fuori
         document.addEventListener('click', (e)=>{
@@ -2845,11 +1472,12 @@ class $d96156a0a1b95fa8$export$7da08f6375958bbe extends HTMLElement {
         this.refreshLoginState();
     }
     async refreshLoginState() {
-        const authenticated = await this.keycloak.init({
-            redirectUri: 'http://localhost:8080'
-        });
-        if (authenticated) {
-            const token = this.keycloak.token;
+        /*
+		const authenticated = await keycloak.init({
+			redirectUri: 'http://localhost:8080'
+		});
+		 */ if ((await $d96156a0a1b95fa8$export$1186fbcaae027bf4).authenticated) {
+            const token = (await $d96156a0a1b95fa8$export$1186fbcaae027bf4).token;
             const decoded = (0, $646b7289fb27eacc$export$fa1e2fb699b7861e)(token);
             const username = decoded.preferred_username || decoded.name || 'User';
             this.user_button.textContent = `${username} \u{25BC}`;
@@ -2862,6 +1490,1398 @@ class $d96156a0a1b95fa8$export$7da08f6375958bbe extends HTMLElement {
     }
 }
 customElements.define('cs-auth-component', $d96156a0a1b95fa8$export$7da08f6375958bbe);
+
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+class $50fcf601af37099e$export$3b0d6d7590275603 extends HTMLElement {
+    constructor(){
+        super();
+        const sroot = this.attachShadow({
+            mode: 'open'
+        });
+        sroot.innerHTML = `
+				<link rel="stylesheet" href="loader.css">
+				<style>
+					:host {
+						width: 65px;
+						height: 15px;
+						display: inline-block;
+						overflow: hidden;
+						margin: 2rem;
+					}
+					div.loader {
+						color: #222;
+					}
+					
+				</style>
+				<div class="loader" style="margin-top: 0px; margin-left:20px"></div>
+				`;
+        customElements.upgrade(sroot);
+    }
+}
+customElements.define('cs-loader', $50fcf601af37099e$export$3b0d6d7590275603);
+
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+class $1e820cf339dfc6f8$export$3a4b11f05d5e029f {
+    static async call(action, json) {
+        const params = new URLSearchParams();
+        params.append('action', action);
+        params.append('filter_byexample', JSON.stringify(json));
+        // https://www.catch-solve.tech/noi-odh-testing-tool/api?
+        // http://localhost:8080/api?
+        const resp = await fetch('api?' + params.toString());
+        const respjson = await resp.json();
+        // wait for debug pourpose
+        // await new Promise((s) =>  { setTimeout(s, 1000)})
+        return respjson;
+    }
+    // begin crudl methods
+    static async list__catchsolve_noiodh__test_dataset_max_ts_vw(filter) {
+        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.catchsolve_noiodh__test_dataset_max_ts_vw', filter);
+        return resp;
+    }
+    static async list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(filter) {
+        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_check_category_failed_recors_vw', filter);
+        return resp;
+    }
+    static async list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(filter) {
+        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_check_category_check_name_failed_recors_vw', filter);
+        return resp;
+    }
+    static async list__catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw(filter) {
+        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw', filter);
+        return resp;
+    }
+    static async list__catchsolve_noiodh__test_dataset_record_check_failed(filter) {
+        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_record_check_failed', filter);
+        return resp;
+    }
+    static async list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw(filter) {
+        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_check_category_record_jsonpath_failed_vw', filter);
+        return resp;
+    }
+    static async list__catchsolve_noiodh__test_dataset_history_vw(filter) {
+        const resp = await $1e820cf339dfc6f8$export$3a4b11f05d5e029f.call('catchsolve_noiodh.test_dataset_history_vw', filter);
+        return resp;
+    }
+}
+ // end interfaces
+
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+function $372cab4458345058$export$26be2e78a9bc3271() {
+    throw new Error('unexpected null or undefined value');
+}
+function $372cab4458345058$export$d885650843ca84a5(tc, x) {
+    if (x === undefined) throw new Error('runtime cast: x is undefined instead of ' + tc.name);
+    if (x === null) throw new Error('runtime cast: x is null instead of ' + tc.name);
+    if (typeof x !== 'object') throw new Error('runtime cast: this function check only objects <T extends object>, instead of ' + typeof x);
+    if (!(x instanceof tc)) throw new Error('runtime cast: x with type: ' + x.constructor.name + ' does not match required type: ' + tc.name);
+    return x;
+}
+function $372cab4458345058$export$2ddf4623c78330ee(x) {
+    if (x === null) throw new Error('unexpected null value');
+    return x;
+}
+
+
+class $de236afea176a079$export$c0941f68287dbcd1 extends HTMLElement {
+    sroot;
+    submenus;
+    menuitemByName = {};
+    menuready_promise;
+    constructor(){
+        super();
+        this.sroot = this.attachShadow({
+            mode: 'open'
+        });
+        this.sroot.innerHTML = `
+			<style>
+
+				.title {
+					padding: 0.4rem;
+				}
+
+				div.submenus {
+					padding-left: 1rem;
+					overflow: hidden;
+				}
+				div.submenus > * {
+					margin:  0.4rem;
+					padding: 0.2rem;
+					cursor: pointer;
+				}
+				.selected {
+					background: #666;
+					color: white;
+				}
+				.title.close ~ .submenus {
+					display: none;
+				}
+				.openclose {
+					cursor: pointer;
+				}
+				.openclose:before {
+					content: "\u{25B2}"
+				}
+				.title.close .openclose:before {
+					content: "\u{25BC}"
+				}
+			</style>
+			<div class="title"><span class="openclose"></span> standard dashboards</div>
+			<div class="submenus"></div>
+		`;
+        this.submenus = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, this.sroot.querySelector('div.submenus'));
+        const title = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, this.sroot.querySelector('div.title'));
+        this.menuitemByName[''] = title;
+        title.onclick = ()=>{
+            location.hash = '';
+        };
+        const openclose = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, this.sroot.querySelector('span.openclose'));
+        openclose.onclick = ()=>{
+            title.classList.toggle('close');
+        };
+        let menuready_fun;
+        this.menuready_promise = new Promise((s)=>menuready_fun = s);
+        //get_current_autenticated_user().then(a => alert(a));
+        //alert (await get_current_autenticated_user())
+        // alert(keycloak.authenticated)
+        (0, $d96156a0a1b95fa8$export$1186fbcaae027bf4).then((k)=>{
+            console.log('devo sapere se loggato ' + k.authenticated);
+        });
+        const json_promise = (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_max_ts_vw({
+            used_key: 'opendata'
+        });
+        const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
+        this.sroot.appendChild(loader);
+        json_promise.then(async (json)=>{
+            for (let dataset of json){
+                const menu1_submenu = document.createElement('div');
+                menu1_submenu.textContent = dataset.dataset_name;
+                this.menuitemByName[dataset.dataset_name] = menu1_submenu;
+                this.submenus.appendChild(menu1_submenu);
+                menu1_submenu.onclick = ()=>{
+                    location.hash = "#page=dataset-categories&dataset_name=" + dataset.dataset_name + '&session_start_ts=' + dataset.session_start_ts + "&failed_records=" + dataset.failed_records + "&tested_records=" + dataset.tested_records;
+                };
+            }
+            loader.remove();
+            menuready_fun(null);
+        });
+    }
+    async refresh() {}
+    async selectItem(name) {
+        await this.menuready_promise;
+        for(let k in this.menuitemByName){
+            const item = this.menuitemByName[k];
+            if (name == k) item.classList.add('selected');
+            else item.classList.remove('selected');
+        }
+    }
+}
+customElements.define('cs-menu-element', $de236afea176a079$export$c0941f68287dbcd1);
+
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+class $5fa5f0f9910be384$export$1e36da95ba633cee extends HTMLElement {
+    label;
+    data;
+    constructor(){
+        super();
+        const sroot = this.attachShadow({
+            mode: 'open'
+        });
+        sroot.innerHTML = `
+		<style>
+			:host {
+				display: flex;
+				border-top: 1px solid #ccc;
+				padding-top: 0.3rem;
+				padding-bottom: 0.3rem;
+				align-items: center;
+			}
+			span {
+				font-size: 0.7rem;
+			}
+			span.label {
+				flex-grow: 1;
+				margin-right: 0.3rem;
+				padding: 0.2rem
+			}
+			span.data {
+				padding: 0.2rem;
+				border-radius: 0.3rem;
+				margin-right: 0.3rem;
+				background-color: var(--dark-background);
+				color: #ddd;
+				min-width: 2rem;
+				text-align: right;
+			}
+			:host(.fail) span.label {
+				background-color: #faa;
+				color: #400;
+				font-weight: bold;
+			}
+			:host(.good) span.label {
+				background-color: #afa;
+				color: #040;
+				font-weight: bold;
+			}
+			:host(.warn) span.label {
+				background-color: #ffa;
+				color: #440;
+				font-weight: bold;
+			}
+		</style>
+		<span class="data">.</span>
+		<span class="label"></span>
+		`;
+        this.label = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.label'));
+        this.setLabel(this.getAttribute('label') !== null ? this.getAttribute('label') : 'label');
+        this.data = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.data'));
+    }
+    setLabel(s) {
+        this.label.textContent = s;
+    }
+    setData(s) {
+        this.data.textContent = s;
+    }
+    setQualityLevel(severity) {
+        this.classList.add(severity);
+    }
+}
+customElements.define('cs-label-and-data', $5fa5f0f9910be384$export$1e36da95ba633cee);
+
+
+class $8fd4ce611e531164$export$56131fb252e2dabc extends HTMLElement {
+    dtitle;
+    img;
+    checkrecs;
+    checkattr;
+    failedrecs;
+    lastupdate;
+    constructor(){
+        super();
+        const sroot = this.attachShadow({
+            mode: 'open'
+        });
+        sroot.innerHTML = `
+			<style>
+				:host {
+					border: 1px solid #ccc;
+					margin: 0.5rem;
+					border-radius: 4px;
+					cursor: pointer;
+					width: 13rem;
+					box-shadow: 4px 4px #ccc;
+				}
+				.title {
+					font-weight: bold;
+					margin-top: .7rem;
+					margin-bottom: 0.3rem;
+					text-align: center;
+					overflow: hidden;
+					height: 2rem;
+					line-height: 1rem;
+				}
+				
+				/*
+				:host(:hover) .title {
+					text-decoration: underline;
+				}
+				 */
+				
+				.ts {
+					font-size: 0.7rem
+				}
+				
+				.view_dashboard {
+					/* background-color: var(--dark-background); */
+					background-color: rgb(71, 105, 41);
+					color: #ddd;
+					text-align: center;
+					padding: 0.6rem;
+				}
+				.view_dashboard:hover {
+					background-color: rgb(35, 75, 20);
+				}
+				
+				.wrapper {
+					padding: 1rem;
+				}
+
+				.lastupdate {
+					margin-top: 0.4rem;
+					font-size: 0.7rem;
+				}
+				
+				img {
+					height: 100px;
+					width: 100%;
+					object-fit: contain;
+					margin-bottom: 0.5rem;
+				}
+	
+			</style>
+			<div class="wrapper">
+				<div class="title">XXX</div>
+				<img class="img">
+				<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
+				<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
+				<cs-label-and-data class="totissues" xstyle="display: none">total issues</cs-label-and-data>
+				<div class="lastupdate">
+					\u{1F551} <span class="data"></span>
+					<span></span>
+				</div>
+			</div>
+			<div class="view_dashboard">View dashboard</div>
+		`;
+        customElements.upgrade(sroot);
+        this.checkrecs = (0, $372cab4458345058$export$d885650843ca84a5)((0, $5fa5f0f9910be384$export$1e36da95ba633cee), sroot.querySelector('.checktrec'));
+        this.checkattr = (0, $372cab4458345058$export$d885650843ca84a5)((0, $5fa5f0f9910be384$export$1e36da95ba633cee), sroot.querySelector('.checkattr'));
+        this.failedrecs = (0, $372cab4458345058$export$d885650843ca84a5)((0, $5fa5f0f9910be384$export$1e36da95ba633cee), sroot.querySelector('.totissues'));
+        this.dtitle = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, sroot.querySelector('.title'));
+        this.img = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLImageElement, sroot.querySelector('.img'));
+        this.lastupdate = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.lastupdate .data'));
+        // this.img.style.display = 'none';
+        this.checkrecs.setLabel('checked recs');
+        this.checkattr.setLabel('checked attrs');
+        this.failedrecs.setLabel('quality-assured recs');
+    // this.failedrecs.setSeverity("fail")
+    // this.failedrecs.setData('123')
+    }
+    refresh(dataset) {
+        const datestr = dataset.session_start_ts;
+        const date = new Date(datestr);
+        const dateformat = new Intl.DateTimeFormat('it-IT', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: "2-digit",
+            timeZone: 'Europe/Rome'
+        }).format(date);
+        this.dtitle.textContent = dataset.dataset_name;
+        this.img.src = dataset.dataset_img_url.length > 0 ? dataset.dataset_img_url : 'dataset-placeholder.png';
+        this.checkrecs.setData('' + dataset.tested_records);
+        this.checkattr.setData('123');
+        this.failedrecs.setData('' + (dataset.tested_records - dataset.failed_records));
+        const quality_ratio = dataset.tested_records == 0 ? 100 : dataset.failed_records / dataset.tested_records;
+        if (quality_ratio < 0.1) this.failedrecs.setQualityLevel("good");
+        else if (quality_ratio < 0.3) this.failedrecs.setQualityLevel("warn");
+        else this.failedrecs.setQualityLevel("fail");
+        this.lastupdate.textContent = dateformat;
+        this.onclick = ()=>{
+            location.hash = "#page=dataset-categories&dataset_name=" + dataset.dataset_name + "&session_start_ts=" + dataset.session_start_ts + "&failed_records=" + dataset.failed_records + "&tested_records=" + dataset.tested_records;
+            window.scrollTo(0, 0);
+        };
+    }
+}
+customElements.define('cs-dataset-box', $8fd4ce611e531164$export$56131fb252e2dabc);
+
+
+
+
+
+class $8669cd8837fe1d69$export$2bdcae992c3953b6 extends HTMLElement {
+    sroot;
+    boxContainer;
+    boxes = [];
+    titles = [];
+    constructor(){
+        super();
+        this.sroot = this.attachShadow({
+            mode: 'open'
+        });
+        this.sroot.innerHTML = `
+			<link rel="stylesheet" href="index.css">
+			<div class="ProjectsElement">
+				<div class="title" style="padding: 1rem">standard dashboards</div>
+				<div class="searchbar">
+					<input> \u{1F50D} <span class="clearinput">\u{2715}</span>
+				</div>
+				<div class="container"></div>
+			</div>
+		`;
+        this.boxContainer = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, this.sroot.querySelector('.container'));
+        this.boxContainer.textContent = "loading ...";
+        const refreshlist = ()=>{
+            for(let b = 0; b < this.titles.length; b++)if (this.titles[b].toLowerCase().indexOf(input.value.toLowerCase()) >= 0) this.boxes[b].style.display = 'block';
+            else this.boxes[b].style.display = 'none';
+        };
+        const input = this.sroot.querySelector('input');
+        input.oninput = refreshlist;
+        const clearinput = this.sroot.querySelector('.clearinput');
+        clearinput.onclick = ()=>{
+            input.value = '';
+            refreshlist();
+        };
+    }
+    async refresh() {
+        this.boxes = [];
+        this.titles = [];
+        this.boxContainer.textContent = '';
+        const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
+        this.boxContainer.appendChild(loader);
+        const used_key = (await (0, $d96156a0a1b95fa8$export$1186fbcaae027bf4)).authenticated ? 'odh-data-quality-job-idm' : 'opendata';
+        const json = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_max_ts_vw({
+            used_key: used_key
+        });
+        loader.remove();
+        console.log(json);
+        for (let dataset of json){
+            const box = new (0, $8fd4ce611e531164$export$56131fb252e2dabc)();
+            this.boxContainer.appendChild(box);
+            box.refresh(dataset);
+            this.boxes.push(box);
+            this.titles.push(dataset.dataset_name);
+        }
+    }
+}
+customElements.define('cs-standard-dashboards-element', $8669cd8837fe1d69$export$2bdcae992c3953b6);
+
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+class $a733ad434eb12a41$export$a31dc9dd1a4cb4b2 extends HTMLElement {
+    content;
+    open = true;
+    openclose;
+    label;
+    actions;
+    onopen = ()=>{};
+    constructor(){
+        super();
+        const sroot = this.attachShadow({
+            mode: 'open'
+        });
+        sroot.innerHTML = `
+				<style>
+					:host {
+						display: block;
+					}
+					.header {
+						display: flex;
+						align-items: center;
+					}
+					.label {
+						flex-grow: 1;
+						cursor: pointer;
+						padding: 0.4rem;
+						user-select: none;
+					}
+					.openclose {
+						cursor: pointer;
+						padding: 0.4rem;
+						user-select: none;
+					}
+					.content {
+						overflow: hidden;
+						transition: transform 1s;
+						transform-origin: top;
+					}
+					
+					/*
+					span.label::before {
+					  content: "";
+					  display: inline-block;
+					  width: 8px;
+					  height: 8px;
+					  background-color: red;
+					  border-radius: 50%;
+					  margin-right: 5px;
+					}
+					 */
+					
+					.nextpagebutton {
+															margin: auto;
+															display: block;
+															background-color: black;
+															color: white;
+														}
+														
+					
+				</style>
+				<div class="header">
+				<span class="label">title</span>
+				<span class="actions">actions</span>
+				<span class="openclose"></span>
+				</div>
+				<div class="content"></div>
+				`;
+        customElements.upgrade(sroot);
+        this.label = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.label'));
+        this.actions = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.actions'));
+        this.content = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, sroot.querySelector('.content'));
+        this.openclose = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.openclose'));
+        this.openclose.onclick = ()=>{
+            this.toggle();
+        };
+        this.label.onclick = this.openclose.onclick;
+        this.toggle();
+    }
+    toggle() {
+        this.open = !this.open;
+        this.content.style.height = !this.open ? '0rem' : 'auto';
+        this.openclose.textContent = !this.open ? "\u25BC" : "\u25B2";
+        if (this.open) {
+            this.content.textContent = '' // svuola la sezione
+            ;
+            this.onopen();
+        }
+    }
+    async refresh(label, actions) {
+        this.label.textContent = label;
+        this.actions.textContent = actions;
+    }
+    addElementToContentArea(e) {
+        this.content.appendChild(e);
+    }
+}
+customElements.define('cs-open-close-section', $a733ad434eb12a41$export$a31dc9dd1a4cb4b2);
+
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+class $909a658809776454$export$f955a0e263c4d7d2 extends HTMLElement {
+    label;
+    constructor(){
+        super();
+        const sroot = this.attachShadow({
+            mode: 'open'
+        });
+        sroot.innerHTML = `
+				<style>
+					:host {
+						display: block;
+						border: 1px solid #eee;
+						padding: 1rem;
+					}
+					
+				</style>
+				<span class="label">title</span>
+				`;
+        customElements.upgrade(sroot);
+        this.label = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, sroot.querySelector('.label'));
+    }
+    async refresh(s) {
+        this.label.textContent = s;
+    }
+}
+customElements.define('cs-section-row', $909a658809776454$export$f955a0e263c4d7d2);
+
+
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
+
+class $ca572d4d6d9b8dd6$export$729e7aa079c22ee6 extends HTMLElement {
+    template;
+    connected_promise;
+    connected_func = (s)=>null;
+    more_div;
+    connectedCallback() {
+        console.log('connected');
+        this.connected_func(null);
+    }
+    constructor(){
+        super();
+        this.connected_promise = new Promise((s)=>this.connected_func = s);
+        const sroot = this.attachShadow({
+            mode: 'open'
+        });
+        sroot.innerHTML = `
+						<style>
+							:host {
+								display: inline-block;
+								box-shadow: 4px 4px #ccc;
+							}
+							.category {
+								border: 1px solid gray;
+								width: 12rem;
+								display: inline-block;
+								/* margin: 1rem; */
+							}
+							.category > img {
+								width: 100%;
+							}
+							.category .category_name {
+								font-weight: bold;
+								text-align: center;
+								margin-top: 0.4rem;
+								margin-bottom: 0.4rem;
+								line-height: 1rem;
+								height: 2rem;
+							}
+							.frame {
+								display: flex
+							}
+							.frame .content {
+								flex-grow: 100;
+								display: flex;
+							}
+							.chartdiv {
+								width:  100px;
+								height: 100px;
+								margin: auto;
+								position: relative;
+								margin-top: 0.4rem;
+							}
+							
+							.chartdiv .perc {
+								position: absolute;
+								top:  calc(50% - 0.8rem);
+								left: calc(50% - 1.6rem);
+								font-size: 1.5rem;
+								font-weight: bold;
+								color: #000;
+							}
+							
+							details {
+								margin-top: 0.4rem;
+								margin-bottom: 0.4rem;
+							}
+							
+							details > * {
+								padding: 0.5em;
+								border-bottom: 1px solid #ccc;
+							}
+														
+							.view_details {
+								/* background-color: var(--dark-background); */
+								background-color: rgb(71, 105, 41);
+								color: #ddd;
+								text-align: center;
+								padding: 0.6rem;
+								cursor: pointer;
+							}
+							
+							.view_details:hover {
+								background-color: rgb(35, 75, 20);
+							}
+
+							.lastupdate {
+								margin-top: 0.4rem;
+								font-size: 0.7rem;
+								margin-bottom: 0.4rem;
+								margin-left: 0.4rem;
+								margin-right: 0.4rem;
+							}
+							
+							.nr_records, details {
+								margin-left: 0.4rem;
+								margin-right: 0.4rem;
+							}
+
+						</style>
+						<div class="category">
+							<!-- <img src="kpi-pie-chart.png"> -->
+							<div class="chartdiv">
+								<div class="perc">12%</div>
+								<canvas class="chart"></canvas>
+							</div>
+							<div class="category_name">Completeness</div>
+							<span></span>
+							<cs-label-and-data label="quality-assured recs" class="nr_records"></cs-label-and-data>
+							<div class="lastupdate">
+								<span class="data"></span>
+								<span></span>
+							</div>
+							<!-- <div class="nr_records">123</div> -->
+							<div class="more">
+								<details>
+									<summary>carried out tests</summary>
+								</details>
+								<div class="view_details">View details</div>
+							</div>
+						</div>
+						`;
+        customElements.upgrade(sroot);
+        this.template = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, sroot.querySelector('.category'));
+        this.more_div = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, sroot.querySelector('.more'));
+    }
+    hideMoreDiv() {
+        this.more_div.style.display = 'none';
+    }
+    async refresh(data) {
+        const cat = this.template;
+        this.setup_chart(cat, data);
+        const cat_name = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, cat.querySelector('.category_name'));
+        cat_name.textContent = data.check_category;
+        const failedelement = (0, $372cab4458345058$export$d885650843ca84a5)((0, $5fa5f0f9910be384$export$1e36da95ba633cee), cat.querySelector('.nr_records'));
+        failedelement.setData('' + (data.tot_records - data.failed_records));
+        const last_update = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, cat.querySelector('.lastupdate .data'));
+        const date = new Date(data.session_start_ts);
+        const perc = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, cat.querySelector('.perc'));
+        perc.textContent = '' + ((data.tot_records - data.failed_records) * 100 / data.tot_records).toFixed(1);
+        const dateformat = new Intl.DateTimeFormat('it-IT', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: "2-digit",
+            timeZone: 'Europe/Rome'
+        }).format(date);
+        last_update.textContent = dateformat;
+        const view_details = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, cat.querySelector('.view_details'));
+        view_details.onclick = ()=>{
+            location.hash = '#page=summary&session_start_ts=' + data.session_start_ts + '&dataset_name=' + data.dataset_name + '&category_name=' + data.check_category + '&failed_records=' + data.failed_records + '&tot_records=' + data.tot_records;
+        };
+        const cat_details = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, cat.querySelector('details'));
+        (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw({
+            session_start_ts: data.session_start_ts,
+            dataset_name: data.dataset_name,
+            check_category: data.check_category
+        }).then((checks)=>{
+            console.log(checks);
+            for(let i2 = 0; i2 < checks.length; i2++){
+                const div = document.createElement('div');
+                div.textContent = checks[i2].check_name // + ' ' + checks[i2].failed_records +  ' / ' + checks[i2].tot_records 
+                ;
+                cat_details.appendChild(div);
+            }
+        });
+    }
+    async setup_chart(cat, arg1) {
+        await this.connected_promise;
+        const chart = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLCanvasElement, cat.querySelector('.chart'));
+        // const context = chart.getContext('2d');
+        new Chart(chart, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'ok',
+                    'fail'
+                ],
+                datasets: [
+                    {
+                        label: 'Dataset 1',
+                        data: [
+                            arg1.tot_records - arg1.failed_records,
+                            arg1.failed_records
+                        ],
+                        backgroundColor: [
+                            '#0a0',
+                            '#222'
+                        ]
+                    }
+                ]
+            },
+            options: {
+                cutout: '80%',
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                        position: 'top'
+                    },
+                    title: {
+                        display: false,
+                        text: 'Chart.js Doughnut Chart'
+                    }
+                }
+            }
+        });
+    }
+}
+customElements.define('cs-dataset-issue-category', $ca572d4d6d9b8dd6$export$729e7aa079c22ee6);
+
+
+class $c8d932129275398d$export$2dcbc072ead0b1fd extends HTMLElement {
+    container;
+    last_session_start_ts = null;
+    last_dataset_name = null;
+    last_check_category = null;
+    last_failed_records = null;
+    last_tot_records = null;
+    current_tab = 'issues';
+    sroot;
+    canvas;
+    // connected_promise
+    // connected_func: (s: null) => void = s => null
+    chartjs_success;
+    chartjs_promise;
+    issues;
+    records;
+    // info_and_settings: GeneralInfoAndSettings;
+    connectedCallback() {
+        // chartjs need to be created when element is attached into the dom
+        const chart = new Chart(this.canvas, {
+            type: 'line',
+            data: {
+                labels: [
+                    '-5',
+                    '-4',
+                    '-3',
+                    '-2',
+                    '-1'
+                ],
+                datasets: []
+            },
+            options: {
+                scales: {
+                    y: {
+                        stacked: true,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        this.chartjs_success(chart);
+    }
+    constructor(){
+        super();
+        this.chartjs_success = (s)=>{} // dummy initialization, next line will init chartjs_success but compiler don't understand this!
+        ;
+        this.chartjs_promise = new Promise((s)=>this.chartjs_success = s);
+        this.sroot = this.attachShadow({
+            mode: 'open'
+        });
+        this.sroot.innerHTML = `
+				<style>
+					:host {
+						padding: 0.5rem;
+						display: block;
+					}
+					.container {
+						border: 1px solid #ccc;
+						border-radius: 0.3rem;
+					}
+					
+					.container > * {
+						border-bottom: 1px solid #ccc;
+					}
+					.header {
+						display: flex;
+					}
+					.header .chart {
+						width: 50%;
+					}
+					
+					.actions {
+						border: 1px solid black;
+						width: 10rem;
+						margin-left: auto;
+						display: flex;
+						border-radius: 0.4rem;
+						margin-bottom: 0.5rem;
+					}
+					
+					.actions span.selected {
+						color: white;
+						background-color: black;
+					}
+					
+					.actions span {
+						flex-grow: 50;
+						text-align: center;
+						cursor: pointer;
+					}
+					
+					.nextpagebutton {
+															margin: auto;
+															display: block;
+															background-color: black;
+															color: white;
+														}
+														
+					
+
+				
+				</style>
+				<!-- <img src="kpi-detail.png" style="max-width: 100%"> -->
+				<div class="header">
+					<div>
+						<cs-dataset-issue-category></cs-dataset-issue-category>
+					</div>
+					<div class="chart">
+						<canvas></canvas>
+					</div>
+					<!--<cs-general-info-and-settings></cs-general-info-and-settings>-->
+				</div>
+				<div style="width: calc(100% - 20px)">
+					<div style="text-align: right" class="actions">
+						<span class="issues">Issues</span>
+						<span class="records">Records</span>
+					</div>
+					<div class="container"></div>
+				</div>
+				`;
+        customElements.upgrade(this.sroot);
+        this.container = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, this.sroot.querySelector('.container'));
+        this.issues = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, this.sroot.querySelector('.issues'));
+        this.records = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLSpanElement, this.sroot.querySelector('.records'));
+        this.issues.onclick = ()=>{
+            this.current_tab = 'issues';
+            if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null && this.last_failed_records != null && this.last_tot_records != null) this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records);
+        };
+        this.records.onclick = ()=>{
+            this.current_tab = 'records';
+            if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null && this.last_failed_records != null && this.last_tot_records != null) this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records);
+        };
+        this.canvas = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLCanvasElement, this.sroot.querySelector('canvas'));
+    // this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
+    }
+    extractHumanReadableName(record_jsonpath, json) {
+        let ret = '';
+        for (let fn of [
+            'sname',
+            'mvalidtime',
+            'mvalue',
+            'AccoDetail.de.Name',
+            'Detail.de.Title'
+        ]){
+            const fn_parts = fn.split('.');
+            let val = JSON.parse(json);
+            for (let p of fn_parts){
+                val = val[p];
+                if (val === undefined) break;
+            }
+            // const val = start[fn] 
+            if (val !== undefined) ret += (ret === '' ? '' : ', ') + fn + '=' + JSON.stringify(val);
+        }
+        if (ret == '') ret = record_jsonpath;
+        return ret;
+    }
+    groupRecords(list) {
+        const groupBy = {};
+        for(let k = 0; k < list.length; k++){
+            const json = JSON.parse(list[k].record_json);
+            let sname = json['sname'];
+            if (typeof sname !== 'string') sname = '';
+            let prev_arr = groupBy[sname];
+            prev_arr = prev_arr === undefined ? [] : prev_arr;
+            prev_arr.push(list[k]);
+            groupBy[sname] = prev_arr;
+        }
+        return groupBy;
+    }
+    async refresh(p_session_start_ts, p_dataset_name, p_category_name, p_failed_records, p_tot_records) {
+        this.last_session_start_ts = p_session_start_ts;
+        this.last_dataset_name = p_dataset_name;
+        this.last_check_category = p_category_name;
+        this.last_failed_records = p_failed_records;
+        this.last_tot_records = p_tot_records;
+        // this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records)
+        console.log(p_session_start_ts);
+        console.log(p_dataset_name);
+        console.log(p_category_name);
+        (async ()=>{
+            const data = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_history_vw({
+                dataset_name: this.last_dataset_name,
+                check_category: this.last_check_category
+            });
+            // const goodarr  = []
+            // const failarr  = []
+            const labels = [];
+            const datasets = [];
+            for(let x = 0; x < data.length; x++){
+                const row = data[x];
+                labels.push(row.session_start_ts.slice(0, 16).replace('T', ' '));
+                const check_stats = JSON.parse(row.check_stats);
+                console.log(check_stats);
+                for(let c = 0; c < check_stats.length; c++){
+                    const check_stat = check_stats[c];
+                    let found = false;
+                    for(let d = 0; d < datasets.length; d++)if (datasets[d].label == check_stat.check_name) {
+                        datasets[d].data.push(check_stat.failed_recs);
+                        found = true;
+                        break;
+                    }
+                    if (!found) datasets.push({
+                        label: check_stat.check_name,
+                        data: [
+                            check_stat.failed_recs
+                        ],
+                        fill: false,
+                        backgroundColor: '#aaa',
+                        borderColor: '#aaa',
+                        tension: 0.1
+                    });
+                }
+            /*
+						goodarr.push(data[x].tested_records - data[x].failed_recs)
+						failarr.push(data[x].failed_recs)
+						 */ }
+            const chartjs = await this.chartjs_promise;
+            chartjs.data.labels = labels;
+            chartjs.data.datasets = datasets;
+            /*
+					chartjs.data.datasets = [
+												{
+													label: 'fail trend',
+													data: failarr,
+													fill: false,
+													backgroundColor: '#222',
+													borderColor: '#222',
+													tension: 0.1
+												},
+												{
+													label: 'total trend',
+													data: goodarr,
+													fill: false,
+													backgroundColor: '#aaa',
+													borderColor: '#aaa',
+													tension: 0.1
+												},						
+											]
+					*/ chartjs.update();
+        })();
+        const category = (0, $372cab4458345058$export$d885650843ca84a5)((0, $ca572d4d6d9b8dd6$export$729e7aa079c22ee6), this.sroot.querySelector('cs-dataset-issue-category'));
+        category.hideMoreDiv();
+        category.refresh({
+            dataset_name: p_dataset_name,
+            session_start_ts: p_session_start_ts,
+            check_category: p_category_name,
+            failed_records: p_failed_records,
+            tot_records: p_tot_records
+        });
+        this.container.textContent = '';
+        if (this.current_tab === 'issues') {
+            this.records.classList.remove('selected');
+            this.issues.classList.add('selected');
+            const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
+            this.container.appendChild(loader);
+            const json = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw({
+                session_start_ts: p_session_start_ts,
+                dataset_name: p_dataset_name,
+                check_category: p_category_name
+            });
+            loader.remove();
+            for(let i = 0; i < json.length; i++){
+                const issue = json[i];
+                // console.log(issue)
+                const section = new (0, $a733ad434eb12a41$export$a31dc9dd1a4cb4b2)();
+                section.refresh(issue.check_name, 'failed: ' + issue.nr_records + ' records');
+                this.container.appendChild(section);
+                section.onopen = async ()=>{
+                    const moreButton = document.createElement('button');
+                    moreButton.classList.add('nextpagebutton');
+                    moreButton.textContent = 'next 100';
+                    section.addElementToContentArea(moreButton);
+                    let list_offset = 0;
+                    const nextFun = async ()=>{
+                        const json2 = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_record_check_failed({
+                            session_start_ts: p_session_start_ts,
+                            dataset_name: p_dataset_name,
+                            check_category: p_category_name,
+                            check_name: issue.check_name,
+                            limit: 100,
+                            offset: list_offset
+                        });
+                        // const list = groupBy[keys[0]]
+                        for(let k2 = 0; k2 < json2.length; k2++){
+                            const sectionRow2 = new (0, $909a658809776454$export$f955a0e263c4d7d2)();
+                            // section.addElementToContentArea(sectionRow2)
+                            moreButton.parentElement.insertBefore(sectionRow2, moreButton);
+                            sectionRow2.refresh(this.extractHumanReadableName(json2[k2].record_jsonpath, json2[k2].record_json));
+                            // sectionRow2.refresh(json2[k2].problem_hint)
+                            sectionRow2.onclick = ()=>{
+                                alert(json2[k2].record_json);
+                            };
+                        }
+                        list_offset += 100;
+                    };
+                    moreButton.onclick = nextFun;
+                    nextFun();
+                /*
+					//console.log('sezione aperta, ricarico!')
+					const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
+								session_start_ts: p_session_start_ts,
+								dataset_name: p_dataset_name,
+								check_category: p_category_name,
+								check_name: issue.check_name
+					});
+					const groupBy = this.groupRecords(json2)
+					const keys = Object.keys(groupBy)
+					console.log(keys)
+					if (keys.length == 1 && keys[0] == '')
+					{
+						const moreButton = document.createElement('button')
+						moreButton.textContent = 'next 10'
+						section.addElementToContentArea(moreButton)
+						const nextFun = () => {
+							const list = groupBy[keys[0]]
+							for (let k2 = 0; k2 < list.length; k2++)
+							{
+								const sectionRow2 = new SectionRow();
+								section.addElementToContentArea(sectionRow2)
+								// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
+								sectionRow2.refresh(list[k2].problem_hint)
+								sectionRow2.onclick = () => {
+									alert(list[k2].record_json)
+								}
+							}
+							
+						}
+						moreButton.onclick = nextFun
+					}
+					else
+					{
+						for (let k = 0; k < keys.length; k++)
+						{
+							const sectionRow = new OpenCloseSection();
+							section.addElementToContentArea(sectionRow)
+							sectionRow.refresh(keys[k], '' + groupBy[keys[k]].length + ' records')
+							sectionRow.onclick = () => {
+								const list = groupBy[keys[k]]
+								console.log(list)
+								for (let k2 = 0; k2 < list.length; k2++)
+								{
+									const sectionRow2 = new SectionRow();
+									sectionRow.addElementToContentArea(sectionRow2)
+									// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
+									sectionRow2.refresh(list[k2].problem_hint)
+									sectionRow2.onclick = () => {
+										alert(list[k2].record_json)
+									}
+								}
+							}
+						}
+					}
+					*/ };
+            }
+        }
+        if (this.current_tab === 'records') {
+            this.issues.classList.remove('selected');
+            this.records.classList.add('selected');
+            const moreButton = document.createElement('button');
+            moreButton.classList.add('nextpagebutton');
+            moreButton.textContent = 'next 100';
+            this.container.appendChild(moreButton);
+            let list_offset = 0;
+            const nextFun = async ()=>{
+                const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
+                this.container.appendChild(loader);
+                const list = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw({
+                    session_start_ts: p_session_start_ts,
+                    dataset_name: p_dataset_name,
+                    check_category: p_category_name,
+                    offset: list_offset,
+                    limit: 100
+                });
+                loader.remove();
+                for(let k2 = 0; k2 < list.length; k2++){
+                    const sectionRow2 = new (0, $a733ad434eb12a41$export$a31dc9dd1a4cb4b2)();
+                    // this.container.appendChild(sectionRow2)
+                    moreButton.parentElement.insertBefore(sectionRow2, moreButton);
+                    sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), '' + list[k2].nr_check_names + ' check failed');
+                    sectionRow2.onclick = async ()=>{
+                        const json2 = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_record_check_failed({
+                            session_start_ts: p_session_start_ts,
+                            dataset_name: p_dataset_name,
+                            check_category: p_category_name,
+                            record_jsonpath: list[k2].record_jsonpath
+                        });
+                        for(let k = 0; k < json2.length; k++){
+                            const sectionRow = new (0, $909a658809776454$export$f955a0e263c4d7d2)();
+                            sectionRow2.addElementToContentArea(sectionRow);
+                            sectionRow.refresh("failed: " + json2[k].check_name);
+                        }
+                    };
+                }
+                list_offset += 100;
+            };
+            moreButton.onclick = nextFun;
+            nextFun();
+        /*
+			const groupBy = this.groupRecords(json)
+			const keys = Object.keys(groupBy)
+			console.log(keys)
+			if (keys.length == 1 && keys[0] == '')
+			{
+				const list = groupBy[keys[0]]
+				for (let k2 = 0; k2 < list.length; k2++)
+				{
+					const sectionRow2 = new OpenCloseSection();
+					this.container.appendChild(sectionRow2)
+					sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), '' + list[k2].nr_check_names + ' check failed')
+					sectionRow2.onclick = async () => {
+						const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
+													session_start_ts: p_session_start_ts,
+													dataset_name: p_dataset_name,
+													check_category: p_category_name,
+													record_jsonpath: list[k2].record_jsonpath
+											});
+
+						for (let k = 0; k < json2.length; k++)
+						{
+							const sectionRow = new SectionRow();
+							sectionRow2.addElementToContentArea(sectionRow)
+							sectionRow.refresh("failed: " + json2[k].check_name)
+						}
+					}
+				}
+			}
+			else
+			{
+				for (let k = 0; k < keys.length; k++)
+				{
+					const sectionRow = new OpenCloseSection();
+					this.container.appendChild(sectionRow)
+					sectionRow.refresh(keys[k], '' + groupBy[keys[k]].length + ' records')
+					sectionRow.onclick = () => {
+						const list = groupBy[keys[k]]
+						console.log(list)
+						for (let k2 = 0; k2 < list.length; k2++)
+						{
+							const sectionRow2 = new OpenCloseSection();
+							sectionRow.addElementToContentArea(sectionRow2)
+							sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), list[k2].nr_check_names)
+							sectionRow2.onclick = async (e) => {
+								e.stopPropagation()
+								const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
+																					session_start_ts: p_session_start_ts,
+																					dataset_name: p_dataset_name,
+																					check_category: p_category_name,
+																					record_jsonpath: list[k2].record_jsonpath
+													});
+								for (let k = 0; k < json2.length; k++)
+								{
+									const sectionRow = new SectionRow();
+									sectionRow2.addElementToContentArea(sectionRow)
+									sectionRow.refresh(json2[k].check_name)
+								}
+								
+							}
+						}
+					}
+				}
+			}
+			 */ }
+    }
+}
+customElements.define('cs-dataset-issues-detail', $c8d932129275398d$export$2dcbc072ead0b1fd);
+
+
+
+// SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+
+
+
+class $37b7d08b4187bf8a$export$1b80eba8896b3ede extends HTMLElement {
+    content;
+    connected_promise;
+    connected_func = (s)=>null;
+    connectedCallback() {
+        console.log('connected');
+        this.connected_func(null);
+    }
+    sroot;
+    // info_and_settings
+    noissues;
+    constructor(){
+        super();
+        this.connected_promise = new Promise((s)=>this.connected_func = s);
+        this.sroot = this.attachShadow({
+            mode: 'open'
+        });
+        this.sroot.innerHTML = `
+						<style>
+							:host {
+							}
+							.category {
+								border: 1px solid gray;
+								width: 12rem;
+								display: inline-block;
+								margin: 1rem;
+							}
+							.category > img {
+								width: 100%;
+							}
+							.category .category_name {
+								font-weight: bold;
+							}
+							.frame {
+								display: flex;
+								align-items: start;
+							}
+							.frame .content {
+								flex-grow: 100;
+								display: flex;
+								align-items: start;
+							}
+							.chartdiv {
+								width:  100px;
+								height: 100px;
+								margin: auto;
+							}
+							details > *:nth-child(even) {
+							  background-color: #ccc;
+							}
+							
+							.content > * {
+								margin-top: 1rem;
+								margin-left: 1rem;
+							}
+							.noissues {
+								display: none;
+							}
+						</style>
+						<div class="frame">
+							<div class="noissues">sound good, no problems found here!</div>
+							<div class="content"></div>
+							<!--<cs-general-info-and-settings></cs-general-info-and-settings>-->
+							<!--<img src="kpi-general-info.png">-->
+						</div>
+						`;
+        customElements.upgrade(this.sroot);
+        this.content = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLElement, this.sroot.querySelector('.content'));
+        // this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
+        this.noissues = (0, $372cab4458345058$export$d885650843ca84a5)(HTMLDivElement, this.sroot.querySelector('.noissues'));
+    }
+    async refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records) {
+        // this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records);
+        const loader = new (0, $50fcf601af37099e$export$3b0d6d7590275603)();
+        this.content.appendChild(loader);
+        const resp = await (0, $1e820cf339dfc6f8$export$3a4b11f05d5e029f).list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw({
+            session_start_ts: p_session_start_ts,
+            dataset_name: p_dataset_name
+        });
+        loader.remove();
+        console.log(resp);
+        for(let i = 0; i < resp.length; i++){
+            const category = new (0, $ca572d4d6d9b8dd6$export$729e7aa079c22ee6)();
+            this.content.appendChild(category);
+            category.refresh(resp[i]);
+        }
+        this.noissues.style.display = resp.length == 0 ? 'block' : 'none';
+    }
+}
+customElements.define('cs-dataset-categories', $37b7d08b4187bf8a$export$1b80eba8896b3ede);
+
 
 
 class $115949517378a2ec$export$5ff9e46e0b0ff25f extends HTMLElement {

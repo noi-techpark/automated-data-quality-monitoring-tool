@@ -225,6 +225,7 @@ export interface catchsolve_noiodh__test_dataset_max_ts_vw__byexample {
 	failed_records?: number
 	session_start_ts?: string
 	tested_records?: number
+	used_key?: string
 }
 
 export interface catchsolve_noiodh__test_dataset_record_check_failed__byexample {

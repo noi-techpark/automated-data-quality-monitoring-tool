@@ -1,9 +1,30 @@
 import Keycloak from 'keycloak-js';
 import { jwtDecode } from 'jwt-decode';
 
+
+export const keycloak: Promise<Keycloak> = new Promise(async s => {
+
+	const kc = new Keycloak({
+		url: "https://auth.opendatahub.testingmachine.eu/auth/",
+		realm: "noi",
+		clientId: "odh-data-quality-web"
+	});
+
+	await kc.init({
+		redirectUri: 'http://localhost:8080'
+	});
+
+	console.log('init fatto!')
+	s(kc)
+
+})
+
+
+
+
 export class AuthComponent extends HTMLElement {
 	sroot
-	keycloak
+	
 
 	div_unauthenticated
 	div_authenticated
@@ -95,14 +116,8 @@ export class AuthComponent extends HTMLElement {
 		this.user_button = this.sroot.querySelector('.user-button') as HTMLButtonElement;
 		this.user_menu = this.sroot.querySelector('.user-menu')!;
 
-		this.keycloak = new Keycloak({
-			url: "https://auth.opendatahub.testingmachine.eu/auth/",
-			realm: "noi",
-			clientId: "odh-data-quality-web"
-		});
-
-		(this.button_login as HTMLButtonElement).onclick = () => {
-			this.keycloak.login();
+		(this.button_login as HTMLButtonElement).onclick = async () => {
+			(await keycloak).login();
 		};
 
 		(this.user_button as HTMLButtonElement).onclick = (e: MouseEvent) => {
@@ -111,8 +126,8 @@ export class AuthComponent extends HTMLElement {
 		};
 
 		const logout_button = this.sroot.querySelector('.logout-button') as HTMLButtonElement;
-		logout_button.onclick = () => {
-			this.keycloak.logout();
+		logout_button.onclick = async () => {
+			(await keycloak).logout();
 		};
 
 		// Listener globale per chiudere il menu se si clicca fuori
@@ -126,14 +141,15 @@ export class AuthComponent extends HTMLElement {
 	}
 
 	async refreshLoginState() {
-		const authenticated = await this.keycloak.init({
+		/*
+		const authenticated = await keycloak.init({
 			redirectUri: 'http://localhost:8080'
 		});
-		if (authenticated) {
-			const token = this.keycloak.token!;
+		 */
+		if ((await keycloak).authenticated) {
+			const token = (await keycloak).token!;
 			const decoded: any = jwtDecode(token);
 			const username = decoded.preferred_username || decoded.name || 'User';
-
 			this.user_button.textContent = `${username} ▼`;
 			
 			this.div_unauthenticated.classList.add('display-none');
