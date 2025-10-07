@@ -6,8 +6,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.3
--- Dumped by pg_dump version 16.3
+-- Dumped from database version 16.8
+-- Dumped by pg_dump version 16.8 (Debian 16.8-1.pgdg120+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -32,6 +32,21 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: rules; Type: TABLE; Schema: catchsolve_noiodh; Owner: -
+--
+
+CREATE TABLE catchsolve_noiodh.rules (
+    id text DEFAULT gen_random_uuid() NOT NULL,
+    name text NOT NULL,
+    datasetname_searchfilter text NOT NULL,
+    searchfilter text NOT NULL,
+    type text NOT NULL,
+    value text NOT NULL,
+    createdat timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: test_dataset; Type: TABLE; Schema: catchsolve_noiodh; Owner: -
 --
 
@@ -39,8 +54,11 @@ CREATE TABLE catchsolve_noiodh.test_dataset (
     id bigint NOT NULL,
     session_start_ts timestamp with time zone NOT NULL,
     dataset_name text NOT NULL,
-    tested_records integer NOT NULL,
-    dataset_img_url text DEFAULT ''::text NOT NULL
+    tested_records integer DEFAULT 0 NOT NULL,
+    dataset_img_url text DEFAULT ''::text NOT NULL,
+    errors text,
+    dataset_dataspace text,
+    used_key text
 );
 
 
@@ -69,7 +87,9 @@ CREATE TABLE catchsolve_noiodh.test_dataset_record_check_failed (
     record_json text NOT NULL,
     impacted_attributes_csv text NOT NULL,
     check_category text NOT NULL,
-    problem_hint text NOT NULL
+    problem_hint text NOT NULL,
+    used_key text,
+    impacted_attribute_value text
 );
 
 
@@ -82,7 +102,7 @@ CREATE VIEW catchsolve_noiodh.test_dataset_check_category_check_name_failed_reco
     dataset_name,
     check_category,
     check_name,
-    count(DISTINCT record_json) AS failed_records,
+    count(DISTINCT record_jsonpath) AS failed_records,
     ( SELECT count(DISTINCT f2.record_jsonpath) AS count
            FROM catchsolve_noiodh.test_dataset_record_check_failed f2
           WHERE ((f1.session_start_ts = f2.session_start_ts) AND (f1.dataset_name = f2.dataset_name))) AS tot_records
@@ -99,7 +119,7 @@ CREATE VIEW catchsolve_noiodh.test_dataset_check_category_check_name_record_reco
     dataset_name,
     check_category,
     check_name,
-    count(*) AS nr_records
+    count(DISTINCT record_jsonpath) AS nr_records
    FROM catchsolve_noiodh.test_dataset_record_check_failed f1
   GROUP BY session_start_ts, dataset_name, check_category, check_name
   ORDER BY (count(*)) DESC, session_start_ts, dataset_name, check_category, check_name;
@@ -113,7 +133,7 @@ CREATE VIEW catchsolve_noiodh.test_dataset_check_category_failed_recors_vw AS
  SELECT session_start_ts,
     dataset_name,
     check_category,
-    count(DISTINCT record_json) AS failed_records,
+    count(DISTINCT record_jsonpath) AS failed_records,
     ( SELECT test_dataset.tested_records
            FROM catchsolve_noiodh.test_dataset
           WHERE ((test_dataset.dataset_name = f1.dataset_name) AND (test_dataset.session_start_ts = f1.session_start_ts))) AS tot_records
@@ -167,21 +187,29 @@ CREATE VIEW catchsolve_noiodh.test_dataset_history_vw AS
             test_dataset.tested_records,
             row_number() OVER (PARTITION BY test_dataset.dataset_name ORDER BY test_dataset.session_start_ts DESC) AS age_per_dataset_name
            FROM catchsolve_noiodh.test_dataset
+        ), t2 AS (
+         SELECT f.dataset_name,
+            f.session_start_ts,
+            f.check_category,
+            f.check_name,
+            count(DISTINCT f.record_jsonpath) AS failed_recs,
+            ( SELECT d.tested_records
+                   FROM catchsolve_noiodh.test_dataset d
+                  WHERE ((d.session_start_ts = f.session_start_ts) AND (d.dataset_name = f.dataset_name))) AS tested_records
+           FROM catchsolve_noiodh.test_dataset_record_check_failed f
+          WHERE ((f.session_start_ts, f.dataset_name) IN ( SELECT t.session_start_ts,
+                    t.dataset_name
+                   FROM t
+                  WHERE (t.session_start_ts >= (CURRENT_TIMESTAMP - '30 days'::interval))))
+          GROUP BY f.dataset_name, f.session_start_ts, f.check_category, f.check_name
+          ORDER BY f.dataset_name, f.session_start_ts, f.check_category, f.check_name
         )
  SELECT dataset_name,
     session_start_ts,
     check_category,
-    count(DISTINCT record_jsonpath) AS failed_recs,
-    ( SELECT d.tested_records
-           FROM catchsolve_noiodh.test_dataset d
-          WHERE ((d.session_start_ts = f.session_start_ts) AND (d.dataset_name = f.dataset_name))) AS tested_records
-   FROM catchsolve_noiodh.test_dataset_record_check_failed f
-  WHERE ((session_start_ts, dataset_name) IN ( SELECT t.session_start_ts,
-            t.dataset_name
-           FROM t
-          WHERE (t.session_start_ts >= (CURRENT_TIMESTAMP - '30 days'::interval))))
-  GROUP BY dataset_name, session_start_ts, check_category
-  ORDER BY dataset_name, session_start_ts, check_category;
+    (json_agg(jsonb_build_object('check_name', check_name, 'failed_recs', failed_recs)))::text AS check_stats
+   FROM t2
+  GROUP BY dataset_name, session_start_ts, check_category;
 
 
 --
@@ -248,19 +276,21 @@ ALTER SEQUENCE catchsolve_noiodh.test_dataset_record_attribute_check_fail_id_seq
 
 
 --
--- Name: test_dataset_check_category_check_name_record_record_failed_vw; Type: VIEW; Schema: public; Owner: -
+-- Name: test_dataset_record_check_failed_impacted_csv_vw; Type: VIEW; Schema: catchsolve_noiodh; Owner: -
 --
 
-CREATE VIEW public.test_dataset_check_category_check_name_record_record_failed_vw AS
+CREATE VIEW catchsolve_noiodh.test_dataset_record_check_failed_impacted_csv_vw AS
  SELECT session_start_ts,
     dataset_name,
-    check_category,
+    record_jsonpath,
     check_name,
-    count(*) AS nr_records
-   FROM catchsolve_noiodh.test_dataset_record_check_failed f1
-  GROUP BY session_start_ts, dataset_name, check_category, check_name
-  ORDER BY session_start_ts, dataset_name, check_category, check_name
- LIMIT 10;
+    max(record_json) AS record_json,
+    string_agg(impacted_attributes_csv, ','::text ORDER BY test_dataset_record_check_failed.impacted_attributes_csv) AS impacted_attributes_csv,
+    check_category,
+    used_key
+   FROM catchsolve_noiodh.test_dataset_record_check_failed
+  GROUP BY session_start_ts, dataset_name, record_jsonpath, check_name, record_json, check_category, used_key
+  ORDER BY session_start_ts DESC, (min(id));
 
 
 --
@@ -285,11 +315,19 @@ ALTER TABLE ONLY catchsolve_noiodh.test_dataset_record_check_failed ALTER COLUMN
 
 
 --
--- Name: test_dataset_record_check_failed nuk; Type: CONSTRAINT; Schema: catchsolve_noiodh; Owner: -
+-- Name: rules rules_pkey; Type: CONSTRAINT; Schema: catchsolve_noiodh; Owner: -
 --
 
-ALTER TABLE ONLY catchsolve_noiodh.test_dataset_record_check_failed
-    ADD CONSTRAINT nuk UNIQUE (session_start_ts, dataset_name, record_jsonpath, check_name);
+ALTER TABLE ONLY catchsolve_noiodh.rules
+    ADD CONSTRAINT rules_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: test_dataset session_start_ts_dataset_name_unique; Type: CONSTRAINT; Schema: catchsolve_noiodh; Owner: -
+--
+
+ALTER TABLE ONLY catchsolve_noiodh.test_dataset
+    ADD CONSTRAINT session_start_ts_dataset_name_unique UNIQUE (session_start_ts, dataset_name);
 
 
 --
@@ -330,6 +368,13 @@ ALTER TABLE ONLY catchsolve_noiodh.test_dataset
 
 ALTER TABLE ONLY catchsolve_noiodh.test_dataset_record_check_failed
     ADD CONSTRAINT test_dataset_record_attribute_check_fail_id_key UNIQUE (id);
+
+
+--
+-- Name: test_dataset_record_check_fai_session_start_ts_dataset_name_idx; Type: INDEX; Schema: catchsolve_noiodh; Owner: -
+--
+
+CREATE INDEX test_dataset_record_check_fai_session_start_ts_dataset_name_idx ON catchsolve_noiodh.test_dataset_record_check_failed USING btree (session_start_ts, dataset_name, check_category, check_name);
 
 
 --
