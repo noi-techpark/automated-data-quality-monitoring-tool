@@ -5,7 +5,7 @@ services:
     env_file: .env
     ports:
       - ${SERVER_PORT}:8080
-  app:
+  job:
     image: ${DOCKER_IMAGE_JOB}:${DOCKER_TAG}
     restart: unless-stopped
     env_file: .env
