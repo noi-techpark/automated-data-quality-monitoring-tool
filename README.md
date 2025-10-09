@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 NOI Techpark <digital@noi.bz.it>
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # Automated data quality monitoring tool
 
 This is a tool to monitor data quality of the Open Data Hub.
