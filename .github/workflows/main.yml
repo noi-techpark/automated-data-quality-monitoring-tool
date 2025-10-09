@@ -17,7 +17,7 @@ env:
 jobs:
   deploy-test:
     runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/backend-ci'
+    if: github.ref == 'refs/heads/main'
     concurrency: 
       group: deploy-test
       cancel-in-progress: true
