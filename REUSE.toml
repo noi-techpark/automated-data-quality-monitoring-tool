@@ -15,23 +15,18 @@ SPDX-License-Identifier = "CC0-1.0"
 [[annotations]]
 path = [
     "COPYRIGHT",
-    "frontend/package.json",
-    "frontend/package-lock.json",
-    "frontend/tsconfig.json",
-    "frontend/**/*.map",
-    "frontend/src/main/webapp/*",
+    "webapp/package.json",
+    "webapp/package-lock.json",
+    "webapp/tsconfig.json",
+    "webapp/src/main/webapp/*",
 ]
-SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
+SPDX-FileCopyrightText = "2025 Catch Solve di Davide Montesin"
 SPDX-License-Identifier = "CC0-1.0"
 precedence = "closest"
 
-# [[annotations]]
-# SPDX-FileCopyrightText = "2024 Catch Solve di Davide Montesin"
-# SPDX-License-Identifier = "AGPL-3.0-or-later"
-
 [[annotations]]
 path = [
-    "backend/**",
+    "job/**",
 ]
 SPDX-FileCopyrightText = "2025 SysWhiteDev <commercial@syswhite.dev>"
 SPDX-License-Identifier = "AGPL-3.0-or-later"

@@ -1,7 +1,14 @@
 services:
-  app:
-    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
+  webapp:
+    image: ${DOCKER_IMAGE_WEBAPP}:${DOCKER_TAG}
     build:
       context: ../
-      dockerfile: infrastructure/docker/Dockerfile
+      dockerfile: infrastructure/docker/webapp.dockerfile
+      target: build
+
+  job:
+    image: ${DOCKER_IMAGE_JOB}:${DOCKER_TAG}
+    build:
+      context: ../
+      dockerfile: infrastructure/docker/job.dockerfile
       target: build
