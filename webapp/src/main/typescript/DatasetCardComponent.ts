@@ -77,6 +77,11 @@ export class DatasetCardComponent extends HTMLElement
 					object-fit: contain;
 					margin-bottom: 0.5rem;
 				}
+
+				div[data-length="0"] {
+					background-color: gray;
+					opacity: 0.5;
+				}
 	
 			</style>
 			<div class="wrapper">
@@ -131,6 +136,7 @@ export class DatasetCardComponent extends HTMLElement
 		this.dtitle.textContent = dataset.dataset_name
 		this.img.src = dataset.dataset_img_url.length > 0 ? dataset.dataset_img_url : 'dataset-placeholder.png'
 		this.checkrecs.setData('' + dataset.tested_records)
+		this.shadowRoot!.querySelector('div.wrapper')!.setAttribute('data-length', '' + dataset.tested_records)
 		this.checkattr.setData('123')
 		this.failedrecs.setData('' + (dataset.tested_records - dataset.failed_records))
 		const quality_ratio = dataset.tested_records == 0 ? 100 : dataset.failed_records / dataset.tested_records
