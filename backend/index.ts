@@ -22,14 +22,14 @@ function requireEnvVar(key: string, defaultValue?: string): string {
   return value;
 }
 
-const KEYCLOAK_CLIENT_ID_OPENDATA = 'opendata';
+export const KEYCLOAK_CLIENT_ID_OPENDATA = 'opendata';
 
 export const LOG_LEVEL = requireEnvVar('LOG_LEVEL', 'minimal');
 export const DATABASE_URL = requireEnvVar('DATABASE_URL');
-export const KEYCLOAK_BASE_URL = requireEnvVar('KEYCLOAK_BASE_URL');
+export const KEYCLOAK_BASE_URL = requireEnvVar('KEYCLOAK_BASE_URL','');
 export const KEYCLOAK_CLIENT_ID = requireEnvVar('KEYCLOAK_CLIENT_ID', KEYCLOAK_CLIENT_ID_OPENDATA);
-export const KEYCLOAK_REALM = requireEnvVar('KEYCLOAK_REALM');
-export const KEYCLOAK_CLIENT_SECRET = requireEnvVar('KEYCLOAK_CLIENT_SECRET');
+export const KEYCLOAK_REALM = requireEnvVar('KEYCLOAK_REALM','');
+export const KEYCLOAK_CLIENT_SECRET = requireEnvVar('KEYCLOAK_CLIENT_SECRET','');
 export const METADATA_BASE_URL = requireEnvVar('METADATA_BASE_URL');
 export const DATASET_CONTENT_PAGE_LIMIT = requireEnvVar('DATASET_CONTENT_PAGE_LIMIT');
 export const DEBUG_MODE_CACHE_ON = requireEnvVar('DEBUG_MODE_CACHE_ON', 'false');
@@ -97,7 +97,7 @@ async function processDataset(metadata_dataset_json: MetadataDatasetItem, datase
                             dataset_name: metadata_dataset_json.Shortname,
                             dataset_dataspace: metadata_dataset_json.Dataspace,
                             dataset_img_url: metadata_dataset_json.ImageGallery?.[0].ImageUrl,
-                            used_key: process.env.KEYCLOAK_CLIENT_ID
+                            used_key: KEYCLOAK_CLIENT_ID
                         }
                     });
 
@@ -167,7 +167,7 @@ function checkRecordWithRule(rule: any, obj: DatasetPageItem, failed_records: an
                         problem_hint: '',
                         impacted_attributes_csv: '',
                         check_category: rule.category,
-                        used_key: process.env.KEYCLOAK_CLIENT_ID,
+                        used_key: KEYCLOAK_CLIENT_ID,
                         impacted_attribute_value: ''
                     })
                     //})
