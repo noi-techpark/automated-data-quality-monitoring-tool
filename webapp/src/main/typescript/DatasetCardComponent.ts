@@ -79,7 +79,7 @@ export class DatasetCardComponent extends HTMLElement
 				}
 
 				div[data-length="0"] {
-					background-color: gray;
+					background-color: #aaa;
 					opacity: 0.5;
 				}
 	
@@ -140,12 +140,15 @@ export class DatasetCardComponent extends HTMLElement
 		this.checkattr.setData('123')
 		this.failedrecs.setData('' + (dataset.tested_records - dataset.failed_records))
 		const quality_ratio = dataset.tested_records == 0 ? 100 : dataset.failed_records / dataset.tested_records
-		if (quality_ratio < 0.1)
-			this.failedrecs.setQualityLevel("good")
-		else if (quality_ratio < 0.3)
-			this.failedrecs.setQualityLevel("warn")
-		else
-			this.failedrecs.setQualityLevel("fail")
+		if (dataset.tested_records > 0)
+		{
+			if (quality_ratio < 0.1)
+				this.failedrecs.setQualityLevel("good")
+			else if (quality_ratio < 0.3)
+				this.failedrecs.setQualityLevel("warn")
+			else
+				this.failedrecs.setQualityLevel("fail")
+		}
 		this.lastupdate.textContent = dateformat
 		this.onclick = () => {
 			location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name 
