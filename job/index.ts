@@ -151,19 +151,24 @@ async function processDataset(metadata_dataset_json: MetadataDatasetItem, datase
         if (dataset_page_json.Items.length == 0)
             break;
         tested_record_count += await processDatasetItems(dataset_page_json, dataset_rules, metadata_dataset_json.Shortname)
+        await updateTestedRecords(metadata_dataset_json.Shortname, tested_record_count);
     }
+    await updateTestedRecords(metadata_dataset_json.Shortname, tested_record_count);
+
+}
+
+async function updateTestedRecords(datasetName: string, testedRecordCount: number): Promise<void> {
     await prisma.test_dataset.update({
         where: {
             session_start_ts_dataset_name: {
                 session_start_ts: getSessionStartTimestamp(),
-                dataset_name: metadata_dataset_json.Shortname,
+                dataset_name: datasetName,
             }
         },
         data: {
-            tested_records: tested_record_count
+            tested_records: testedRecordCount
         }
     });
-
 }
 
 async function processDatasetItems(dataset_page_json: DatasetPage, dataset_rules: Check[], dataset_Shortname: string): Promise<number> {
@@ -216,4 +221,3 @@ function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: 
             throw new Error('type not implemented ' + rule.rule_language)
     }
 }
-

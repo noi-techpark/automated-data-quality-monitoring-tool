@@ -21,3 +21,5 @@
 /src_bak/
 backend/.env-public
 backend/.env-idm
+job/.env-public
+job/.env-idm
