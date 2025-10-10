@@ -68,7 +68,7 @@ interface DatasetPageItem {
 
 interface DatasetPage {
     NextPage: string | null
-    Items: DatasetPageItem[]
+    Items: DatasetPageItem[] | undefined
 }
 
 export interface ChecksRoot {
@@ -120,13 +120,26 @@ for (let m = 0; m < metadata_json.Items.length; m++)
     )
     // console.log(dataset_rules)
 
-    processDataset(metadata_dataset_json, dataset_rules)
+    try
+    {
+        await processDataset(metadata_dataset_json, dataset_rules)
+    }
+    catch (e)
+    {
+        console.error(e)
+    }
 }
 
 
 async function processDataset(metadata_dataset_json: MetadataDatasetItem, dataset_rules: Check[]) {
 
-        await prisma.test_dataset.create({
+    if (dataset_rules.length == 0)
+    {
+        console.log('dataset senza regole')
+        return
+    }
+
+    await prisma.test_dataset.create({
                         data: {
                             session_start_ts: getSessionStartTimestamp(),
                             dataset_name: metadata_dataset_json.Shortname,
@@ -136,19 +149,14 @@ async function processDataset(metadata_dataset_json: MetadataDatasetItem, datase
                         }
                     });
 
-    if (dataset_rules.length == 0)
-    {
-        console.log('dataset senza regole')
-        // TODO record that no rule was applied
-        return
-    }
     let tested_record_count = 0;
     for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++)
     {
-        const pageUrl = metadata_dataset_json.ApiUrl + ( metadata_dataset_json.ApiUrl.includes("?") ? '&' : '?' ) + `pagesize=1000&pagenumber=${pageNumber}`;
+        const pageUrl = metadata_dataset_json.ApiUrl + ( metadata_dataset_json.ApiUrl.includes("?") ? '&' : '?' ) + `pagesize=100&pagenumber=${pageNumber}`;
+        console.log("pageUrl", pageUrl)
         const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl)
-        // console.log(dataset_page_json)
-        if (dataset_page_json.Items.length == 0)
+        //console.log(dataset_page_json)
+        if (dataset_page_json.Items === undefined || dataset_page_json.Items.length == 0)
             break;
         tested_record_count += await processDatasetItems(dataset_page_json, dataset_rules, metadata_dataset_json.Shortname)
         await updateTestedRecords(metadata_dataset_json.Shortname, tested_record_count);
