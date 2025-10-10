@@ -1,6 +1,9 @@
 import { getDatasetContent, getDatasetLists } from "./lib/odhDatasets";
 import prisma from "./lib/db";
 import { getSessionStartTimestamp } from "./lib/session";
+import xml2js from "xml2js"
+import fs from "fs/promises"
+import { xml2json } from 'xml-js';
 
 
 import {fetch_json_with_optional_cache} from "./lib/utils";
@@ -68,11 +71,40 @@ interface DatasetPage {
     Items: DatasetPageItem[]
 }
 
+export interface ChecksRoot {
+  checks: {
+    check: Check[];
+  };
+}
+
+export interface Check {
+  name: string;
+  category: string;
+  description: string;
+  dataset_shortname: string;
+  dataset_dataspace: string;
+  rule_language: string;
+  rule_code: string;
+}
+
 
 
 const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL);
 
-const rules = await prisma.rules.findMany({});
+const checks_xml = await fs.readFile("checks.xml", 'utf-8')
+
+// const jsonString = xml2json(checks_xml, { compact: true, spaces: 2 });
+// console.log(jsonString)
+
+const parser = new xml2js.Parser({ explicitArray: false });
+const rules: ChecksRoot  = await parser.parseStringPromise(checks_xml)
+if (!Array.isArray(rules.checks.check)) // fix xml2js problem when only one check
+    rules.checks.check = [rules.checks.check]
+// console.log(JSON.stringify(rules, null, 2))
+
+// process.exit(0)
+
+// const rules = await prisma.rules.findMany({});
 
 for (let m = 0; m < metadata_json.Items.length; m++)
 {
@@ -82,14 +114,17 @@ for (let m = 0; m < metadata_json.Items.length; m++)
     console.log(metadata_dataset_json.Dataspace)
     console.log(metadata_dataset_json.ImageGallery?.[0].ImageUrl)
 
-    const dataset_rules = rules.filter(r => r.active && r.datasetname_searchfilter == metadata_dataset_json.Shortname)
+    const dataset_rules = rules.checks.check.filter(r => 
+            (r.dataset_shortname == '' || r.dataset_shortname == metadata_dataset_json.Shortname)
+        &&  (r.dataset_dataspace == '' || r.dataset_dataspace == metadata_dataset_json.Dataspace)
+    )
     // console.log(dataset_rules)
 
     processDataset(metadata_dataset_json, dataset_rules)
 }
 
 
-async function processDataset(metadata_dataset_json: MetadataDatasetItem, dataset_rules: any[]) {
+async function processDataset(metadata_dataset_json: MetadataDatasetItem, dataset_rules: Check[]) {
 
         await prisma.test_dataset.create({
                         data: {
@@ -131,7 +166,7 @@ async function processDataset(metadata_dataset_json: MetadataDatasetItem, datase
 
 }
 
-async function processDatasetItems(dataset_page_json: DatasetPage, dataset_rules: any[], dataset_Shortname: string): Promise<number> {
+async function processDatasetItems(dataset_page_json: DatasetPage, dataset_rules: Check[], dataset_Shortname: string): Promise<number> {
     let tested_record_count = 0;
     const failed_records: any = []
     for (let i = 0; i < dataset_page_json.Items.length; i++) {
@@ -146,10 +181,10 @@ async function processDatasetItems(dataset_page_json: DatasetPage, dataset_rules
     return tested_record_count;
 }
 
-function checkRecordWithRule(rule: any, obj: DatasetPageItem, failed_records: any, dataset_Shortname: string) {
-    switch (rule.type) {
+function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: any, dataset_Shortname: string) {
+    switch (rule.rule_language) {
         case 'javascript':
-            const fn = new Function("$", `return ${rule.value};`);
+            const fn = new Function("$", `return (${rule.rule_code});`);
             try {
                 const result = fn(obj);
                 if (typeof result != 'boolean')
@@ -178,7 +213,7 @@ function checkRecordWithRule(rule: any, obj: DatasetPageItem, failed_records: an
             }
             break;
         default:
-            throw new Error('type not implemented ' + rule.type)
+            throw new Error('type not implemented ' + rule.rule_language)
     }
 }
 

@@ -6,159 +6,52 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 <!-- * (C) 2024 Catch Solve di Davide Montesin * License: AGPL -->
 <checks>
-	<check>
-		<name>altitude between 50m and 4000m</name>
-		<category>range quality</category>
-		<description>
-		</description>
-		<!-- dataset shortname, if empty is tested on all datasets -->
-		<dataset_shortname>Accommodation</dataset_shortname>
-		<!-- field name, if empty is tested on all fields -->
-		<field_name>Altitude</field_name>
-		<!-- field type (null, string, number, boolean, object, array), if empty is tested on all types -->
-		<field_type>number</field_type>
-		<!-- the javascript code that check the fields. There are predefined
-		     variables that can be used:
-		     
-		     * fieldName:
-		     * fieldValue:
-		     * fieldType: null, string, number, boolean, object, array
-		     * record: the entrire record containing the field
-		     * json: the entire json
-		     * jsonpath: an array with the "jsonpath" that point to the current record, useful for relative navigation
-		 -->
-		<jscode><![CDATA[
-
-			fieldValue > 50 && fieldValue < 4000
-
-		]]></jscode>
-	</check>
-	
-	<check>
-		<name>ImageGallery present</name>
-		<category>completeness quality</category>
-		<description>
-		</description>
-		<!-- dataset shortname, if empty is tested on all datasets -->
-		<dataset_shortname>Accommodation</dataset_shortname>
-		<!-- field name, if empty is tested on all fields -->
-		<field_name>ImageGallery</field_name>
-		<!-- field type (null, string, number, boolean, object, array), if empty is tested on all types -->
-		<field_type></field_type>
-		
-		<!-- the javascript code that check the fields. There are predefined
-		     variables that can be used:
-		     
-		     * fieldName:
-		     * fieldValue:
-		     * fieldType: null, string, number, boolean, object, array
-		     * record: the entrire record containing the field
-		     * json: the entire json
-		     * jsonpath: an array with the "jsonpath" that point to the current record, useful for relative navigation
-		 -->
-		
-		<jscode><![CDATA[
-
-			fieldValue !== null
-
-		]]></jscode>
-	</check>
-
 
 	<check>
-		<name>Website present</name>
-		<category>completeness quality</category>
+		<name>GpsInfo must be not 0,0</name>
+		<category>GpsInfo must be not 0,0</category>
 		<description>
-			this check that ...
+			This rule checks that if GPS information is provided as a list, all entries in that list have valid coordinates (i.e., latitude and longitude are not 0).
+			If there is no list (GpsInfo is not an array), the rule automatically passes.
 		</description>
-		<!-- dataset shortname, if empty is tested on all datasets -->
-		<dataset_shortname>Accommodation</dataset_shortname>
-		<!-- field name, if empty is tested on all fields -->
-		<field_name>AccoDetail</field_name>
-		<!-- field type (null, string, number, boolean, object, array), if empty is tested on all types -->
-		<field_type></field_type>
-		
-		<!-- the javascript code that check the fields. There are predefined
-		     variables that can be used:
-		     
-		     * fieldName:
-		     * fieldValue:
-		     * fieldType: null, string, number, boolean, object, array
-		     * record: the entrire record containing the field
-		     * json: the entire json
-		     * jsonpath: an array with the "jsonpath" that point to the current record, useful for relative navigation
-		 -->
-		
-		<jscode><![CDATA[
-
-			fieldValue.it.Website != null && fieldValue.de.Website != null && fieldValue.en.Website != null
-
-		]]></jscode>
-	</check>
-
-	<check>
-		<name>mvalue realistic</name>
-		<category>range quality</category>
-		<description>
-			this check that ...
-		</description>
-		<!-- dataset shortname, if empty is tested on all datasets -->
+		<!-- dataset shortname, if * is tested on all datasets -->
 		<dataset_shortname></dataset_shortname>
-		<!-- field name, if empty is tested on all fields -->
-		<field_name>mvalue</field_name>
-		<!-- field type (null, string, number, boolean, object, array), if empty is tested on all types -->
-		<field_type>number</field_type>
-		
-		<!-- the javascript code that check the fields. There are predefined
-		     variables that can be used:
-		     
-		     * fieldName:
-		     * fieldValue:
-		     * fieldType: null, string, number, boolean, object, array
-		     * record: the entrire record containing the field
-		     * json: the entire json
-		     * jsonpath: an array with the "jsonpath" that point to the current record, useful for relative navigation
-		 -->
-		
-		<jscode><![CDATA[
+		<dataset_dataspace>tourism</dataset_dataspace>
+		<!-- which programming language the rule is written. at the moment supported javascript and jsonlogic -->
+		<rule_language>javascript</rule_language>
+		<rule_code><![CDATA[
 
-			fieldValue > 0
+			!Array.isArray($.GpsInfo) || $.GpsInfo.every($ => $.Latitude != 0 && $.Longitude != 0)
 
-		]]></jscode>
+		]]></rule_code>
 	</check>
-	
+
 	<check>
-		<name>mvalidtime not older than 30 day</name>
-		<category>freshness quality</category>
+	<name>GpsInfo must be inside Europe bounding box (if not 0,0)</name>
+		<category>geolocation quality</category>
 		<description>
-			This check verifies how many of the records associated to a station have a timestamp which is "fresh", i.e. within the last 30 days.
+			This rule checks that if GPS information is provided as a list, all entries have coordinates located within the approximate bounding box of Europe
+			(Latitude between 34° and 72°, Longitude between -25° and 45°).  
+			If coordinates are 0,0, the rule passes to avoid overlapping with the "GpsInfo must be not 0,0" check.
+			If there is no list (GpsInfo is not an array), the rule automatically passes.
 		</description>
-		<!-- dataset shortname, if empty is tested on all datasets -->
+
 		<dataset_shortname></dataset_shortname>
-		<!-- field name, if empty is tested on all fields -->
-		<field_name>mvalidtime</field_name>
-		<!-- field type (null, string, number, boolean, object, array), if empty is tested on all types -->
-		<field_type>string</field_type>
-		
-		<!-- the javascript code that check the fields. There are predefined
-		     variables that can be used:
-		     
-		     * fieldName:
-		     * fieldValue:
-		     * fieldType: null, string, number, boolean, object, array
-		     * record: the entrire record containing the field
-		     * json: the entire json
-		     * jsonpath: an array with the "jsonpath" that point to the current record, useful for relative navigation
-		 -->
-		
-		<jscode><![CDATA[
+		<dataset_dataspace>tourism</dataset_dataspace>
 
-			const diffms = Date.now() - Date.parse( fieldValue );
-			diffms / 24 / 3600 / 1000 < 30
-
-		]]></jscode>
+		<rule_language>javascript</rule_language>
+		<rule_code><![CDATA[
+		
+			!Array.isArray($.GpsInfo) || $.GpsInfo.every($ => 
+				($.Latitude === 0 && $.Longitude === 0) || (
+					$.Latitude >= 34 &&
+					$.Latitude <= 72 &&
+					$.Longitude >= -25 &&
+					$.Longitude <= 45
+				)
+			)
+		]]></rule_code>
 	</check>
-
 
 
 </checks>
