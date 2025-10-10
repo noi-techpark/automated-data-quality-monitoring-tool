@@ -133,12 +133,6 @@ for (let m = 0; m < metadata_json.Items.length; m++)
 
 async function processDataset(metadata_dataset_json: MetadataDatasetItem, dataset_rules: Check[]) {
 
-    if (dataset_rules.length == 0)
-    {
-        console.log('dataset senza regole')
-        return
-    }
-
     await prisma.test_dataset.create({
                         data: {
                             session_start_ts: getSessionStartTimestamp(),
@@ -148,6 +142,13 @@ async function processDataset(metadata_dataset_json: MetadataDatasetItem, datase
                             used_key: KEYCLOAK_CLIENT_ID
                         }
                     });
+
+    if (dataset_rules.length == 0)
+    {
+        console.log('dataset senza regole')
+        return
+    }
+
 
     let tested_record_count = 0;
     for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++)
@@ -182,9 +183,9 @@ async function updateTestedRecords(datasetName: string, testedRecordCount: numbe
 async function processDatasetItems(dataset_page_json: DatasetPage, dataset_rules: Check[], dataset_Shortname: string): Promise<number> {
     let tested_record_count = 0;
     const failed_records: any = []
-    for (let i = 0; i < dataset_page_json.Items.length; i++) {
+    for (let i = 0; i < dataset_page_json.Items!.length; i++) {
         tested_record_count++;
-        const obj = dataset_page_json.Items[i]
+        const obj = dataset_page_json.Items![i]
         for (let rule of dataset_rules) {
            checkRecordWithRule(rule, obj, failed_records, dataset_Shortname)
         }
