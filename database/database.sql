@@ -1,7 +1,3 @@
--- SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
---
--- SPDX-License-Identifier: AGPL-3.0-or-later
-
 --
 -- PostgreSQL database dump
 --
@@ -42,7 +38,9 @@ CREATE TABLE catchsolve_noiodh.rules (
     searchfilter text NOT NULL,
     type text NOT NULL,
     value text NOT NULL,
-    createdat timestamp with time zone DEFAULT now() NOT NULL
+    createdat timestamp with time zone DEFAULT now() NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    category text DEFAULT ''::text NOT NULL
 );
 
 
@@ -237,12 +235,14 @@ ALTER SEQUENCE catchsolve_noiodh.test_dataset_id_seq OWNED BY catchsolve_noiodh.
 
 CREATE VIEW catchsolve_noiodh.test_dataset_max_ts_vw AS
  WITH t AS (
-         SELECT test_dataset.dataset_name,
+         SELECT test_dataset.used_key,
+            test_dataset.dataset_name,
             max(test_dataset.session_start_ts) AS session_start_ts
            FROM catchsolve_noiodh.test_dataset
-          GROUP BY test_dataset.dataset_name
+          GROUP BY test_dataset.used_key, test_dataset.dataset_name
         )
- SELECT dataset_name,
+ SELECT used_key,
+    dataset_name,
     session_start_ts,
     ( SELECT test_dataset.tested_records
            FROM catchsolve_noiodh.test_dataset
