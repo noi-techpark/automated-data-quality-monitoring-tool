@@ -41,12 +41,12 @@ jobs:
           # format: postgres://user:pw@host:port/db?schema=catchsolve_noiodh
           X_DATABASE_URL: "${{secrets.TEST_DATABASE_URL}}"
           X_LOG_LEVEL: "minimal"
-          X_KEYCLOAK_BASE_URL: "CHANGE_ME"
-          X_KEYCLOAK_REALM: "CHANGE_ME"
-          X_KEYCLOAK_CLIENT_ID: "CHANGE_ME"
-          X_KEYCLOAK_CLIENT_SECRET: "CHANGE_ME"
+          X_KEYCLOAK_BASE_URL: "https://auth.opendatahub.com/auth/"
+          X_KEYCLOAK_REALM: "noi"
+          X_KEYCLOAK_CLIENT_ID: "odh-data-quality-job"
+          X_KEYCLOAK_CLIENT_SECRET: "${{secrets.PROD_JOB_CLIENT_SECRET}}"
           X_METADATA_BASE_URL: "https://tourism.api.opendatahub.com/v1/MetaData?pagesize=300&origin=webcomp-datasets-list"
-          X_DATASET_CONTENT_PAGE_LIMIT: 1
+          X_DATASET_CONTENT_PAGE_LIMIT: 4
 
       - name: Build and push images
         uses: noi-techpark/github-actions/docker-build-and-push@v2
