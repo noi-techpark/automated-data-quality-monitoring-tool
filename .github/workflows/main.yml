@@ -41,10 +41,10 @@ jobs:
           # format: postgres://user:pw@host:port/db?schema=catchsolve_noiodh
           X_DATABASE_URL: "${{secrets.TEST_DATABASE_URL}}"
           X_LOG_LEVEL: "minimal"
-          X_KEYCLOAK_BASE_URL: "https://auth.opendatahub.testingmachine.eu"
+          X_KEYCLOAK_BASE_URL: "https://auth.opendatahub.com/auth/"
           X_KEYCLOAK_REALM: "noi"
           X_KEYCLOAK_CLIENT_ID: "odh-data-quality-job"
-          X_KEYCLOAK_CLIENT_SECRET: "${{secrets.TEST_JOB_CLIENT_SECRET}}"
+          X_KEYCLOAK_CLIENT_SECRET: "${{secrets.PROD_JOB_CLIENT_SECRET}}"
           X_METADATA_BASE_URL: "https://tourism.api.opendatahub.com/v1/MetaData?pagesize=300&origin=webcomp-datasets-list"
           X_DATASET_CONTENT_PAGE_LIMIT: 4
 
