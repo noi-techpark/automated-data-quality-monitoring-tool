@@ -52,8 +52,9 @@ interface MetadataDatasetImageGallery {
 }
 
 interface MetadataDatasetItem {
-    Shortname: string
-    ApiUrl: string
+    Shortname: string,
+    ApiUrl: string,
+    ApiType: string,
     Dataspace: string,
     ImageGallery: MetadataDatasetImageGallery[]
 }
@@ -63,12 +64,13 @@ interface MetadataResponse {
 }
 
 interface DatasetPageItem {
-    Id: string
+    // Id: string
 }
 
 interface DatasetPage {
-    NextPage: string | null
+    //  NextPage: string | null
     Items: DatasetPageItem[] | undefined
+    data:  DatasetPageItem[] | undefined
 }
 
 export interface ChecksRoot {
@@ -83,6 +85,8 @@ export interface Check {
   description: string;
   dataset_shortname: string;
   dataset_dataspace: string;
+  dataset_apitype: string;
+  additional_url_parameters: string
   rule_language: string;
   rule_code: string;
 }
@@ -114,10 +118,16 @@ for (let m = 0; m < metadata_json.Items.length; m++)
     console.log(metadata_dataset_json.Dataspace)
     console.log(metadata_dataset_json.ImageGallery?.[0].ImageUrl)
 
-    const dataset_rules = rules.checks.check.filter(r => 
-            (r.dataset_shortname == '' || r.dataset_shortname == metadata_dataset_json.Shortname)
-        &&  (r.dataset_dataspace == '' || r.dataset_dataspace == metadata_dataset_json.Dataspace)
-    )
+
+    const dataset_rules: Check[] = [];
+    for (const rule of rules.checks.check) {
+        const matchesShortname = rule.dataset_shortname == null || rule.dataset_shortname == ''  || rule.dataset_shortname === metadata_dataset_json.Shortname;
+        const matchesDataspace = rule.dataset_dataspace == null || rule.dataset_dataspace   == '' || rule.dataset_dataspace === metadata_dataset_json.Dataspace;
+        const matchesApiType   = rule.dataset_apitype   == null || rule.dataset_apitype     == '' || rule.dataset_apitype === metadata_dataset_json.ApiType;
+        if (matchesShortname && matchesDataspace && matchesApiType) {
+            dataset_rules.push(rule);
+        }
+    }
     // console.log(dataset_rules)
 
     try
@@ -133,36 +143,66 @@ for (let m = 0; m < metadata_json.Items.length; m++)
 
 async function processDataset(metadata_dataset_json: MetadataDatasetItem, dataset_rules: Check[]) {
 
-    await prisma.test_dataset.create({
-                        data: {
-                            session_start_ts: getSessionStartTimestamp(),
-                            dataset_name: metadata_dataset_json.Shortname,
-                            dataset_dataspace: metadata_dataset_json.Dataspace,
-                            dataset_img_url: metadata_dataset_json.ImageGallery?.[0].ImageUrl,
-                            used_key: KEYCLOAK_CLIENT_ID
-                        }
-                    });
-
     if (dataset_rules.length == 0)
     {
-        console.log('dataset senza regole')
+        console.error('====================== dataset without rules  ======================')
+        console.log('Shortname', metadata_dataset_json.Shortname);
+        console.log('Dataspace', metadata_dataset_json.Dataspace);
+        console.log('ApiType', metadata_dataset_json.ApiType);
+        console.error('=====================================================================')
         return
     }
 
+    const additional_params: string[] = []
 
-    let tested_record_count = 0;
-    for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++)
+    for (let r of dataset_rules)
     {
-        const pageUrl = metadata_dataset_json.ApiUrl + ( metadata_dataset_json.ApiUrl.includes("?") ? '&' : '?' ) + `pagesize=100&pagenumber=${pageNumber}`;
-        console.log("pageUrl", pageUrl)
-        const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl)
-        //console.log(dataset_page_json)
-        if (dataset_page_json.Items === undefined || dataset_page_json.Items.length == 0)
-            break;
-        tested_record_count += await processDatasetItems(dataset_page_json, dataset_rules, metadata_dataset_json.Shortname)
-        await updateTestedRecords(metadata_dataset_json.Shortname, tested_record_count);
+        if (!additional_params.includes(r.additional_url_parameters ?? ''))
+            additional_params.push(r.additional_url_parameters ?? '')
     }
-    await updateTestedRecords(metadata_dataset_json.Shortname, tested_record_count);
+
+    console.log(additional_params)
+
+    for (let additional_par of additional_params)
+    {
+        const combined_shorname = metadata_dataset_json.Shortname + additional_par
+        await prisma.test_dataset.create({
+                            data: {
+                                session_start_ts: getSessionStartTimestamp(),
+                                dataset_name: combined_shorname,
+                                dataset_dataspace: metadata_dataset_json.Dataspace,
+                                dataset_img_url: metadata_dataset_json.ImageGallery?.[0].ImageUrl,
+                                used_key: KEYCLOAK_CLIENT_ID
+                            }
+                        });
+
+
+
+        let tested_record_count = 0;
+        for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++)
+        {
+            const pageUrl = metadata_dataset_json.ApiUrl + additional_par + ( (metadata_dataset_json.ApiUrl + additional_par).includes("?") ? '&' : '?' ) + `pagesize=100&pagenumber=${pageNumber}`;
+            console.log("pageUrl", pageUrl)
+            const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl)
+            
+            const records = []
+
+            if (Array.isArray(dataset_page_json.Items))
+                records.push(...dataset_page_json.Items)
+
+            if (Array.isArray(dataset_page_json.data))
+                records.push(...dataset_page_json.data)
+
+            if (records.length == 0)
+                break;
+            await processDatasetItems(records, dataset_rules, combined_shorname, tested_record_count, additional_par)
+            tested_record_count += records.length
+            await updateTestedRecords(combined_shorname, tested_record_count);
+            if (additional_par != '') // don't' combine paging with additional params
+                break;
+        }
+        await updateTestedRecords(combined_shorname, tested_record_count);
+    }
 
 }
 
@@ -180,22 +220,23 @@ async function updateTestedRecords(datasetName: string, testedRecordCount: numbe
     });
 }
 
-async function processDatasetItems(dataset_page_json: DatasetPage, dataset_rules: Check[], dataset_Shortname: string): Promise<number> {
-    let tested_record_count = 0;
+async function processDatasetItems(dataset_page_json_item: DatasetPageItem[], dataset_rules: Check[], dataset_Shortname: string, start_number: number, additional_par: string): Promise<void> {
+    // let tested_record_count = 0;
     const failed_records: any = []
-    for (let i = 0; i < dataset_page_json.Items!.length; i++) {
-        tested_record_count++;
-        const obj = dataset_page_json.Items![i]
+    for (let i = 0; i < dataset_page_json_item.length; i++) {
+        // tested_record_count++;
+        const obj = dataset_page_json_item[i]
         for (let rule of dataset_rules) {
-           checkRecordWithRule(rule, obj, failed_records, dataset_Shortname)
+            if ((rule.additional_url_parameters ?? '') == additional_par)
+               checkRecordWithRule(rule, obj, failed_records, dataset_Shortname, 'seq=' + (start_number + i))
         }
 
     }
     await prisma.test_dataset_record_check_failed.createMany({ data: failed_records });
-    return tested_record_count;
+    // return tested_record_count;
 }
 
-function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: any, dataset_Shortname: string) {
+function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: any, dataset_Shortname: string, rec_id: string) {
     switch (rule.rule_language) {
         case 'javascript':
             const fn = new Function("$", `return (${rule.rule_code});`);
@@ -204,13 +245,13 @@ function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: 
                 if (typeof result != 'boolean')
                     throw new Error('rule code invalid, instead of boolean has returned a ' + (typeof result))
                 if (!result) {
-                    console.log(`rule ${rule.name} failed for ${obj.Id}`)
+                    console.log(`rule ${rule.name} failed for ${obj}`)
                     // await prisma.test_dataset_record_check_failed.create({
                     //    data: {
                     failed_records.push({
                         session_start_ts: getSessionStartTimestamp(),
                         dataset_name: dataset_Shortname,
-                        record_jsonpath: obj.Id,
+                        record_jsonpath: rec_id, // shold be unique
                         check_name: rule.name,
                         record_json: JSON.stringify(obj, null, 3),
                         problem_hint: '',

@@ -53,5 +53,51 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		]]></rule_code>
 	</check>
 
+	<check>
+	
+	<name>mvalue gt zero1</name>
+		<category>mvalue gt zero1</category>
+		<description>
+			mvalue gt zero
+		</description>
+
+		<dataset_shortname></dataset_shortname>
+		<dataset_dataspace>environmental</dataset_dataspace>
+		<dataset_apitype>timeseries</dataset_apitype>
+
+		<additional_url_parameters>/nitrogen-dioxide/latest?where=mperiod.eq.3600</additional_url_parameters>
+
+		<rule_language>javascript</rule_language>
+		<rule_code><![CDATA[
+		
+			false
+
+		]]></rule_code>
+	</check>
+
+	<check>
+	
+	<name>mvalue gt zero2</name>
+		<category>mvalue gt zero2</category>
+		<description>
+			mvalue gt zero
+		</description>
+
+		<dataset_shortname></dataset_shortname>
+		<dataset_dataspace>environmental</dataset_dataspace>
+		<dataset_apitype>timeseries</dataset_apitype>
+
+		<additional_url_parameters>/EAQI-NO2/latest?where=mperiod.eq.3600</additional_url_parameters>
+
+		<rule_language>javascript</rule_language>
+		<rule_code><![CDATA[
+		
+			$.mvalue > 10
+
+		]]></rule_code>
+	</check>
+
+
+
 
 </checks>
