@@ -41,7 +41,7 @@ jobs:
           # format: postgres://user:pw@host:port/db?schema=catchsolve_noiodh
           X_DATABASE_URL: "${{secrets.TEST_DATABASE_URL}}"
           X_LOG_LEVEL: "minimal"
-          X_KEYCLOAK_BASE_URL: "https://auth.opendatahub.testingmachine.eu/"
+          X_KEYCLOAK_BASE_URL: "https://auth.opendatahub.testingmachine.eu"
           X_KEYCLOAK_REALM: "noi"
           X_KEYCLOAK_CLIENT_ID: "odh-data-quality-job"
           X_KEYCLOAK_CLIENT_SECRET: "${{secrets.TEST_JOB_CLIENT_SECRET}}"
