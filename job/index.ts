@@ -79,36 +79,98 @@ export interface ChecksRoot {
   };
 }
 
+export interface DataScopeFilters {
+  dataset_shortname: string | undefined;
+  dataset_dataspace: string |  undefined;
+  dataset_apitype:   string | undefined;
+  apitype_timeseries_param_datatype: string | undefined;
+  apitype_timeseries_param_mperiod: string | undefined;
+  apitype_timeseries_param_last_from_hours: string | undefined;
+  apitype_timeseries_param_last_to_hours: string | undefined;
+}
+
+export interface DataQualityRule {
+  rule_language: string;
+  rule_expression: string;
+}
+
 export interface Check {
   name: string;
   category: string;
   description: string;
-  dataset_shortname: string;
-  dataset_dataspace: string;
-  dataset_apitype: string;
-  additional_url_parameters: string
-  rule_language: string;
-  rule_code: string;
+ 
+  data_scope_filters: DataScopeFilters;
+  data_quality_rule: DataQualityRule;
 }
 
 
 
 const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL);
 
-const checks_xml = await fs.readFile("checks.xml", 'utf-8')
+const rules: Check[] = await loadRules();
 
-// const jsonString = xml2json(checks_xml, { compact: true, spaces: 2 });
-// console.log(jsonString)
+const group_rules_by_same_url: Record<string, Check[]> = {};
 
-const parser = new xml2js.Parser({ explicitArray: false });
-const rules: ChecksRoot  = await parser.parseStringPromise(checks_xml)
-if (!Array.isArray(rules.checks.check)) // fix xml2js problem when only one check
-    rules.checks.check = [rules.checks.check]
-// console.log(JSON.stringify(rules, null, 2))
+for (const rule of rules) {
+    
+    for (const dataset_metadata of metadata_json.Items) {
+       
+        let scope_url = dataset_metadata.ApiUrl;
 
-// process.exit(0)
+        let rest: any;
+        const { dataset_shortname, dataset_dataspace, dataset_apitype, ...rest1 } = rule.data_scope_filters;
+        const match_dataset_shortname =  dataset_shortname === undefined || dataset_shortname === '' || dataset_shortname === dataset_metadata.Shortname
+        const match_dataset_dataspace =  dataset_dataspace === undefined || dataset_dataspace === '' || dataset_dataspace === dataset_metadata.Dataspace
+        const match_dataset_apitype   =  dataset_apitype   === undefined || dataset_apitype   === '' || dataset_apitype   === dataset_metadata.ApiType
+        rest = rest1
 
-// const rules = await prisma.rules.findMany({});
+        if (dataset_apitype === 'timeseries') {
+
+            const { apitype_timeseries_param_datatype, apitype_timeseries_param_mperiod,
+                    apitype_timeseries_param_last_from_hours, apitype_timeseries_param_last_to_hours, ...rest2 } = rest;
+            // build url like https://mobility.api.opendatahub.com/v2/flat/EnvironmentStation/NO2%20-%20Ossidi%20di%20azoto/2025-10-14T00:00:00.000Z/2025-10-17T23:59:59.999Z?limit=-1&distinct=true&select=sname,mvalue,mvalidtime&where=mperiod.eq.3600,sactive.eq.true,sorigin.eq.APPABZ
+            scope_url += '/' + (apitype_timeseries_param_datatype ?? '*'); // datatype
+            const now = new Date();
+            const fromHours = Number(apitype_timeseries_param_last_from_hours ?? '24');
+            const toHours = Number(apitype_timeseries_param_last_to_hours ?? '0');
+            const fromDate = new Date(now.getTime() - fromHours * 3600_000);
+            const toDate = new Date(now.getTime() - toHours * 3600_000);
+            scope_url += '/' + fromDate.toISOString();
+            scope_url += '/' + toDate.toISOString();
+            scope_url += '?limit=-1&';    
+            if (apitype_timeseries_param_mperiod !== undefined) {
+                scope_url += `mperiod=${apitype_timeseries_param_mperiod}&`;
+            }
+
+            // TODO endw with & or ? properly not both
+            if (scope_url.endsWith('?') || scope_url.endsWith('&')) 
+                scope_url = scope_url.slice(0, -1);
+            
+            rest = rest2
+        }
+
+        if ( Object.keys(rest).length > 0) {
+            throw new Error(`Unexpected filter attribute(s): ${ Object.keys(rest).join(', ')}`);
+        }
+
+        if (match_dataset_shortname && match_dataset_dataspace && match_dataset_apitype) {
+         
+            console.log('Evaluating rule', rule.name, 'for dataset', dataset_metadata.Shortname, 'with scope url', scope_url);
+
+            if (!group_rules_by_same_url[scope_url]) {
+                group_rules_by_same_url[scope_url] = [];
+            }
+            group_rules_by_same_url[scope_url].push(rule);
+
+        }
+
+    }
+    
+}
+
+
+
+process.exit(0);
 
 for (let m = 0; m < metadata_json.Items.length; m++)
 {
@@ -120,7 +182,12 @@ for (let m = 0; m < metadata_json.Items.length; m++)
 
 
     const dataset_rules: Check[] = [];
-    for (const rule of rules.checks.check) {
+    for (const rule of rules) {
+
+        const rule_copy = { ...rule }; // create a shallow copy of the rule
+
+        
+
         const matchesShortname = rule.dataset_shortname == null || rule.dataset_shortname == ''  || rule.dataset_shortname === metadata_dataset_json.Shortname;
         const matchesDataspace = rule.dataset_dataspace == null || rule.dataset_dataspace   == '' || rule.dataset_dataspace === metadata_dataset_json.Dataspace;
         const matchesApiType   = rule.dataset_apitype   == null || rule.dataset_apitype     == '' || rule.dataset_apitype === metadata_dataset_json.ApiType;
@@ -138,6 +205,22 @@ for (let m = 0; m < metadata_json.Items.length; m++)
     {
         console.error(e)
     }
+}
+
+async function loadRules(): Promise<Check[]> {
+
+    const checks_xml = await fs.readFile("checks.xml", 'utf-8')
+
+    // const jsonString = xml2json(checks_xml, { compact: true, spaces: 2 });
+    // console.log(jsonString)
+
+    const parser = new xml2js.Parser({ explicitArray: false });
+    const rules: ChecksRoot = await parser.parseStringPromise(checks_xml)
+    if (!Array.isArray(rules.checks.check)) // fix xml2js problem when only one check
+        rules.checks.check = [rules.checks.check]
+    
+    return rules.checks.check;
+
 }
 
 
@@ -181,7 +264,7 @@ async function processDataset(metadata_dataset_json: MetadataDatasetItem, datase
         let tested_record_count = 0;
         for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++)
         {
-            const pageUrl = metadata_dataset_json.ApiUrl + additional_par + ( (metadata_dataset_json.ApiUrl + additional_par).includes("?") ? '&' : '?' ) + `pagesize=100&pagenumber=${pageNumber}`;
+            const pageUrl = metadata_dataset_json.ApiUrl + additional_par + ( (metadata_dataset_json.ApiUrl + additional_par).includes("?") ? '&' : '?' ) + `pagesize=1&pagenumber=${pageNumber}`;
             console.log("pageUrl", pageUrl)
             const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl)
             
