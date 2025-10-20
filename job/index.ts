@@ -114,8 +114,16 @@ for (const [url, { metadata, rules }] of Object.entries(group_rules_by_same_url)
  
     console.log('Processing URL', url, 'with', rules.length, 'rules for dataset', metadata.Shortname, metadata.Dataspace, metadata.ApiType);
 
-    const human_friendly_dataset_name = url === metadata.ApiUrl ? metadata.Shortname 
+    let human_friendly_dataset_name = url === metadata.ApiUrl ? metadata.Shortname 
                                                                 : metadata.Shortname + ' ' + url.replace(metadata.ApiUrl, '');
+
+    // TODO to make more robust replace with last_from and last_to hours
+    human_friendly_dataset_name = human_friendly_dataset_name
+        .replace(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z\b/g, 'YYYY-MM-DDTHH:MM:SSZ')
+        // .replace(/\s{2,}/g, ' ')
+        // .trim();
+
+
     await prisma.test_dataset.create({
                             data: {
                                 session_start_ts: getSessionStartTimestamp(),

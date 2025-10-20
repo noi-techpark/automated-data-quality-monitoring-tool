@@ -9,7 +9,7 @@ import { jwtDecode } from 'jwt-decode';
 export const keycloak: Promise<Keycloak> = new Promise(async s => {
 
 	const kc = new Keycloak({
-		url: "https://auth.opendatahub.testingmachine.eu/auth/",
+		url: "https://auth.opendatahub.com/auth/",
 		realm: "noi",
 		clientId: "odh-data-quality-web"
 	});

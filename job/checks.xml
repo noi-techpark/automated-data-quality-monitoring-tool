@@ -102,7 +102,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 		<data_scope_filters>
 
-			<dataset_shortname>EnvironmentStation</dataset_shortname>
+			<dataset_shortname>Enviromental Station</dataset_shortname>
 			<dataset_dataspace>environmental</dataset_dataspace>
 			<dataset_apitype>timeseries</dataset_apitype>
 

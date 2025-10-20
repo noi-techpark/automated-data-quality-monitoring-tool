@@ -64,7 +64,9 @@ export class StandardDashboardsComponent extends HTMLElement
 		this.boxContainer.textContent = ('');
 		const loader = new Loader();
 		this.boxContainer.appendChild(loader)
-		const used_key = (await keycloak).authenticated ? 'odh-data-quality-job-idm' : 'opendata'
+		let used_key = (await keycloak).authenticated ? 'odh-data-quality-job-idm' : 'opendata'
+		// TODO remove, only for testing ...
+		used_key = 'odh-data-quality-job-idm'
 		const json = await API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({used_key: used_key})
 		loader.remove();
 		console.log(json)
