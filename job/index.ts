@@ -236,72 +236,6 @@ async function loadRules(): Promise<Check[]> {
 
 }
 
-
-async function processDataset(metadata_dataset_json: MetadataDatasetItem, dataset_rules: Check[]) {
-
-    if (dataset_rules.length == 0)
-    {
-        console.error('====================== dataset without rules  ======================')
-        console.log('Shortname', metadata_dataset_json.Shortname);
-        console.log('Dataspace', metadata_dataset_json.Dataspace);
-        console.log('ApiType', metadata_dataset_json.ApiType);
-        console.error('=====================================================================')
-        return
-    }
-
-    const additional_params: string[] = []
-
-    for (let r of dataset_rules)
-    {
-        if (!additional_params.includes(r.additional_url_parameters ?? ''))
-            additional_params.push(r.additional_url_parameters ?? '')
-    }
-
-    console.log(additional_params)
-
-    for (let additional_par of additional_params)
-    {
-        const combined_shorname = metadata_dataset_json.Shortname + additional_par
-        await prisma.test_dataset.create({
-                            data: {
-                                session_start_ts: getSessionStartTimestamp(),
-                                dataset_name: combined_shorname,
-                                dataset_dataspace: metadata_dataset_json.Dataspace,
-                                dataset_img_url: metadata_dataset_json.ImageGallery?.[0].ImageUrl,
-                                used_key: KEYCLOAK_CLIENT_ID
-                            }
-                        });
-
-
-
-        let tested_record_count = 0;
-        for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++)
-        {
-            const pageUrl = metadata_dataset_json.ApiUrl + additional_par + ( (metadata_dataset_json.ApiUrl + additional_par).includes("?") ? '&' : '?' ) + `pagesize=1&pagenumber=${pageNumber}`;
-            console.log("pageUrl", pageUrl)
-            const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl)
-            
-            const records = []
-
-            if (Array.isArray(dataset_page_json.Items))
-                records.push(...dataset_page_json.Items)
-
-            if (Array.isArray(dataset_page_json.data))
-                records.push(...dataset_page_json.data)
-
-            if (records.length == 0)
-                break;
-            await processDatasetItems(records, dataset_rules, combined_shorname, tested_record_count, additional_par)
-            tested_record_count += records.length
-            await updateTestedRecords(combined_shorname, tested_record_count);
-            if (additional_par != '') // don't' combine paging with additional params
-                break;
-        }
-        await updateTestedRecords(combined_shorname, tested_record_count);
-    }
-
-}
-
 async function updateTestedRecords(datasetName: string, testedRecordCount: number): Promise<void> {
     await prisma.test_dataset.update({
         where: {
@@ -328,7 +262,6 @@ async function processDatasetItems(dataset_page_json_item: DatasetPageItem[], da
 
     }
     await prisma.test_dataset_record_check_failed.createMany({ data: failed_records });
-    // return tested_record_count;
 }
 
 function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: any, dataset_Shortname: string, rec_id: string) {
