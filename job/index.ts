@@ -59,6 +59,11 @@ interface MetadataDatasetItem {
     ImageGallery: MetadataDatasetImageGallery[]
 }
 
+interface DatasetRuleGroup {
+    metadata: MetadataDatasetItem;
+    rules: Check[];
+}
+
 interface MetadataResponse {
     Items: MetadataDatasetItem[]
 }
@@ -103,109 +108,117 @@ export interface Check {
   data_quality_rule: DataQualityRule;
 }
 
+const group_rules_by_same_url: Record<string, DatasetRuleGroup> = await processRulesAndMetadata();
 
+for (const [url, { metadata, rules }] of Object.entries(group_rules_by_same_url)) {
+ 
+    console.log('Processing URL', url, 'with', rules.length, 'rules for dataset', metadata.Shortname, metadata.Dataspace, metadata.ApiType);
 
-const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL);
+    const human_friendly_dataset_name = url === metadata.ApiUrl ? metadata.Shortname 
+                                                                : metadata.Shortname + ' ' + url.replace(metadata.ApiUrl, '');
+    await prisma.test_dataset.create({
+                            data: {
+                                session_start_ts: getSessionStartTimestamp(),
+                                dataset_name: human_friendly_dataset_name,
+                                dataset_dataspace: metadata.Dataspace,
+                                dataset_img_url: metadata.ImageGallery?.[0].ImageUrl,
+                                used_key: KEYCLOAK_CLIENT_ID
+                            }
+                        });
 
-const rules: Check[] = await loadRules();
-
-const group_rules_by_same_url: Record<string, Check[]> = {};
-
-for (const rule of rules) {
-    
-    for (const dataset_metadata of metadata_json.Items) {
-       
-        let scope_url = dataset_metadata.ApiUrl;
-
-        let rest: any;
-        const { dataset_shortname, dataset_dataspace, dataset_apitype, ...rest1 } = rule.data_scope_filters;
-        const match_dataset_shortname =  dataset_shortname === undefined || dataset_shortname === '' || dataset_shortname === dataset_metadata.Shortname
-        const match_dataset_dataspace =  dataset_dataspace === undefined || dataset_dataspace === '' || dataset_dataspace === dataset_metadata.Dataspace
-        const match_dataset_apitype   =  dataset_apitype   === undefined || dataset_apitype   === '' || dataset_apitype   === dataset_metadata.ApiType
-        rest = rest1
-
-        if (dataset_apitype === 'timeseries') {
-
-            const { apitype_timeseries_param_datatype, apitype_timeseries_param_mperiod,
-                    apitype_timeseries_param_last_from_hours, apitype_timeseries_param_last_to_hours, ...rest2 } = rest;
-            // build url like https://mobility.api.opendatahub.com/v2/flat/EnvironmentStation/NO2%20-%20Ossidi%20di%20azoto/2025-10-14T00:00:00.000Z/2025-10-17T23:59:59.999Z?limit=-1&distinct=true&select=sname,mvalue,mvalidtime&where=mperiod.eq.3600,sactive.eq.true,sorigin.eq.APPABZ
-            scope_url += '/' + (apitype_timeseries_param_datatype ?? '*'); // datatype
-            const now = new Date();
-            const fromHours = Number(apitype_timeseries_param_last_from_hours ?? '24');
-            const toHours = Number(apitype_timeseries_param_last_to_hours ?? '0');
-            const fromDate = new Date(now.getTime() - fromHours * 3600_000);
-            const toDate = new Date(now.getTime() - toHours * 3600_000);
-            scope_url += '/' + fromDate.toISOString();
-            scope_url += '/' + toDate.toISOString();
-            scope_url += '?limit=-1&';    
-            if (apitype_timeseries_param_mperiod !== undefined) {
-                scope_url += `mperiod=${apitype_timeseries_param_mperiod}&`;
-            }
-
-            // TODO endw with & or ? properly not both
-            if (scope_url.endsWith('?') || scope_url.endsWith('&')) 
-                scope_url = scope_url.slice(0, -1);
+        let tested_record_count = 0;
+        for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++)
+        {
+            const pageUrl = url + (url.includes("?") ? '&' : '?' ) + `pagesize=1&pagenumber=${pageNumber}`;
+            console.log("pageUrl", pageUrl)
+            const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl)
             
-            rest = rest2
+            const records = []
+
+            if (Array.isArray(dataset_page_json.Items))
+                records.push(...dataset_page_json.Items)
+
+            if (Array.isArray(dataset_page_json.data))
+                records.push(...dataset_page_json.data)
+
+            if (records.length == 0)
+                break;
+            await processDatasetItems(records, rules, human_friendly_dataset_name, tested_record_count)
+            tested_record_count += records.length
+            await updateTestedRecords(human_friendly_dataset_name, tested_record_count);
         }
+        await updateTestedRecords(human_friendly_dataset_name, tested_record_count);
+}
 
-        if ( Object.keys(rest).length > 0) {
-            throw new Error(`Unexpected filter attribute(s): ${ Object.keys(rest).join(', ')}`);
-        }
+async function processRulesAndMetadata(): Promise<Record<string, DatasetRuleGroup>> {
 
-        if (match_dataset_shortname && match_dataset_dataspace && match_dataset_apitype) {
-         
-            console.log('Evaluating rule', rule.name, 'for dataset', dataset_metadata.Shortname, 'with scope url', scope_url);
+    const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL);
 
-            if (!group_rules_by_same_url[scope_url]) {
-                group_rules_by_same_url[scope_url] = [];
+    const rules: Check[] = await loadRules();
+
+    const group_rules_by_same_url: Record<string, DatasetRuleGroup> = {};
+
+    for (const rule of rules) {
+        
+        for (const dataset_metadata of metadata_json.Items) {
+        
+            let scope_url = dataset_metadata.ApiUrl;
+
+            let rest: any;
+            const { dataset_shortname, dataset_dataspace, dataset_apitype, ...rest1 } = rule.data_scope_filters;
+            const match_dataset_shortname =  dataset_shortname === undefined || dataset_shortname === '' || dataset_shortname === dataset_metadata.Shortname
+            const match_dataset_dataspace =  dataset_dataspace === undefined || dataset_dataspace === '' || dataset_dataspace === dataset_metadata.Dataspace
+            const match_dataset_apitype   =  dataset_apitype   === undefined || dataset_apitype   === '' || dataset_apitype   === dataset_metadata.ApiType
+            rest = rest1
+
+            if (dataset_apitype === 'timeseries') {
+
+                const { apitype_timeseries_param_datatype, apitype_timeseries_param_mperiod,
+                        apitype_timeseries_param_last_from_hours, apitype_timeseries_param_last_to_hours, ...rest2 } = rest;
+                // build url like https://mobility.api.opendatahub.com/v2/flat/EnvironmentStation/NO2%20-%20Ossidi%20di%20azoto/2025-10-14T00:00:00.000Z/2025-10-17T23:59:59.999Z?limit=-1&distinct=true&select=sname,mvalue,mvalidtime&where=mperiod.eq.3600,sactive.eq.true,sorigin.eq.APPABZ
+                scope_url += '/' + (apitype_timeseries_param_datatype ?? '*'); // datatype
+                const now = new Date();
+                const fromHours = Number(apitype_timeseries_param_last_from_hours ?? '24');
+                const toHours = Number(apitype_timeseries_param_last_to_hours ?? '0');
+                const fromDate = new Date(now.getTime() - fromHours * 3600_000);
+                const toDate = new Date(now.getTime() - toHours * 3600_000);
+                scope_url += '/' + fromDate.toISOString();
+                scope_url += '/' + toDate.toISOString();
+                scope_url += '?limit=-1&';    
+                if (apitype_timeseries_param_mperiod !== undefined) {
+                    scope_url += `mperiod=${apitype_timeseries_param_mperiod}&`;
+                }
+
+                // TODO endw with & or ? properly not both
+                if (scope_url.endsWith('?') || scope_url.endsWith('&')) 
+                    scope_url = scope_url.slice(0, -1);
+                
+                rest = rest2
             }
-            group_rules_by_same_url[scope_url].push(rule);
 
+            if ( Object.keys(rest).length > 0) {
+                throw new Error(`Unexpected filter attribute(s): ${ Object.keys(rest).join(', ')}`);
+            }
+
+            if (match_dataset_shortname && match_dataset_dataspace && match_dataset_apitype) {
+            
+                console.log('Evaluating rule', rule.name, 'for dataset', dataset_metadata.Shortname, 'with scope url', scope_url);
+
+                if (!group_rules_by_same_url[scope_url]) {
+                    group_rules_by_same_url[scope_url] = { metadata: dataset_metadata, rules: [] };
+                }
+                if (group_rules_by_same_url[scope_url].metadata !== dataset_metadata)
+                    throw new Error('Internal error, conflicting metadata for same scope url ' + scope_url);
+                group_rules_by_same_url[scope_url].rules.push(rule);
+
+            }
         }
-
     }
+
+    return group_rules_by_same_url;
     
 }
 
-
-
-process.exit(0);
-
-for (let m = 0; m < metadata_json.Items.length; m++)
-{
-    const metadata_dataset_json = metadata_json.Items[m]
-    console.log(metadata_dataset_json.Shortname)
-    console.log(metadata_dataset_json.ApiUrl)
-    console.log(metadata_dataset_json.Dataspace)
-    console.log(metadata_dataset_json.ImageGallery?.[0].ImageUrl)
-
-
-    const dataset_rules: Check[] = [];
-    for (const rule of rules) {
-
-        const rule_copy = { ...rule }; // create a shallow copy of the rule
-
-        
-
-        const matchesShortname = rule.dataset_shortname == null || rule.dataset_shortname == ''  || rule.dataset_shortname === metadata_dataset_json.Shortname;
-        const matchesDataspace = rule.dataset_dataspace == null || rule.dataset_dataspace   == '' || rule.dataset_dataspace === metadata_dataset_json.Dataspace;
-        const matchesApiType   = rule.dataset_apitype   == null || rule.dataset_apitype     == '' || rule.dataset_apitype === metadata_dataset_json.ApiType;
-        if (matchesShortname && matchesDataspace && matchesApiType) {
-            dataset_rules.push(rule);
-        }
-    }
-    // console.log(dataset_rules)
-
-    try
-    {
-        await processDataset(metadata_dataset_json, dataset_rules)
-    }
-    catch (e)
-    {
-        console.error(e)
-    }
-}
 
 async function loadRules(): Promise<Check[]> {
 
@@ -303,15 +316,14 @@ async function updateTestedRecords(datasetName: string, testedRecordCount: numbe
     });
 }
 
-async function processDatasetItems(dataset_page_json_item: DatasetPageItem[], dataset_rules: Check[], dataset_Shortname: string, start_number: number, additional_par: string): Promise<void> {
+async function processDatasetItems(dataset_page_json_item: DatasetPageItem[], dataset_rules: Check[], dataset_Shortname: string, start_number: number): Promise<void> {
     // let tested_record_count = 0;
     const failed_records: any = []
     for (let i = 0; i < dataset_page_json_item.length; i++) {
         // tested_record_count++;
         const obj = dataset_page_json_item[i]
         for (let rule of dataset_rules) {
-            if ((rule.additional_url_parameters ?? '') == additional_par)
-               checkRecordWithRule(rule, obj, failed_records, dataset_Shortname, 'seq=' + (start_number + i))
+             checkRecordWithRule(rule, obj, failed_records, dataset_Shortname, 'seq=' + (start_number + i))
         }
 
     }
@@ -320,17 +332,15 @@ async function processDatasetItems(dataset_page_json_item: DatasetPageItem[], da
 }
 
 function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: any, dataset_Shortname: string, rec_id: string) {
-    switch (rule.rule_language) {
+    switch (rule.data_quality_rule.rule_language) {
         case 'javascript':
-            const fn = new Function("$", `return (${rule.rule_code});`);
+            const fn = new Function("$", `return (${rule.data_quality_rule.rule_expression});`);
             try {
                 const result = fn(obj);
                 if (typeof result != 'boolean')
                     throw new Error('rule code invalid, instead of boolean has returned a ' + (typeof result))
                 if (!result) {
                     console.log(`rule ${rule.name} failed for ${obj}`)
-                    // await prisma.test_dataset_record_check_failed.create({
-                    //    data: {
                     failed_records.push({
                         session_start_ts: getSessionStartTimestamp(),
                         dataset_name: dataset_Shortname,
@@ -343,7 +353,6 @@ function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: 
                         used_key: KEYCLOAK_CLIENT_ID,
                         impacted_attribute_value: ''
                     })
-                    //})
                 }
             }
             catch (e) {
@@ -351,6 +360,6 @@ function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: 
             }
             break;
         default:
-            throw new Error('type not implemented ' + rule.rule_language)
+            throw new Error('type not implemented ' + rule.data_quality_rule.rule_language)
     }
 }
