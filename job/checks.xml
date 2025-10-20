@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		</description>
 		<data_scope_filters>
 			<!-- dataset shortname, if * is tested on all datasets -->
-			<dataset_shortname>Museums</dataset_shortname>
+			<dataset_shortname></dataset_shortname>
 			<dataset_dataspace>tourism</dataset_dataspace>
 		</data_scope_filters>
 		<data_quality_rule>
@@ -41,7 +41,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			If there is no list (GpsInfo is not an array), the rule automatically passes.
 		</description>
 		<data_scope_filters>
-			<dataset_shortname>Museums</dataset_shortname>
+			<dataset_shortname>Accommodation</dataset_shortname>
 			<dataset_dataspace>tourism</dataset_dataspace>
 		</data_scope_filters>
 		<data_quality_rule>
@@ -134,7 +134,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	</description>
 
 	<data_scope_filters>
-		<dataset_shortname></dataset_shortname>
+		<dataset_shortname>Accommodation</dataset_shortname>
 		<dataset_dataspace>tourism</dataset_dataspace>
 	</data_scope_filters>
 
@@ -156,7 +156,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	</description>
 
 	<data_scope_filters>
-		<dataset_shortname></dataset_shortname>
+		<dataset_shortname>Accommodation</dataset_shortname>
 		<dataset_dataspace>tourism</dataset_dataspace>
 	</data_scope_filters>
 
@@ -180,6 +180,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	</data_quality_rule>
 </check>
 
+<!--
 <check>
 	<name>Italian language must include Title and BaseText</name>
 	<category>content completeness</category>
@@ -190,7 +191,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	</description>
 
 	<data_scope_filters>
-		<dataset_shortname></dataset_shortname>
+		<dataset_shortname>Accommodation</dataset_shortname>
 		<dataset_dataspace>tourism</dataset_dataspace>
 	</data_scope_filters>
 
@@ -203,7 +204,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		]]></rule_expression>
 	</data_quality_rule>
 </check>
-
+-->
 
 
 

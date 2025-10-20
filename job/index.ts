@@ -113,30 +113,33 @@ for (const [url, { metadata, rules }] of Object.entries(group_rules_by_same_url)
  
     console.log('Processing URL', url, 'with', rules.length, 'rules for dataset', metadata.Shortname, metadata.Dataspace, metadata.ApiType);
 
-    let human_friendly_dataset_name = url === metadata.ApiUrl ? metadata.Shortname 
-                                                                : metadata.Shortname + ' ' + url.replace(metadata.ApiUrl, '');
+    try
+    {
 
-    // TODO to make more robust replace with last_from and last_to hours
-    human_friendly_dataset_name = human_friendly_dataset_name
-        .replace(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z\b/g, 'YYYY-MM-DDTHH:MM:SSZ')
-        // .replace(/\s{2,}/g, ' ')
-        // .trim();
+        let human_friendly_dataset_name = url === metadata.ApiUrl ? metadata.Shortname 
+                                                                    : metadata.Shortname + ' ' + url.replace(metadata.ApiUrl, '');
+
+        // TODO to make more robust replace with last_from and last_to hours
+        human_friendly_dataset_name = human_friendly_dataset_name
+            .replace(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z\b/g, 'YYYY-MM-DDTHH:MM:SSZ')
+            // .replace(/\s{2,}/g, ' ')
+            // .trim();
 
 
-    await prisma.test_dataset.create({
-                            data: {
-                                session_start_ts: getSessionStartTimestamp(),
-                                dataset_name: human_friendly_dataset_name,
-                                dataset_dataspace: metadata.Dataspace,
-                                dataset_img_url: metadata.ImageGallery?.[0].ImageUrl,
-                                used_key: KEYCLOAK_CLIENT_ID
-                            }
-                        });
+        await prisma.test_dataset.create({
+                                data: {
+                                    session_start_ts: getSessionStartTimestamp(),
+                                    dataset_name: human_friendly_dataset_name,
+                                    dataset_dataspace: metadata.Dataspace,
+                                    dataset_img_url: metadata.ImageGallery?.[0].ImageUrl,
+                                    used_key: KEYCLOAK_CLIENT_ID
+                                }
+                            });
 
         let tested_record_count = 0;
         for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++)
         {
-            const pageUrl = url + (url.includes("?") ? '&' : '?' ) + `pagesize=1&pagenumber=${pageNumber}`;
+            const pageUrl = url + (url.includes("?") ? '&' : '?' ) + `pagesize=100&pagenumber=${pageNumber}`;
             console.log("pageUrl", pageUrl)
             const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl)
             
@@ -155,6 +158,11 @@ for (const [url, { metadata, rules }] of Object.entries(group_rules_by_same_url)
             await updateTestedRecords(human_friendly_dataset_name, tested_record_count);
         }
         await updateTestedRecords(human_friendly_dataset_name, tested_record_count);
+    }
+    catch (e)
+    {
+        console.error('Error processing dataset', metadata.Shortname, e);
+    }
 }
 
 async function processRulesAndMetadata(): Promise<Record<string, DatasetRuleGroup>> {
@@ -184,7 +192,7 @@ async function processRulesAndMetadata(): Promise<Record<string, DatasetRuleGrou
                         apitype_timeseries_param_last_from_hours, apitype_timeseries_param_last_to_hours, ...rest2 } = rest;
                 // build url like https://mobility.api.opendatahub.com/v2/flat/EnvironmentStation/NO2%20-%20Ossidi%20di%20azoto/2025-10-14T00:00:00.000Z/2025-10-17T23:59:59.999Z?limit=-1&distinct=true&select=sname,mvalue,mvalidtime&where=mperiod.eq.3600,sactive.eq.true,sorigin.eq.APPABZ
                 scope_url += '/' + (apitype_timeseries_param_datatype ?? '*'); // datatype
-                const now = new Date();
+                const now = getSessionStartTimestamp(); // use session start timestamp to have consistent results across rules
                 const fromHours = Number(apitype_timeseries_param_last_from_hours ?? '24');
                 const toHours = Number(apitype_timeseries_param_last_to_hours ?? '0');
                 const fromDate = new Date(now.getTime() - fromHours * 3600_000);
