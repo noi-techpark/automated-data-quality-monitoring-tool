@@ -32,24 +32,47 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	</check>
 
 	<check>
-	
-		<name>mvalue gt zero2</name>
-		<category>mvalue gt zero2</category>
+		<name>GpsInfo must be inside Europe bounding box (if not 0,0)</name>
+		<category>geolocation quality</category>
 		<description>
-			mvalue gt zero
+			This rule checks that if GPS information is provided as a list, all entries have coordinates located within the approximate bounding box of Europe
+			(Latitude between 34° and 72°, Longitude between -25° and 45°).  
+			If coordinates are 0,0, the rule passes to avoid overlapping with the "GpsInfo must be not 0,0" check.
+			If there is no list (GpsInfo is not an array), the rule automatically passes.
+		</description>
+		<data_scope_filters>
+			<dataset_shortname>Museums</dataset_shortname>
+			<dataset_dataspace>tourism</dataset_dataspace>
+		</data_scope_filters>
+		<data_quality_rule>
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
+			
+				!Array.isArray($.GpsInfo) || $.GpsInfo.every($ => 
+					($.Latitude === 0 && $.Longitude === 0) || (
+						$.Latitude >= 34 &&
+						$.Latitude <= 72 &&
+						$.Longitude >= -25 &&
+						$.Longitude <= 45
+					)
+				)
+			]]></rule_expression>
+		</data_quality_rule>
+	</check>
+
+	<check>
+	
+		<name>EAQI-NO2 gt 10</name>
+		<category>EAQI-NO2 gt 10</category>
+		<description>
+			EAQI-NO2 gt 10
 		</description>
 
 		<data_scope_filters>
 
-			<dataset_shortname></dataset_shortname>
+			<dataset_shortname>Enviromental Station</dataset_shortname>
 			<dataset_dataspace>environmental</dataset_dataspace>
 			<dataset_apitype>timeseries</dataset_apitype>
-
-			<!-- sactive.eq.true -->
-			<!-- last hours, last day, week, minute o latest -->
-			<!--
-			<additional_url_parameters>/EAQI-NO2/latest?where=mperiod.eq.3600</additional_url_parameters>
-			-->
 
 			<apitype_timeseries_param_datatype>EAQI-NO2</apitype_timeseries_param_datatype>
 			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
@@ -67,6 +90,120 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			]]></rule_expression>
 		</data_quality_rule>
 	</check>
+
+
+	<check>
+	
+		<name>nitrogen-dioxid gt 10</name>
+		<category>nitrogen-dioxid gt 10</category>
+		<description>
+			nitrogen-dioxid gt 10
+		</description>
+
+		<data_scope_filters>
+
+			<dataset_shortname>EnvironmentStation</dataset_shortname>
+			<dataset_dataspace>environmental</dataset_dataspace>
+			<dataset_apitype>timeseries</dataset_apitype>
+
+			<apitype_timeseries_param_datatype>nitrogen-dioxide</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
+			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
+			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
+
+		</data_scope_filters>
+
+		<data_quality_rule>
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
+			
+				$.mvalue > 10
+
+			]]></rule_expression>
+		</data_quality_rule>
+	</check>
+
+
+<check>
+	<name>ImageGallery must be a non-empty array</name>
+	<category>content quality</category>
+	<description>
+		This rule checks that the current accommodation item has an ImageGallery property
+		that is an array containing at least one image object.  
+		If ImageGallery is not an array or is empty, the rule fails.
+	</description>
+
+	<data_scope_filters>
+		<dataset_shortname></dataset_shortname>
+		<dataset_dataspace>tourism</dataset_dataspace>
+	</data_scope_filters>
+
+	<data_quality_rule>
+		<rule_language>javascript</rule_language>
+		<rule_expression><![CDATA[
+			Array.isArray($.ImageGallery) && $.ImageGallery.length > 0
+		]]></rule_expression>
+	</data_quality_rule>
+</check>
+
+<check>
+	<name>ImageGallery ValidFrom/ValidTo must include July</name>
+	<category>content validity</category>
+	<description>
+		This rule checks that each image in ImageGallery has non-null ValidFrom and ValidTo fields,
+		and that the month of July (7) is between the month of ValidFrom and ValidTo (inclusive).
+		If ImageGallery is not an array, the rule automatically passes.
+	</description>
+
+	<data_scope_filters>
+		<dataset_shortname></dataset_shortname>
+		<dataset_dataspace>tourism</dataset_dataspace>
+	</data_scope_filters>
+
+	<data_quality_rule>
+
+		<rule_language>javascript</rule_language>
+		<rule_expression><![CDATA[
+			$._Meta.Source != "lts" ||
+			!Array.isArray($.ImageGallery) || 
+			$.ImageGallery
+			.filter(img => img.ValidFrom && img.ValidTo)
+			.every(img => {
+					
+					const fromMonth = new Date(img.ValidFrom).getMonth() + 1; // mesi 0-11 → +1
+					const toMonth = new Date(img.ValidTo).getMonth() + 1;
+
+					// month 7 is between fromMonth and toMonth
+					return fromMonth <= 7 && 7 <= toMonth;
+				})
+		]]></rule_expression>
+	</data_quality_rule>
+</check>
+
+<check>
+	<name>Italian language must include Title and BaseText</name>
+	<category>content completeness</category>
+	<description>
+		This rule checks that, if the record declares the Italian language (it) in HasLanguage,
+		then both Title and BaseText attributes exist and are non-empty for that language.
+		If HasLanguage does not include "it", the rule automatically passes.
+	</description>
+
+	<data_scope_filters>
+		<dataset_shortname></dataset_shortname>
+		<dataset_dataspace>tourism</dataset_dataspace>
+	</data_scope_filters>
+
+	<data_quality_rule>
+		<rule_language>javascript</rule_language>
+		<rule_expression><![CDATA[
+
+			$.HasLanguage.every(lang => $.Title?.[lang] !== undefined && $.BaseText?.[lang] !== undefined )
+
+		]]></rule_expression>
+	</data_quality_rule>
+</check>
+
 
 
 

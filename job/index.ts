@@ -186,7 +186,7 @@ async function processRulesAndMetadata(): Promise<Record<string, DatasetRuleGrou
                 scope_url += '/' + toDate.toISOString();
                 scope_url += '?limit=-1&';    
                 if (apitype_timeseries_param_mperiod !== undefined) {
-                    scope_url += `mperiod=${apitype_timeseries_param_mperiod}&`;
+                    scope_url += `where=mperiod.eq.${apitype_timeseries_param_mperiod}&`;
                 }
 
                 // TODO endw with & or ? properly not both
@@ -202,7 +202,7 @@ async function processRulesAndMetadata(): Promise<Record<string, DatasetRuleGrou
 
             if (match_dataset_shortname && match_dataset_dataspace && match_dataset_apitype) {
             
-                console.log('Evaluating rule', rule.name, 'for dataset', dataset_metadata.Shortname, 'with scope url', scope_url);
+                // console.log('Evaluating rule', rule.name, 'for dataset', dataset_metadata.Shortname, 'with scope url', scope_url);
 
                 if (!group_rules_by_same_url[scope_url]) {
                     group_rules_by_same_url[scope_url] = { metadata: dataset_metadata, rules: [] };
