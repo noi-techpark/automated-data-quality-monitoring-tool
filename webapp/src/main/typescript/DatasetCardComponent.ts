@@ -151,7 +151,8 @@ export class DatasetCardComponent extends HTMLElement
 		}
 		this.lastupdate.textContent = dateformat
 		this.onclick = () => {
-			location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name 
+			const escapedDatasetName = encodeURIComponent(dataset.dataset_name ?? '')
+			location.hash = '#page=dataset-categories' + '&dataset_name=' + escapedDatasetName 
 							+ "&session_start_ts=" + dataset.session_start_ts
 							+ "&failed_records=" + dataset.failed_records
 							+ "&tested_records=" + dataset.tested_records

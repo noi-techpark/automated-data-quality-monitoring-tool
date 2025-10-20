@@ -173,7 +173,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 		const view_details = cs_cast(HTMLElement, cat.querySelector('.view_details'))
 		
 		view_details.onclick = () => {
-			location.hash = '#page=summary&session_start_ts=' + data.session_start_ts + '&dataset_name=' + data.dataset_name + '&category_name=' + data.check_category +
+			location.hash = '#page=summary&session_start_ts=' + data.session_start_ts + '&dataset_name=' + encodeURIComponent(data.dataset_name) + '&category_name=' + data.check_category +
 							'&failed_records=' + data.failed_records + '&tot_records=' + data.tot_records 
 		}
 		
