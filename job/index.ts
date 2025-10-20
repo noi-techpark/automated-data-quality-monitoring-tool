@@ -35,6 +35,8 @@ export const KEYCLOAK_CLIENT_SECRET = requireEnvVar('KEYCLOAK_CLIENT_SECRET','')
 export const METADATA_BASE_URL = requireEnvVar('METADATA_BASE_URL');
 export const DATASET_CONTENT_PAGE_LIMIT = requireEnvVar('DATASET_CONTENT_PAGE_LIMIT');
 export const DEBUG_MODE_CACHE_ON = requireEnvVar('DEBUG_MODE_CACHE_ON', 'false');
+export const KEYCLOAK_ASSOCIATED_ROLE = requireEnvVar('KEYCLOAK_ASSOCIATED_ROLE', KEYCLOAK_CLIENT_ID_OPENDATA)
+
 
 Object.entries(envValues).forEach(([key, value]) => {
   const ok = missingEnvKeys.includes(key) ? '❌' : '✅';

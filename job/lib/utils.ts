@@ -1,4 +1,4 @@
-import { DEBUG_MODE_CACHE_ON, KEYCLOAK_BASE_URL, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_ID_OPENDATA, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM } from "..";
+import { DEBUG_MODE_CACHE_ON, KEYCLOAK_ASSOCIATED_ROLE, KEYCLOAK_BASE_URL, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_ID_OPENDATA, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM } from "..";
 import fs from "fs";
 
 export async function fetch_json_with_optional_cache(url: string)
@@ -12,8 +12,11 @@ export async function fetch_json_with_optional_cache(url: string)
     }
     let fetch_options: any = { headers: {}}
     if (KEYCLOAK_CLIENT_ID != KEYCLOAK_CLIENT_ID_OPENDATA)
-        fetch_options.headers.Authorization = await getKeycloakToken()
-    
+    {
+      if (KEYCLOAK_ASSOCIATED_ROLE == KEYCLOAK_CLIENT_ID_OPENDATA)
+        throw new Error(`Cannot use ODH client role (${KEYCLOAK_ASSOCIATED_ROLE}) with non open client id (${KEYCLOAK_CLIENT_ID})`)  
+      fetch_options.headers.Authorization = await getKeycloakToken()
+    }
     const response = await fetch(url, fetch_options);
      if (!response.ok) {
         const errorText = await response.text();
