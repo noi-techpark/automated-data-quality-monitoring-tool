@@ -87,6 +87,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		<dataset_dataspace>environmental</dataset_dataspace>
 		<dataset_apitype>timeseries</dataset_apitype>
 
+		<!-- sactive.eq.true -->
+		<!-- last hours, last day, week, minute o latest -->
 		<additional_url_parameters>/EAQI-NO2/latest?where=mperiod.eq.3600</additional_url_parameters>
 
 		<rule_language>javascript</rule_language>
@@ -98,6 +100,74 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	</check>
 
 
+<check>
+	<name>ImageGallery must be a non-empty array</name>
+	<category>content quality</category>
+	<description>
+		This rule checks that the current accommodation item has an ImageGallery property
+		that is an array containing at least one image object.  
+		If ImageGallery is not an array or is empty, the rule fails.
+	</description>
+
+	<dataset_shortname></dataset_shortname>
+	<dataset_dataspace>tourism</dataset_dataspace>
+
+	<rule_language>javascript</rule_language>
+	<rule_code><![CDATA[
+		Array.isArray($.ImageGallery) && $.ImageGallery.length > 0
+	]]></rule_code>
+</check>
+
+<check>
+	<name>ImageGallery ValidFrom/ValidTo must include July</name>
+	<category>content validity</category>
+	<description>
+		This rule checks that each image in ImageGallery has non-null ValidFrom and ValidTo fields,
+		and that the month of July (7) is between the month of ValidFrom and ValidTo (inclusive).
+		If ImageGallery is not an array, the rule automatically passes.
+	</description>
+
+	<dataset_shortname></dataset_shortname>
+	<dataset_dataspace>tourism</dataset_dataspace>
+
+	<rule_language>javascript</rule_language>
+	<rule_code><![CDATA[
+		$._Meta.Source != "lts" ||
+		!Array.isArray($.ImageGallery) || 
+		$.ImageGallery
+		   .filter(img => img.ValidFrom && img.ValidTo)
+		   .every(img => {
+				
+				const fromMonth = new Date(img.ValidFrom).getMonth() + 1; // mesi 0-11 → +1
+				const toMonth = new Date(img.ValidTo).getMonth() + 1;
+
+				// month 7 is between fromMonth and toMonth
+				return fromMonth <= 7 && 7 <= toMonth;
+			})
+	]]></rule_code>
+</check>
+
+<check>
+	<name>Italian language must include Title and BaseText</name>
+	<category>content completeness</category>
+	<description>
+		This rule checks that, if the record declares the Italian language (it) in HasLanguage,
+		then both Title and BaseText attributes exist and are non-empty for that language.
+		If HasLanguage does not include "it", the rule automatically passes.
+	</description>
+
+	<dataset_shortname></dataset_shortname>
+	<dataset_dataspace>tourism</dataset_dataspace>
+
+	<!-- Source, active boolean true/false ? -->
+
+	<rule_language>javascript</rule_language>
+	<rule_code><![CDATA[
+
+        $.HasLanguage.every(lang => $.Title?.[lang] !== undefined && $.BaseText?.[lang] !== undefined )
+
+	]]></rule_code>
+</check>
 
 
 </checks>
