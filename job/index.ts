@@ -34,7 +34,7 @@ export const KEYCLOAK_REALM = requireEnvVar('KEYCLOAK_REALM','');
 export const KEYCLOAK_CLIENT_SECRET = requireEnvVar('KEYCLOAK_CLIENT_SECRET','');
 export const METADATA_BASE_URL = requireEnvVar('METADATA_BASE_URL');
 export const DATASET_CONTENT_PAGE_LIMIT = requireEnvVar('DATASET_CONTENT_PAGE_LIMIT');
-export const DEBUG_MODE_CACHE_ON = requireEnvVar('DEBUG_MODE_CACHE_ON', 'false');
+export const DEBUG_MODE_CACHE_ON = requireEnvVar('DEBUG_MODE_CACHE_ON', 'false').trim().toLowerCase() === 'true';
 export const KEYCLOAK_ASSOCIATED_ROLE = requireEnvVar('KEYCLOAK_ASSOCIATED_ROLE', KEYCLOAK_CLIENT_ID_OPENDATA)
 
 
@@ -161,7 +161,7 @@ for (const item of metadata_json.Items) {
 
         // update counters per all the rules applied to this scope url
         for (const rule of rules) {
-            await upsertDatasetCheckTestedRecords(sessionStartTs, item.Shortname, rule.name, rule_tested_record_count);
+            await upsertDatasetCheckTestedRecords(sessionStartTs, item.Shortname, rule.name, rule.category, rule_tested_record_count);
         }       
 
         // this is an approximation as multiple rules can apply to same record in different scope urls
@@ -236,7 +236,7 @@ async function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: Met
                     where += `sorigin.eq.${apitype_timeseries_param_sorigin},`;
                 }
                 if (where != '')
-                    scope_url += 'where=' + where + '&';
+                    scope_url += 'where=' + where.slice(0, -1) + '&';
 
                 // TODO endw with & or ? properly not both
                 if (scope_url.endsWith('?') || scope_url.endsWith('&')) 
@@ -282,11 +282,7 @@ async function loadRules(): Promise<Check[]> {
 }
 
 async function upsertDatasetCheckTestedRecords(
-    sessionStartTs: Date,
-    datasetName: string,
-    checkName: string,
-    testedRecords: number
-): Promise<void> {
+sessionStartTs: Date, datasetName: string, checkName: string, category: string, testedRecords: number): Promise<void> {
     await prisma.test_dataset_check.upsert({
         where: {
             session_start_ts_dataset_name_check_name: {
@@ -302,6 +298,7 @@ async function upsertDatasetCheckTestedRecords(
             session_start_ts: sessionStartTs,
             dataset_name: datasetName,
             check_name: checkName,
+            check_category: category,
             tested_records: testedRecords,
         },
     });
