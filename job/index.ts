@@ -140,19 +140,26 @@ for (const item of metadata_json.Items) {
 
         console.log(`   Scope URL: ${url}`);
         let rule_tested_record_count = 0;
-        for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++) {
+        try {
+            for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++) {
 
-            const dataset_page_json_items: DatasetPageItem[] = await fetch_dataset_items_with_paging(url, pageNumber);
+                const dataset_page_json_items: DatasetPageItem[] = await fetch_dataset_items_with_paging(url, pageNumber);
 
-            if (dataset_page_json_items.length == 0)
-                break;
+                if (dataset_page_json_items.length == 0)
+                    break;
 
-            for (const rule of rules) {
-                console.log(`    Rule: ${rule.name}, Category: ${rule.category}`);
+                for (const rule of rules) {
+                    console.log(`    Rule: ${rule.name}, Category: ${rule.category}`);
+                }
+                rule_tested_record_count += dataset_page_json_items.length;
             }
-            rule_tested_record_count += dataset_page_json_items.length;
+        }
+        catch (e) {
+            console.error(`      Error fetching dataset items from ${url}: ${e}`);
+            continue;
         }
 
+        // update counters per all the rules applied to this scope url
         for (const rule of rules) {
             await upsertDatasetCheckTestedRecords(sessionStartTs, item.Shortname, rule.name, rule_tested_record_count);
         }       
@@ -182,70 +189,6 @@ async function fetch_dataset_items_with_paging(url: string, pageNumber: number) 
     return records;
 
 }
-
-
-
-/*
-const group_rules_by_same_url: Record<string, DatasetRuleGroup> = await processRulesAndMetadata();
-
-for (const [url, { metadata, rules }] of Object.entries(group_rules_by_same_url)) {
- 
-    console.log('Processing URL', url, 'with', rules.length, 'rules for dataset', metadata.Shortname, metadata.Dataspace, metadata.ApiType);
-
-    try
-    {
-
-        let human_friendly_dataset_name = url === metadata.ApiUrl ? metadata.Shortname 
-                                                                    : metadata.Shortname + ' ' + url.replace(metadata.ApiUrl, '');
-
-        // TODO to make more robust replace with last_from and last_to hours
-        human_friendly_dataset_name = human_friendly_dataset_name
-            .replace(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z\b/g, 'YYYY-MM-DDTHH:MM:SSZ')
-            // .replace(/\s{2,}/g, ' ')
-            // .trim();
-
-
-        await prisma.test_dataset.create({
-                                data: {
-                                    session_start_ts: getSessionStartTimestamp(),
-                                    dataset_name: human_friendly_dataset_name,
-                                    dataset_dataspace: metadata.Dataspace,
-                                    dataset_img_url: metadata.ImageGallery?.[0].ImageUrl,
-                                    used_key: KEYCLOAK_CLIENT_ID
-                                }
-                            });
-
-        let tested_record_count = 0;
-        for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++)
-        {
-            const pageUrl = url + (url.includes("?") ? '&' : '?' ) + `pagesize=100&pagenumber=${pageNumber}`;
-            console.log("pageUrl", pageUrl)
-            const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl)
-            
-            const records = []
-
-            if (Array.isArray(dataset_page_json.Items))
-                records.push(...dataset_page_json.Items)
-
-            if (Array.isArray(dataset_page_json.data))
-                records.push(...dataset_page_json.data)
-
-            if (records.length == 0)
-                break;
-            await processDatasetItems(records, rules, human_friendly_dataset_name, tested_record_count)
-            tested_record_count += records.length
-            await updateTestedRecords(human_friendly_dataset_name, tested_record_count);
-        }
-        await updateTestedRecords(human_friendly_dataset_name, tested_record_count);
-    }
-    catch (e)
-    {
-        console.error('Error processing dataset', metadata.Shortname, e);
-    }
-}
-
-*/
-
 
 /*
     to optimize api calls and avoid fetching and count same dataset multiple times
@@ -321,87 +264,6 @@ async function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: Met
 
     return matched_rules;
 }
-
-async function processRulesAndMetadata(): Promise<Record<string, DatasetRuleGroup>> {
-
-    const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL);
-
-    const rules: Check[] = await loadRules();
-
-    const group_rules_by_same_url: Record<string, DatasetRuleGroup> = {};
-
-    for (const rule of rules) {
-        
-        for (const dataset_metadata of metadata_json.Items) {
-        
-            let scope_url = dataset_metadata.ApiUrl;
-
-            let rest: any;
-            const { dataset_shortname, dataset_dataspace, dataset_apitype, ...rest1 } = rule.data_scope_filters;
-            const match_dataset_shortname =  dataset_shortname === undefined || dataset_shortname === '' || dataset_shortname === dataset_metadata.Shortname
-            const match_dataset_dataspace =  dataset_dataspace === undefined || dataset_dataspace === '' || dataset_dataspace === dataset_metadata.Dataspace
-            const match_dataset_apitype   =  dataset_apitype   === undefined || dataset_apitype   === '' || dataset_apitype   === dataset_metadata.ApiType
-            rest = rest1
-
-            if (dataset_apitype === 'timeseries') {
-
-                const { apitype_timeseries_param_datatype, apitype_timeseries_param_mperiod,
-                        apitype_timeseries_param_last_from_hours, apitype_timeseries_param_last_to_hours,
-                        apitype_timeseries_param_sactive, apitype_timeseries_param_sorigin,
-                        ...rest2 } = rest;
-                // build url like https://mobility.api.opendatahub.com/v2/flat/EnvironmentStation/NO2%20-%20Ossidi%20di%20azoto/2025-10-14T00:00:00.000Z/2025-10-17T23:59:59.999Z?limit=-1&distinct=true&select=sname,mvalue,mvalidtime&where=mperiod.eq.3600,sactive.eq.true,sorigin.eq.APPABZ
-                scope_url += '/' + (apitype_timeseries_param_datatype ?? '*'); // datatype
-                const now = getSessionStartTimestamp(); // use session start timestamp to have consistent results across rules
-                const fromHours = Number(apitype_timeseries_param_last_from_hours ?? '24');
-                const toHours = Number(apitype_timeseries_param_last_to_hours ?? '0');
-                const fromDate = new Date(now.getTime() - fromHours * 3600_000);
-                const toDate = new Date(now.getTime() - toHours * 3600_000);
-                scope_url += '/' + fromDate.toISOString();
-                scope_url += '/' + toDate.toISOString();
-                scope_url += '?limit=-1&';
-                let where = ''
-                if (apitype_timeseries_param_mperiod !== undefined) {
-                    where += `mperiod.eq.${apitype_timeseries_param_mperiod},`;
-                }
-                if (apitype_timeseries_param_sactive !== undefined) {
-                    where += `sactive.eq.${apitype_timeseries_param_sactive},`;
-                }
-                if (apitype_timeseries_param_sorigin !== undefined) {
-                    where += `sorigin.eq.${apitype_timeseries_param_sorigin},`;
-                }
-                if (where != '')
-                    scope_url += 'where=' + where + '&';
-
-                // TODO endw with & or ? properly not both
-                if (scope_url.endsWith('?') || scope_url.endsWith('&')) 
-                    scope_url = scope_url.slice(0, -1);
-                
-                rest = rest2
-            }
-
-            if ( Object.keys(rest).length > 0) {
-                throw new Error(`Unexpected filter attribute(s): ${ Object.keys(rest).join(', ')}`);
-            }
-
-            if (match_dataset_shortname && match_dataset_dataspace && match_dataset_apitype) {
-            
-                // console.log('Evaluating rule', rule.name, 'for dataset', dataset_metadata.Shortname, 'with scope url', scope_url);
-
-                if (!group_rules_by_same_url[scope_url]) {
-                    group_rules_by_same_url[scope_url] = { metadata: dataset_metadata, rules: [] };
-                }
-                if (group_rules_by_same_url[scope_url].metadata !== dataset_metadata)
-                    throw new Error('Internal error, conflicting metadata for same scope url ' + scope_url);
-                group_rules_by_same_url[scope_url].rules.push(rule);
-
-            }
-        }
-    }
-
-    return group_rules_by_same_url;
-    
-}
-
 
 async function loadRules(): Promise<Check[]> {
 
