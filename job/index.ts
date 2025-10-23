@@ -121,9 +121,11 @@ const rules: Check[] = await loadRules();
 for (const item of metadata_json.Items) {
     console.log(`Dataset: ${item.Shortname}, ApiType: ${item.ApiType}, ApiUrl: ${item.ApiUrl}`);
 
+    const sessionStartTs = getSessionStartTimestamp();
+
     await prisma.test_dataset.create({
         data: {
-            session_start_ts: getSessionStartTimestamp(),
+            session_start_ts: sessionStartTs,
             dataset_name: item.Shortname,
             dataset_dataspace: item.Dataspace,
             dataset_img_url: item.ImageGallery?.[0].ImageUrl,
@@ -151,10 +153,9 @@ for (const item of metadata_json.Items) {
             rule_tested_record_count += dataset_page_json_items.length;
         }
 
-
         for (const rule of rules) {
-            // TODO update tested records count per rule if needed
-        }
+            await upsertDatasetCheckTestedRecords(sessionStartTs, item.Shortname, rule.name, rule_tested_record_count);
+        }       
 
         // this is an approximation as multiple rules can apply to same record in different scope urls
         // to avoid overcounting we should define unique record ids across rules and datasets
@@ -251,6 +252,7 @@ for (const [url, { metadata, rules }] of Object.entries(group_rules_by_same_url)
 */
 
 async function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataDatasetItem, rules: Check[]): Promise<Map<string, Check[]>> {
+
     const matched_rules = new Map<string, Check[]>();
 
     for (const rule of rules) {
@@ -415,6 +417,32 @@ async function loadRules(): Promise<Check[]> {
     
     return rules.checks.check;
 
+}
+
+async function upsertDatasetCheckTestedRecords(
+    sessionStartTs: Date,
+    datasetName: string,
+    checkName: string,
+    testedRecords: number
+): Promise<void> {
+    await prisma.test_dataset_check.upsert({
+        where: {
+            session_start_ts_dataset_name_check_name: {
+                session_start_ts: sessionStartTs,
+                dataset_name: datasetName,
+                check_name: checkName,
+            },
+        },
+        update: {
+            tested_records: testedRecords,
+        },
+        create: {
+            session_start_ts: sessionStartTs,
+            dataset_name: datasetName,
+            check_name: checkName,
+            tested_records: testedRecords,
+        },
+    });
 }
 
 async function updateTestedRecords(datasetName: string, testedRecordCount: number): Promise<void> {
