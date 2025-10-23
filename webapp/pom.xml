@@ -36,6 +36,11 @@ SPDX-License-Identifier: CC0-1.0
 			<artifactId>js</artifactId>
 			<version>23.0.5</version>
 		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>10.17.0</version>
+		</dependency>
 		
 		<!-- dev libs -->
 		<dependency>
