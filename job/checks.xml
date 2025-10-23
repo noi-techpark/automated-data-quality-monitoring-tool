@@ -108,6 +108,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 			<apitype_timeseries_param_datatype>nitrogen-dioxide</apitype_timeseries_param_datatype>
 			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
+			<apitype_timeseries_param_sactive>true</apitype_timeseries_param_sactive>
+			<apitype_timeseries_param_sorigin>APPABZ</apitype_timeseries_param_sorigin>
 			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
 			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
 

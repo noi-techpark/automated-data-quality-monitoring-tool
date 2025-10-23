@@ -91,6 +91,8 @@ export interface DataScopeFilters {
   dataset_apitype:   string | undefined;
   apitype_timeseries_param_datatype: string | undefined;
   apitype_timeseries_param_mperiod: string | undefined;
+  apitype_timeseries_param_sactive: string | undefined;
+  apitype_timeseries_param_sorigin: string | undefined;
   apitype_timeseries_param_last_from_hours: string | undefined;
   apitype_timeseries_param_last_to_hours: string | undefined;
 }
@@ -191,7 +193,9 @@ async function processRulesAndMetadata(): Promise<Record<string, DatasetRuleGrou
             if (dataset_apitype === 'timeseries') {
 
                 const { apitype_timeseries_param_datatype, apitype_timeseries_param_mperiod,
-                        apitype_timeseries_param_last_from_hours, apitype_timeseries_param_last_to_hours, ...rest2 } = rest;
+                        apitype_timeseries_param_last_from_hours, apitype_timeseries_param_last_to_hours,
+                        apitype_timeseries_param_sactive, apitype_timeseries_param_sorigin,
+                        ...rest2 } = rest;
                 // build url like https://mobility.api.opendatahub.com/v2/flat/EnvironmentStation/NO2%20-%20Ossidi%20di%20azoto/2025-10-14T00:00:00.000Z/2025-10-17T23:59:59.999Z?limit=-1&distinct=true&select=sname,mvalue,mvalidtime&where=mperiod.eq.3600,sactive.eq.true,sorigin.eq.APPABZ
                 scope_url += '/' + (apitype_timeseries_param_datatype ?? '*'); // datatype
                 const now = getSessionStartTimestamp(); // use session start timestamp to have consistent results across rules
@@ -201,10 +205,19 @@ async function processRulesAndMetadata(): Promise<Record<string, DatasetRuleGrou
                 const toDate = new Date(now.getTime() - toHours * 3600_000);
                 scope_url += '/' + fromDate.toISOString();
                 scope_url += '/' + toDate.toISOString();
-                scope_url += '?limit=-1&';    
+                scope_url += '?limit=-1&';
+                let where = ''
                 if (apitype_timeseries_param_mperiod !== undefined) {
-                    scope_url += `where=mperiod.eq.${apitype_timeseries_param_mperiod}&`;
+                    where += `mperiod.eq.${apitype_timeseries_param_mperiod},`;
                 }
+                if (apitype_timeseries_param_sactive !== undefined) {
+                    where += `sactive.eq.${apitype_timeseries_param_sactive},`;
+                }
+                if (apitype_timeseries_param_sorigin !== undefined) {
+                    where += `sorigin.eq.${apitype_timeseries_param_sorigin},`;
+                }
+                if (where != '')
+                    scope_url += 'where=' + where + '&';
 
                 // TODO endw with & or ? properly not both
                 if (scope_url.endsWith('?') || scope_url.endsWith('&')) 
