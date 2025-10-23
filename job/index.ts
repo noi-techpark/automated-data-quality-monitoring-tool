@@ -148,9 +148,8 @@ for (const item of metadata_json.Items) {
                 if (dataset_page_json_items.length == 0)
                     break;
 
-                for (const rule of rules) {
-                    console.log(`    Rule: ${rule.name}, Category: ${rule.category}`);
-                }
+                processDatasetItems(dataset_page_json_items, rules, item.Shortname, rule_tested_record_count);
+                
                 rule_tested_record_count += dataset_page_json_items.length;
             }
         }

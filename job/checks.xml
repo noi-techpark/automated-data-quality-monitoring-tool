@@ -85,7 +85,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<rule_language>javascript</rule_language>
 			<rule_expression><![CDATA[
 			
-				$.mvalue > 10
+				$.mvalue === "good"
 
 			]]></rule_expression>
 		</data_quality_rule>
