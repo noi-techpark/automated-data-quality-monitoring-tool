@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 	<check>
 		<name>GpsInfo must be inside Europe bounding box (if not 0,0)</name>
-		<category>geolocation quality</category>
+		<category>GpsInfo must be inside Europe bounding box (if not 0,0)</category>
 		<description>
 			This rule checks that if GPS information is provided as a list, all entries have coordinates located within the approximate bounding box of Europe
 			(Latitude between 34° and 72°, Longitude between -25° and 45°).  
@@ -128,7 +128,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 <check>
 	<name>ImageGallery must be a non-empty array</name>
-	<category>content quality</category>
+	<category>ImageGallery must be a non-empty array</category>
 	<description>
 		This rule checks that the current accommodation item has an ImageGallery property
 		that is an array containing at least one image object.  
@@ -150,7 +150,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 <check>
 	<name>ImageGallery ValidFrom/ValidTo must include July</name>
-	<category>content validity</category>
+	<category>ImageGallery ValidFrom/ValidTo must include July</category>
 	<description>
 		This rule checks that each image in ImageGallery has non-null ValidFrom and ValidTo fields,
 		and that the month of July (7) is between the month of ValidFrom and ValidTo (inclusive).
