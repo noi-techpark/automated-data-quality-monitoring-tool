@@ -20,6 +20,7 @@
   "dependencies": {
     "@prisma/client": "^6.16.1",
     "isolated-vm": "^6.0.0",
+    "node-cron": "^4.2.1",
     "wildcard-match": "^5.1.4",
     "xml-js": "^1.6.11",
     "xml2js": "^0.6.2"
