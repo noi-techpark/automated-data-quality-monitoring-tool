@@ -2,9 +2,22 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import Keycloak from 'keycloak-js';
 
-import {MainComponent} from './MainComponent.js'
 
-const mainComponent = new MainComponent();
-// mainComponent.refresh();
-document.body.appendChild(mainComponent)
+import { MainComponent } from './MainComponent.js'
+import { kc, initAuth } from './auth.js';
+
+
+
+async function main() {
+
+    // initialize authentication before anything else
+    await initAuth();
+
+    const mainComponent = new MainComponent();
+    document.body.appendChild(mainComponent)
+
+}
+
+main();
