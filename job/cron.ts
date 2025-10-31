@@ -1,4 +1,6 @@
 import cron from 'node-cron';
+import { readFileSync } from 'fs';
+import path from 'path';
 
 console.log("\r\n\r\n          _ _               _           _           \r\n  ___  __| | |_    ___   __| |_  ___ __| |_____ _ _ \r\n \/ _ \\\/ _` | \' \\  |___| \/ _| \' \\\/ -_) _| \/ \/ -_) \'_|\r\n \\___\/\\__,_|_||_|       \\__|_||_\\___\\__|_\\_\\___|_|  \r\n                                                    \r\n\r\n");
 
@@ -38,7 +40,6 @@ if (missingEnvKeys.length > 0) {
   process.exit(1);
 }
 
-
 /*
 export const KEYCLOAK_ASSOCIATED_ROLE = requireEnvVar('KEYCLOAK_ASSOCIATED_ROLE', KEYCLOAK_CLIENT_ID_OPENDATA)
 export const KEYCLOAK_CLIENT_ID = requireEnvVar('KEYCLOAK_CLIENT_ID', KEYCLOAK_CLIENT_ID_OPENDATA);
@@ -46,7 +47,33 @@ export const KEYCLOAK_REALM = requireEnvVar('KEYCLOAK_REALM','');
 export const KEYCLOAK_CLIENT_SECRET = requireEnvVar('KEYCLOAK_CLIENT_SECRET','');
  */
 
+export interface KeycloakAccountConfig {
+  CLIENT_ID: string;
+  REALM: string;
+  CLIENT_SECRET: string;
+  ASSOCIATED_ROLE: string;
+}
+
+
+export const KEYCLOAK_ACCOUNTS: KeycloakAccountConfig[] = JSON.parse(
+  readFileSync(KEYCLOAK_ACCOUNTS_JSON, 'utf8'),
+);
+
+
+function onTick() {
+    console.log('Cron job executed at', new Date().toISOString());
+    for(let account of KEYCLOAK_ACCOUNTS) {
+        console.log(`Account for client_id=${account.CLIENT_ID}, realm=${account.REALM}, associated_role=${account.ASSOCIATED_ROLE}`);
+        doTestFor( account);
+    }
+}
 
 cron.schedule('* * * * *', () => {
-  console.log('running a task every minute');
+   // onTick
 });
+
+onTick();
+
+function doTestFor(account: KeycloakAccountConfig) {
+  throw new Error('Function not implemented.');
+}
