@@ -21,13 +21,14 @@ function requireEnvVar(key: string, defaultValue?: string): string {
 
 export const KEYCLOAK_CLIENT_ID_OPENDATA = 'opendata';
 
-export const LOG_LEVEL = requireEnvVar('LOG_LEVEL', 'minimal');
-export const DATABASE_URL = requireEnvVar('DATABASE_URL');
-export const KEYCLOAK_BASE_URL = requireEnvVar('KEYCLOAK_BASE_URL');
-export const METADATA_BASE_URL = requireEnvVar('METADATA_BASE_URL');
-export const KEYCLOAK_ACCOUNTS_JSON = requireEnvVar('KEYCLOAK_ACCOUNTS_JSON');
-export const DATASET_CONTENT_PAGE_LIMIT = requireEnvVar('DATASET_CONTENT_PAGE_LIMIT');
-export const DEBUG_MODE_CACHE_ON = requireEnvVar('DEBUG_MODE_CACHE_ON', 'false').trim().toLowerCase() === 'true';
+const LOG_LEVEL = requireEnvVar('LOG_LEVEL', 'minimal');
+const DATABASE_URL = requireEnvVar('DATABASE_URL');
+const KEYCLOAK_BASE_URL = requireEnvVar('KEYCLOAK_BASE_URL');
+const METADATA_BASE_URL = requireEnvVar('METADATA_BASE_URL');
+const KEYCLOAK_ACCOUNTS_JSON = requireEnvVar('KEYCLOAK_ACCOUNTS_JSON');
+const CRON_SCHEDULE = requireEnvVar('CRON_SCHEDULE');
+const DATASET_CONTENT_PAGE_LIMIT = requireEnvVar('DATASET_CONTENT_PAGE_LIMIT');
+const DEBUG_MODE_CACHE_ON = requireEnvVar('DEBUG_MODE_CACHE_ON', 'false').trim().toLowerCase() === 'true';
 
 
 Object.entries(envValues).forEach(([key, value]) => {
@@ -55,16 +56,16 @@ export interface KeycloakAccountConfig {
 }
 
 
-export const KEYCLOAK_ACCOUNTS: KeycloakAccountConfig[] = JSON.parse(
-  readFileSync(KEYCLOAK_ACCOUNTS_JSON, 'utf8'),
-);
+export const KEYCLOAK_ACCOUNTS: KeycloakAccountConfig[] = JSON.parse(readFileSync(KEYCLOAK_ACCOUNTS_JSON, 'utf8'));
 
 
 function onTick() {
-    console.log('Cron job executed at', new Date().toISOString());
     for(let account of KEYCLOAK_ACCOUNTS) {
+        const test_start_ts = new Date();
+        console.log('Cron job executed at', test_start_ts.toISOString());
         console.log(`Account for client_id=${account.CLIENT_ID}, realm=${account.REALM}, associated_role=${account.ASSOCIATED_ROLE}`);
         doTestFor(
+          test_start_ts,
           account.CLIENT_ID,
           account.REALM,
           account.CLIENT_SECRET,
@@ -80,13 +81,14 @@ function onTick() {
     }
 }
 
-cron.schedule('* * * * *', () => {
+cron.schedule(CRON_SCHEDULE, () => {
    // onTick
 });
 
 onTick();
 
 function doTestFor(
+  sessionStartTs: Date,
   clientId: string,
   realm: string,
   clientSecret: string,
@@ -99,5 +101,5 @@ function doTestFor(
   datasetContentPageLimit: string,
   debugModeCacheOn: boolean,
 ) {
-  throw new Error('Function not implemented.');
+  // throw new Error('Function not implemented.');
 }
