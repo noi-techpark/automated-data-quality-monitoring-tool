@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import { readFileSync } from 'fs';
 import path from 'path';
+import { doTestFor } from '.';
 
 console.log("\r\n\r\n          _ _               _           _           \r\n  ___  __| | |_    ___   __| |_  ___ __| |_____ _ _ \r\n \/ _ \\\/ _` | \' \\  |___| \/ _| \' \\\/ -_) _| \/ \/ -_) \'_|\r\n \\___\/\\__,_|_||_|       \\__|_||_\\___\\__|_\\_\\___|_|  \r\n                                                    \r\n\r\n");
 
@@ -60,52 +61,36 @@ const KEYCLOAK_ACCOUNTS: KeycloakAccountConfig[] = JSON.parse(readFileSync(KEYCL
 
 console.log(`Loaded ${KEYCLOAK_ACCOUNTS.length} Keycloak account(s) from ${KEYCLOAK_ACCOUNTS_JSON}`);
 
-function onTick() {
+
+
+if (CRON_SCHEDULE === '') {
+    console.log('No CRON_SCHEDULE provided, running once and exiting');
+    await onTick();
+    process.exit(0);
+}
+
+console.log(`Scheduling cron job with schedule: ${CRON_SCHEDULE}`);
+cron.schedule(CRON_SCHEDULE,async  () => {
+   await onTick()
+});
+
+async function onTick() {
     for(let account of KEYCLOAK_ACCOUNTS) {
         const test_start_ts = new Date();
         console.log('Cron job executed at', test_start_ts.toISOString());
         console.log(`Account for client_id=${account.CLIENT_ID}, realm=${account.REALM}, associated_role=${account.ASSOCIATED_ROLE}`);
-        doTestFor(
+        await doTestFor(
           test_start_ts,
+          KEYCLOAK_BASE_URL,
           account.CLIENT_ID,
           account.REALM,
           account.CLIENT_SECRET,
           account.ASSOCIATED_ROLE,
           LOG_LEVEL,
           DATABASE_URL,
-          KEYCLOAK_BASE_URL,
           METADATA_BASE_URL,
-          KEYCLOAK_ACCOUNTS_JSON,
           DATASET_CONTENT_PAGE_LIMIT,
           DEBUG_MODE_CACHE_ON,
         );
     }
-}
-
-if (CRON_SCHEDULE === '') {
-    console.log('No CRON_SCHEDULE provided, running once and exiting');
-    onTick();
-    process.exit(0);
-}
-
-console.log(`Scheduling cron job with schedule: ${CRON_SCHEDULE}`);
-cron.schedule(CRON_SCHEDULE, () => {
-   onTick()
-});
-
-function doTestFor(
-  sessionStartTs: Date,
-  clientId: string,
-  realm: string,
-  clientSecret: string,
-  associatedRole: string,
-  logLevel: string,
-  databaseUrl: string,
-  keycloakBaseUrl: string,
-  metadataBaseUrl: string,
-  keycloakAccountsJson: string,
-  datasetContentPageLimit: string,
-  debugModeCacheOn: boolean,
-) {
-  // throw new Error('Function not implemented.');
 }

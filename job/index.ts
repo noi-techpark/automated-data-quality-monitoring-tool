@@ -1,5 +1,4 @@
 import prisma from "./lib/db";
-import { getSessionStartTimestamp } from "./lib/session";
 import xml2js from "xml2js"
 import fs from "fs/promises"
 import { xml2json } from 'xml-js';
@@ -71,17 +70,25 @@ export interface Check {
   data_quality_rule: DataQualityRule;
 }
 
+export async function doTestFor(
+  sessionStartTs: Date,
+  KEYCLOAK_BASE_URL: string,
+  KEYCLOAK_CLIENT_ID: string,
+  KEYCLOAK_REALM: string, 
+  KEYCLOAK_CLIENT_SECRET: string,
+  KEYCLOAK_ASSOCIATED_ROLE: string, 
+  LOG_LEVEL: string,
+  DATABASE_URL: string,
+  METADATA_BASE_URL: string, 
+  DATASET_CONTENT_PAGE_LIMIT: string, 
+  DEBUG_MODE_CACHE_ON: boolean) {
 
-
-
-const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL);
+const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON );
 const rules: Check[] = await loadRules();
 
 
 for (const item of metadata_json.Items) {
     console.log(`Dataset: ${item.Shortname}, ApiType: ${item.ApiType}, ApiUrl: ${item.ApiUrl}`);
-
-    const sessionStartTs = getSessionStartTimestamp();
 
     await prisma.test_dataset.create({
         data: {
@@ -95,7 +102,7 @@ for (const item of metadata_json.Items) {
 
     let dataset_tested_record_count = 0;
 
-    const rules_of_dataset: Map<string, Check[]> = await findRulesForDatasetGroupByUrlAndQueryParams(item, rules);
+    const rules_of_dataset: Map<string, Check[]> = await findRulesForDatasetGroupByUrlAndQueryParams(item, rules, sessionStartTs);
     for (const [url, rules] of rules_of_dataset.entries()) {
 
         console.log(`   Scope URL: ${url}`);
@@ -103,12 +110,12 @@ for (const item of metadata_json.Items) {
         try {
             for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++) {
 
-                const dataset_page_json_items: DatasetPageItem[] = await fetch_dataset_items_with_paging(url, pageNumber);
+                const dataset_page_json_items: DatasetPageItem[] = await fetch_dataset_items_with_paging(url, pageNumber, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON);
 
                 if (dataset_page_json_items.length == 0)
                     break;
 
-                processDatasetItems(dataset_page_json_items, rules, item.Shortname, rule_tested_record_count);
+                processDatasetItems(dataset_page_json_items, rules, item.Shortname, rule_tested_record_count, sessionStartTs, KEYCLOAK_ASSOCIATED_ROLE);
                 
                 rule_tested_record_count += dataset_page_json_items.length;
             }
@@ -126,16 +133,17 @@ for (const item of metadata_json.Items) {
         // this is an approximation as multiple rules can apply to same record in different scope urls
         // to avoid overcounting we should define unique record ids across rules and datasets
         dataset_tested_record_count += rule_tested_record_count;
-        await updateTestedRecords(item.Shortname, dataset_tested_record_count);
+        await updateTestedRecords(item.Shortname, dataset_tested_record_count, sessionStartTs);
     
     }
 }
+  }
 
-async function fetch_dataset_items_with_paging(url: string, pageNumber: number) : Promise<DatasetPageItem[]> {
+async function fetch_dataset_items_with_paging(url: string, pageNumber: number, KEYCLOAK_CLIENT_ID: string, KEYCLOAK_CLIENT_SECRET: string, KEYCLOAK_REALM: string, KEYCLOAK_BASE_URL: string, KEYCLOAK_ASSOCIATED_ROLE: string, DEBUG_MODE_CACHE_ON: boolean) : Promise<DatasetPageItem[]> {
 
     const pageUrl = url + (url.includes("?") ? '&' : '?' ) + `pagesize=100&pagenumber=${pageNumber}`;
     console.log("pageUrl", pageUrl)
-    const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl)
+    const dataset_page_json: DatasetPage = await fetch_json_with_optional_cache(pageUrl, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON);  
     
     const records = []
 
@@ -153,7 +161,7 @@ async function fetch_dataset_items_with_paging(url: string, pageNumber: number) 
     to optimize api calls and avoid fetching and count same dataset multiple times
 */
 
-async function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataDatasetItem, rules: Check[]): Promise<Map<string, Check[]>> {
+async function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataDatasetItem, rules: Check[], sessionStartTs: Date): Promise<Map<string, Check[]>> {
 
     const matched_rules = new Map<string, Check[]>();
 
@@ -176,7 +184,7 @@ async function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: Met
                         ...rest2 } = rest;
                 // build url like https://mobility.api.opendatahub.com/v2/flat/EnvironmentStation/NO2%20-%20Ossidi%20di%20azoto/2025-10-14T00:00:00.000Z/2025-10-17T23:59:59.999Z?limit=-1&distinct=true&select=sname,mvalue,mvalidtime&where=mperiod.eq.3600,sactive.eq.true,sorigin.eq.APPABZ
                 scope_url += '/' + (apitype_timeseries_param_datatype ?? '*'); // datatype
-                const now = getSessionStartTimestamp(); // use session start timestamp to have consistent results across rules
+                const now = sessionStartTs; // use session start timestamp to have consistent results across rules
                 const fromHours = Number(apitype_timeseries_param_last_from_hours ?? '24');
                 const toHours = Number(apitype_timeseries_param_last_to_hours ?? '0');
                 const fromDate = new Date(now.getTime() - fromHours * 3600_000);
@@ -263,11 +271,11 @@ sessionStartTs: Date, datasetName: string, checkName: string, category: string, 
     });
 }
 
-async function updateTestedRecords(datasetName: string, testedRecordCount: number): Promise<void> {
+async function updateTestedRecords(datasetName: string, testedRecordCount: number, sessionStartTs: Date): Promise<void> {
     await prisma.test_dataset.update({
         where: {
             session_start_ts_dataset_name: {
-                session_start_ts: getSessionStartTimestamp(),
+                session_start_ts: sessionStartTs,
                 dataset_name: datasetName,
             }
         },
@@ -277,21 +285,21 @@ async function updateTestedRecords(datasetName: string, testedRecordCount: numbe
     });
 }
 
-async function processDatasetItems(dataset_page_json_item: DatasetPageItem[], dataset_rules: Check[], dataset_Shortname: string, start_number: number): Promise<void> {
+async function processDatasetItems(dataset_page_json_item: DatasetPageItem[], dataset_rules: Check[], dataset_Shortname: string, start_number: number, sessionStartTs: Date,  KEYCLOAK_ASSOCIATED_ROLE: string): Promise<void> {
     // let tested_record_count = 0;
     const failed_records: any = []
     for (let i = 0; i < dataset_page_json_item.length; i++) {
         // tested_record_count++;
         const obj = dataset_page_json_item[i]
         for (let rule of dataset_rules) {
-             checkRecordWithRule(rule, obj, failed_records, dataset_Shortname, 'seq=' + (start_number + i))
+             checkRecordWithRule(rule, obj, failed_records, dataset_Shortname, 'seq=' + (start_number + i), sessionStartTs, KEYCLOAK_ASSOCIATED_ROLE)
         }
 
     }
     await prisma.test_dataset_record_check_failed.createMany({ data: failed_records });
 }
 
-function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: any, dataset_Shortname: string, rec_id: string) {
+function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: any, dataset_Shortname: string, rec_id: string, sessionStartTs: Date, KEYCLOAK_ASSOCIATED_ROLE: string) {
     switch (rule.data_quality_rule.rule_language) {
         case 'javascript':
             const fn = new Function("$", `return (${rule.data_quality_rule.rule_expression});`);
@@ -302,7 +310,7 @@ function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: 
                 if (!result) {
                     console.log(`rule ${rule.name} failed for ${obj}`)
                     failed_records.push({
-                        session_start_ts: getSessionStartTimestamp(),
+                        session_start_ts: sessionStartTs,
                         dataset_name: dataset_Shortname,
                         record_jsonpath: rec_id, // shold be unique
                         check_name: rule.name,
@@ -310,7 +318,7 @@ function checkRecordWithRule(rule: Check, obj: DatasetPageItem, failed_records: 
                         problem_hint: '',
                         impacted_attributes_csv: '',
                         check_category: rule.category,
-                        used_key: KEYCLOAK_CLIENT_ID,
+                        used_key: KEYCLOAK_ASSOCIATED_ROLE,
                         impacted_attribute_value: ''
                     })
                 }
