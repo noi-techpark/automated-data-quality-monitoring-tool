@@ -32,12 +32,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	</check>
 
 	<check>
-		<name>GpsInfo must be inside Europe bounding box (if not 0,0)</name>
-		<category>GpsInfo must be inside Europe bounding box (if not 0,0)</category>
+		<name>GpsInfo must be inside Europe bounding box</name>
+		<category>GpsInfo must be inside Europe bounding box</category>
 		<description>
 			This rule checks that if GPS information is provided as a list, all entries have coordinates located within the approximate bounding box of Europe
 			(Latitude between 34° and 72°, Longitude between -25° and 45°).  
-			If coordinates are 0,0, the rule passes to avoid overlapping with the "GpsInfo must be not 0,0" check.
 			If there is no list (GpsInfo is not an array), the rule automatically passes.
 		</description>
 		<data_scope_filters>
@@ -49,12 +48,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<rule_expression><![CDATA[
 			
 				!Array.isArray($.GpsInfo) || $.GpsInfo.every($ => 
-					($.Latitude === 0 && $.Longitude === 0) || (
 						$.Latitude >= 34 &&
 						$.Latitude <= 72 &&
 						$.Longitude >= -25 &&
 						$.Longitude <= 45
-					)
 				)
 			]]></rule_expression>
 		</data_quality_rule>
