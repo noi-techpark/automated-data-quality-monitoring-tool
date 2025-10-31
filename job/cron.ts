@@ -56,8 +56,9 @@ export interface KeycloakAccountConfig {
 }
 
 
-export const KEYCLOAK_ACCOUNTS: KeycloakAccountConfig[] = JSON.parse(readFileSync(KEYCLOAK_ACCOUNTS_JSON, 'utf8'));
+const KEYCLOAK_ACCOUNTS: KeycloakAccountConfig[] = JSON.parse(readFileSync(KEYCLOAK_ACCOUNTS_JSON, 'utf8'));
 
+console.log(`Loaded ${KEYCLOAK_ACCOUNTS.length} Keycloak account(s) from ${KEYCLOAK_ACCOUNTS_JSON}`);
 
 function onTick() {
     for(let account of KEYCLOAK_ACCOUNTS) {
@@ -81,11 +82,16 @@ function onTick() {
     }
 }
 
-cron.schedule(CRON_SCHEDULE, () => {
-   // onTick
-});
+if (CRON_SCHEDULE === '') {
+    console.log('No CRON_SCHEDULE provided, running once and exiting');
+    onTick();
+    process.exit(0);
+}
 
-onTick();
+console.log(`Scheduling cron job with schedule: ${CRON_SCHEDULE}`);
+cron.schedule(CRON_SCHEDULE, () => {
+   onTick()
+});
 
 function doTestFor(
   sessionStartTs: Date,
