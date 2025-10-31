@@ -64,7 +64,19 @@ function onTick() {
     console.log('Cron job executed at', new Date().toISOString());
     for(let account of KEYCLOAK_ACCOUNTS) {
         console.log(`Account for client_id=${account.CLIENT_ID}, realm=${account.REALM}, associated_role=${account.ASSOCIATED_ROLE}`);
-        doTestFor( account);
+        doTestFor(
+          account.CLIENT_ID,
+          account.REALM,
+          account.CLIENT_SECRET,
+          account.ASSOCIATED_ROLE,
+          LOG_LEVEL,
+          DATABASE_URL,
+          KEYCLOAK_BASE_URL,
+          METADATA_BASE_URL,
+          KEYCLOAK_ACCOUNTS_JSON,
+          DATASET_CONTENT_PAGE_LIMIT,
+          DEBUG_MODE_CACHE_ON,
+        );
     }
 }
 
@@ -74,6 +86,18 @@ cron.schedule('* * * * *', () => {
 
 onTick();
 
-function doTestFor(account: KeycloakAccountConfig) {
+function doTestFor(
+  clientId: string,
+  realm: string,
+  clientSecret: string,
+  associatedRole: string,
+  logLevel: string,
+  databaseUrl: string,
+  keycloakBaseUrl: string,
+  metadataBaseUrl: string,
+  keycloakAccountsJson: string,
+  datasetContentPageLimit: string,
+  debugModeCacheOn: boolean,
+) {
   throw new Error('Function not implemented.');
 }
