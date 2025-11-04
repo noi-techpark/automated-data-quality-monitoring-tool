@@ -9,3 +9,5 @@ services:
     image: ${DOCKER_IMAGE_JOB}:${DOCKER_TAG}
     restart: unless-stopped
     env_file: .env
+    volumes:
+      - ./accounts.json:/accounts.json:ro

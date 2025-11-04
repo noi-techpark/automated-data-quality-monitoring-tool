@@ -1,0 +1,20 @@
+[
+    {
+      "CLIENT_ID": "opendata",
+      "REALM": "",
+      "CLIENT_SECRET": "",
+      "ASSOCIATED_ROLE": "opendata"
+    },
+    {
+      "CLIENT_ID": "odh-data-quality-job-blc",
+      "REALM": "noi",
+      "CLIENT_SECRET": "....",
+      "ASSOCIATED_ROLE": "blc"
+    },
+  {
+      "CLIENT_ID": "odh-data-quality-job-idm",
+      "REALM": "noi",
+      "CLIENT_SECRET": "...",
+      "ASSOCIATED_ROLE": "idm"
+    }
+]

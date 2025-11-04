@@ -21,14 +21,15 @@ services:
     environment:
       DATABASE_URL: ${JOB_DATABASE_URL}
       KEYCLOAK_BASE_URL: ${JOB_KEYCLOAK_BASE_URL}
-      KEYCLOAK_REALM: ${JOB_KEYCLOAK_REALM}
-      KEYCLOAK_CLIENT_ID: ${JOB_KEYCLOAK_CLIENT_ID}
-      KEYCLOAK_CLIENT_SECRET: ${JOB_KEYCLOAK_CLIENT_SECRET}
       METADATA_BASE_URL: ${JOB_METADATA_BASE_URL}
       DATASET_CONTENT_PAGE_LIMIT: ${JOB_DATASET_CONTENT_PAGE_LIMIT}
       LOG_LEVEL: ${JOB_LOG_LEVEL}
+      KEYCLOAK_ACCOUNTS_JSON: /accounts.json
+      CRON_SCHEDULE: ""
     depends_on:
       - postgres
+    volumes:
+      - ./keycloak-accounts.json:/accounts.json:ro
       
   postgres:
     restart: unless-stopped

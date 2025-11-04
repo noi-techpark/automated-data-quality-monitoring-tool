@@ -18,6 +18,7 @@ jobs:
   deploy-test:
     runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/main'
+    
     concurrency: 
       group: deploy-test
       cancel-in-progress: true
@@ -43,10 +44,35 @@ jobs:
           X_LOG_LEVEL: "minimal"
           X_KEYCLOAK_BASE_URL: "https://auth.opendatahub.com/auth/"
           X_KEYCLOAK_REALM: "noi"
-          X_KEYCLOAK_CLIENT_ID: "odh-data-quality-job"
-          X_KEYCLOAK_CLIENT_SECRET: "${{secrets.PROD_JOB_CLIENT_SECRET}}"
           X_METADATA_BASE_URL: "https://tourism.api.opendatahub.com/v1/MetaData?pagesize=300&origin=webcomp-datasets-list"
           X_DATASET_CONTENT_PAGE_LIMIT: 4
+          X_JOB_KEYCLOAK_ACCOUNTS_JSON: "accounts.json"
+          X_JOB_CRON_SCHEDULE: "0 * * * *"
+          
+      - name: Generate accounts.json
+        run: |
+          cat << 'EOF' > accounts.json
+          [
+            {
+              "CLIENT_ID": "opendata",
+              "REALM": "",
+              "CLIENT_SECRET": "",
+              "ASSOCIATED_ROLE": "opendata"
+            },
+            {
+              "CLIENT_ID": "odh-data-quality-job-blc",
+              "REALM": "noi",
+              "CLIENT_SECRET": "${{ secrets.JOB_CLIENT_SECRET_BLC }}",
+              "ASSOCIATED_ROLE": "blc"
+            },
+            {
+              "CLIENT_ID": "odh-data-quality-job-idm",
+              "REALM": "noi",
+              "CLIENT_SECRET": "${{ secrets.JOB_CLIENT_SECRET_IDM }}",
+              "ASSOCIATED_ROLE": "idm"
+            }
+          ]
+          EOF
 
       - name: Build and push images
         uses: noi-techpark/github-actions/docker-build-and-push@v2

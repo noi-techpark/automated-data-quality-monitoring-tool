@@ -31,11 +31,12 @@ The ODHDataChecker can be run natively or as a Docker container (recommended).
 
 ### Docker Usage (Recommended)
 
-1. Create a `.env` file in the root directory with the following content:
+1. Create a `.env` and `keycloak-accounts.json` file in the root directory:
    ```bash
    cp .env.example .env
+   cp keycloak-accounts.json.example keycloak-accounts.json
    ```
-2. Configure the `.env` file.
+2. Configure the `.env` and `keycloak-accounts.json` file.
 3. Use Docker Compose to build and run the application:
    ```bash
    docker-compose up --build

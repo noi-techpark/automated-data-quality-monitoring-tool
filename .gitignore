@@ -23,4 +23,4 @@ backend/.env-public
 backend/.env-idm
 job/.env-public
 job/.env-idm
-job/keycloak-accounts.json
+keycloak-accounts.json
