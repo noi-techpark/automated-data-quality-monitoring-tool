@@ -106,7 +106,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 								margin-right: 0.4rem;
 							}
 							
-							.nr_records, details {
+							.nr_records, details, .checked_nr_records {
 								margin-left: 0.4rem;
 								margin-right: 0.4rem;
 							}
@@ -120,6 +120,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 							</div>
 							<div class="category_name">Completeness</div>
 							<span></span>
+							<cs-label-and-data label="checked recs" class="checked_nr_records"></cs-label-and-data>
 							<cs-label-and-data label="quality-assured recs" class="nr_records"></cs-label-and-data>
 							<div class="lastupdate">
 								<span class="data"></span>
@@ -153,6 +154,8 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 		cat_name.textContent = data.check_category
 		const failedelement = cs_cast(LabelAndData, cat.querySelector('.nr_records'))
 		failedelement.setData('' + (data.tot_records - data.failed_records))
+		const checked_nr_records = cs_cast(LabelAndData, cat.querySelector('.checked_nr_records'))
+		checked_nr_records.setData('' + data.tot_records)
 		const last_update = cs_cast(HTMLSpanElement, cat.querySelector('.lastupdate .data'))
 		const date = new Date(data.session_start_ts)
 		
@@ -173,7 +176,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 		const view_details = cs_cast(HTMLElement, cat.querySelector('.view_details'))
 		
 		view_details.onclick = () => {
-			location.hash = '#page=summary&session_start_ts=' + data.session_start_ts + '&dataset_name=' + data.dataset_name + '&category_name=' + data.check_category +
+			location.hash = '#page=summary&session_start_ts=' + data.session_start_ts + '&dataset_name=' + encodeURIComponent(data.dataset_name) + '&category_name=' + data.check_category +
 							'&failed_records=' + data.failed_records + '&tot_records=' + data.tot_records 
 		}
 		

@@ -2,28 +2,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import Keycloak from 'keycloak-js';
 import { jwtDecode } from 'jwt-decode';
-
-
-export const keycloak: Promise<Keycloak> = new Promise(async s => {
-
-	const kc = new Keycloak({
-		url: "https://auth.opendatahub.testingmachine.eu/auth/",
-		realm: "noi",
-		clientId: "odh-data-quality-web"
-	});
-
-	await kc.init({
-		redirectUri: 'http://localhost:8080'
-	});
-
-	console.log('init fatto!')
-	s(kc)
-
-})
-
-
+import { kc } from './auth.js';
 
 
 export class AuthComponent extends HTMLElement {
@@ -121,7 +101,7 @@ export class AuthComponent extends HTMLElement {
 		this.user_menu = this.sroot.querySelector('.user-menu')!;
 
 		(this.button_login as HTMLButtonElement).onclick = async () => {
-			(await keycloak).login();
+			kc.login();
 		};
 
 		(this.user_button as HTMLButtonElement).onclick = (e: MouseEvent) => {
@@ -131,7 +111,7 @@ export class AuthComponent extends HTMLElement {
 
 		const logout_button = this.sroot.querySelector('.logout-button') as HTMLButtonElement;
 		logout_button.onclick = async () => {
-			(await keycloak).logout();
+			kc.logout();
 		};
 
 		// Listener globale per chiudere il menu se si clicca fuori
@@ -150,8 +130,8 @@ export class AuthComponent extends HTMLElement {
 			redirectUri: 'http://localhost:8080'
 		});
 		 */
-		if ((await keycloak).authenticated) {
-			const token = (await keycloak).token!;
+		if (kc.authenticated) {
+			const token = kc.token!;
 			const decoded: any = jwtDecode(token);
 			const username = decoded.preferred_username || decoded.name || 'User';
 			this.user_button.textContent = `${username} ▼`;

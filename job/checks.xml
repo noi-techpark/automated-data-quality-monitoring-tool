@@ -7,6 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 <!-- * (C) 2024 Catch Solve di Davide Montesin * License: AGPL -->
 <checks>
 
+
 	<check>
 		<name>GpsInfo must be not 0,0</name>
 		<category>GpsInfo must be not 0,0</category>
@@ -14,89 +15,195 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			This rule checks that if GPS information is provided as a list, all entries in that list have valid coordinates (i.e., latitude and longitude are not 0).
 			If there is no list (GpsInfo is not an array), the rule automatically passes.
 		</description>
-		<!-- dataset shortname, if * is tested on all datasets -->
-		<dataset_shortname></dataset_shortname>
-		<dataset_dataspace>tourism</dataset_dataspace>
-		<!-- which programming language the rule is written. at the moment supported javascript and jsonlogic -->
-		<rule_language>javascript</rule_language>
-		<rule_code><![CDATA[
+		<data_scope_filters>
+			<!-- dataset shortname, if * is tested on all datasets -->
+			<dataset_shortname></dataset_shortname>
+			<dataset_dataspace>tourism</dataset_dataspace>
+		</data_scope_filters>
+		<data_quality_rule>
+			<!-- which programming language the rule is written. at the moment supported javascript and jsonlogic -->
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
 
-			!Array.isArray($.GpsInfo) || $.GpsInfo.every($ => $.Latitude != 0 && $.Longitude != 0)
+				!Array.isArray($.GpsInfo) || $.GpsInfo.every($ => $.Latitude != 0 && $.Longitude != 0)
 
-		]]></rule_code>
+			]]></rule_expression>
+		</data_quality_rule>
 	</check>
 
 	<check>
-	<name>GpsInfo must be inside Europe bounding box (if not 0,0)</name>
-		<category>geolocation quality</category>
+		<name>GpsInfo must be inside Europe bounding box</name>
+		<category>GpsInfo must be inside Europe bounding box</category>
 		<description>
 			This rule checks that if GPS information is provided as a list, all entries have coordinates located within the approximate bounding box of Europe
 			(Latitude between 34° and 72°, Longitude between -25° and 45°).  
-			If coordinates are 0,0, the rule passes to avoid overlapping with the "GpsInfo must be not 0,0" check.
 			If there is no list (GpsInfo is not an array), the rule automatically passes.
 		</description>
-
-		<dataset_shortname></dataset_shortname>
-		<dataset_dataspace>tourism</dataset_dataspace>
-
-		<rule_language>javascript</rule_language>
-		<rule_code><![CDATA[
-		
-			!Array.isArray($.GpsInfo) || $.GpsInfo.every($ => 
-				($.Latitude === 0 && $.Longitude === 0) || (
-					$.Latitude >= 34 &&
-					$.Latitude <= 72 &&
-					$.Longitude >= -25 &&
-					$.Longitude <= 45
+		<data_scope_filters>
+			<dataset_shortname>Accommodation</dataset_shortname>
+			<dataset_dataspace>tourism</dataset_dataspace>
+		</data_scope_filters>
+		<data_quality_rule>
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
+			
+				!Array.isArray($.GpsInfo) || $.GpsInfo.every($ => 
+						$.Latitude >= 34 &&
+						$.Latitude <= 72 &&
+						$.Longitude >= -25 &&
+						$.Longitude <= 45
 				)
-			)
-		]]></rule_code>
+			]]></rule_expression>
+		</data_quality_rule>
 	</check>
 
 	<check>
 	
-	<name>mvalue gt zero1</name>
-		<category>mvalue gt zero1</category>
+		<name>EAQI-NO2 gt 10</name>
+		<category>EAQI-NO2 gt 10</category>
 		<description>
-			mvalue gt zero
+			EAQI-NO2 gt 10
 		</description>
 
-		<dataset_shortname></dataset_shortname>
-		<dataset_dataspace>environmental</dataset_dataspace>
-		<dataset_apitype>timeseries</dataset_apitype>
+		<data_scope_filters>
 
-		<additional_url_parameters>/nitrogen-dioxide/latest?where=mperiod.eq.3600</additional_url_parameters>
+			<dataset_shortname>Enviromental Station</dataset_shortname>
+			<dataset_dataspace>environmental</dataset_dataspace>
+			<dataset_apitype>timeseries</dataset_apitype>
 
-		<rule_language>javascript</rule_language>
-		<rule_code><![CDATA[
-		
-			false
+			<apitype_timeseries_param_datatype>EAQI-NO2</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
+			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
+			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
 
-		]]></rule_code>
+		</data_scope_filters>
+
+		<data_quality_rule>
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
+			
+				$.mvalue === "good"
+
+			]]></rule_expression>
+		</data_quality_rule>
 	</check>
+
 
 	<check>
 	
-	<name>mvalue gt zero2</name>
-		<category>mvalue gt zero2</category>
+		<name>nitrogen-dioxid gt 10</name>
+		<category>nitrogen-dioxid gt 10</category>
 		<description>
-			mvalue gt zero
+			nitrogen-dioxid gt 10
 		</description>
 
-		<dataset_shortname></dataset_shortname>
-		<dataset_dataspace>environmental</dataset_dataspace>
-		<dataset_apitype>timeseries</dataset_apitype>
+		<data_scope_filters>
 
-		<additional_url_parameters>/EAQI-NO2/latest?where=mperiod.eq.3600</additional_url_parameters>
+			<dataset_shortname>Enviromental Station</dataset_shortname>
+			<dataset_dataspace>environmental</dataset_dataspace>
+			<dataset_apitype>timeseries</dataset_apitype>
 
-		<rule_language>javascript</rule_language>
-		<rule_code><![CDATA[
-		
-			$.mvalue > 10
+			<apitype_timeseries_param_datatype>nitrogen-dioxide</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
+			<apitype_timeseries_param_sactive>true</apitype_timeseries_param_sactive>
+			<apitype_timeseries_param_sorigin>APPABZ</apitype_timeseries_param_sorigin>
+			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
+			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
 
-		]]></rule_code>
+		</data_scope_filters>
+
+		<data_quality_rule>
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
+			
+				$.mvalue > 10
+
+			]]></rule_expression>
+		</data_quality_rule>
 	</check>
 
+
+<check>
+	<name>ImageGallery must be a non-empty array</name>
+	<category>ImageGallery must be a non-empty array</category>
+	<description>
+		This rule checks that the current accommodation item has an ImageGallery property
+		that is an array containing at least one image object.  
+		If ImageGallery is not an array or is empty, the rule fails.
+	</description>
+
+	<data_scope_filters>
+		<dataset_shortname>Accommodation</dataset_shortname>
+		<dataset_dataspace>tourism</dataset_dataspace>
+	</data_scope_filters>
+
+	<data_quality_rule>
+		<rule_language>javascript</rule_language>
+		<rule_expression><![CDATA[
+			Array.isArray($.ImageGallery) && $.ImageGallery.length > 0
+		]]></rule_expression>
+	</data_quality_rule>
+</check>
+
+<check>
+	<name>ImageGallery ValidFrom/ValidTo must include July</name>
+	<category>ImageGallery ValidFrom/ValidTo must include July</category>
+	<description>
+		This rule checks that each image in ImageGallery has non-null ValidFrom and ValidTo fields,
+		and that the month of July (7) is between the month of ValidFrom and ValidTo (inclusive).
+		If ImageGallery is not an array, the rule automatically passes.
+	</description>
+
+	<data_scope_filters>
+		<dataset_shortname>Accommodation</dataset_shortname>
+		<dataset_dataspace>tourism</dataset_dataspace>
+	</data_scope_filters>
+
+	<data_quality_rule>
+
+		<rule_language>javascript</rule_language>
+		<rule_expression><![CDATA[
+			$._Meta.Source != "lts" ||
+			!Array.isArray($.ImageGallery) || 
+			$.ImageGallery
+			.filter(img => img.ValidFrom && img.ValidTo)
+			.every(img => {
+					
+					const fromMonth = new Date(img.ValidFrom).getMonth() + 1; // mesi 0-11 → +1
+					const toMonth = new Date(img.ValidTo).getMonth() + 1;
+
+					// month 7 is between fromMonth and toMonth
+					return fromMonth <= 7 && 7 <= toMonth;
+				})
+		]]></rule_expression>
+	</data_quality_rule>
+</check>
+
+<!--
+<check>
+	<name>Italian language must include Title and BaseText</name>
+	<category>content completeness</category>
+	<description>
+		This rule checks that, if the record declares the Italian language (it) in HasLanguage,
+		then both Title and BaseText attributes exist and are non-empty for that language.
+		If HasLanguage does not include "it", the rule automatically passes.
+	</description>
+
+	<data_scope_filters>
+		<dataset_shortname>Accommodation</dataset_shortname>
+		<dataset_dataspace>tourism</dataset_dataspace>
+	</data_scope_filters>
+
+	<data_quality_rule>
+		<rule_language>javascript</rule_language>
+		<rule_expression><![CDATA[
+
+			$.HasLanguage.every(lang => $.Title?.[lang] !== undefined && $.BaseText?.[lang] !== undefined )
+
+		]]></rule_expression>
+	</data_quality_rule>
+</check>
+-->
 
 
 

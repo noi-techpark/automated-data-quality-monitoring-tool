@@ -77,10 +77,31 @@ mvn clean package
 
 * create a postgres instance and initialize the database using
 
+	*If you have an existing database that matches the baseline schema, baseline it once:*
+
+	```bash
+	mvn -Dflyway.url=jdbc:postgresql://HOST/DATABASE \
+	    -Dflyway.user=USER \
+	    -Dflyway.password=PASSWORD \
+	    -Dflyway.baselineVersion=1 \
+	    -Dflyway.baselineOnMigrate=true \
+	    flyway:baseline
+	```
+
+	*Run migrations (starts from `V2__...` after the baseline above):*
+
+	```bash
+	mvn -Dflyway.url=jdbc:postgresql://HOST/DATABASE \
+	    -Dflyway.user=USER \
+	    -Dflyway.password=PASSWORD \
+	    flyway:migrate
+	```
+
+	*To load the schema dump directly instead of Flyway, run:*
+
 ```bash
 psql ... < database/database.sql
 ```
-
 
 * confiure environment variable JDBC_URL=jdbc:postgresql://server/database?user=xxx&password=yyy to point the postgres database
 * deploy the war to a j2ee container like tomcat or jetty

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 
-import { keycloak } from './AuthComponent.js';
+
 import { DatasetCardComponent } from './DatasetCardComponent.js';
 import { Loader } from './Loader.js';
 import { API3 } from './api/api3.js';
@@ -64,7 +64,10 @@ export class StandardDashboardsComponent extends HTMLElement
 		this.boxContainer.textContent = ('');
 		const loader = new Loader();
 		this.boxContainer.appendChild(loader)
-		const used_key = (await keycloak).authenticated ? 'odh-data-quality-job-idm' : 'opendata'
+		// TODO read from kc
+		let used_key = 'opendata'
+		// TODO remove, only for testing ...
+		// used_key = 'idm'
 		const json = await API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({used_key: used_key})
 		loader.remove();
 		console.log(json)

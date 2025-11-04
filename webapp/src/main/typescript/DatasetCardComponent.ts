@@ -109,9 +109,9 @@ export class DatasetCardComponent extends HTMLElement
 				
 		// this.img.style.display = 'none';
 		
-		this.checkrecs.setLabel('checked recs')
+		this.checkrecs.setLabel('total checks')
 		this.checkattr.setLabel('checked attrs')
-		this.failedrecs.setLabel('quality-assured recs')
+		this.failedrecs.setLabel('passed checks')
 		
 		// this.failedrecs.setSeverity("fail")
 		// this.failedrecs.setData('123')
@@ -140,6 +140,7 @@ export class DatasetCardComponent extends HTMLElement
 		this.checkattr.setData('123')
 		this.failedrecs.setData('' + (dataset.tested_records - dataset.failed_records))
 		const quality_ratio = dataset.tested_records == 0 ? 100 : dataset.failed_records / dataset.tested_records
+		/*
 		if (dataset.tested_records > 0)
 		{
 			if (quality_ratio < 0.1)
@@ -149,9 +150,11 @@ export class DatasetCardComponent extends HTMLElement
 			else
 				this.failedrecs.setQualityLevel("fail")
 		}
+		 */
 		this.lastupdate.textContent = dateformat
 		this.onclick = () => {
-			location.hash = '#page=dataset-categories' + '&dataset_name=' + dataset.dataset_name 
+			const escapedDatasetName = encodeURIComponent(dataset.dataset_name ?? '')
+			location.hash = '#page=dataset-categories' + '&dataset_name=' + escapedDatasetName 
 							+ "&session_start_ts=" + dataset.session_start_ts
 							+ "&failed_records=" + dataset.failed_records
 							+ "&tested_records=" + dataset.tested_records

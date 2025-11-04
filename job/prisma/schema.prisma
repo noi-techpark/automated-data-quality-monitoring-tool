@@ -40,6 +40,8 @@ model test_dataset_check {
   session_start_ts DateTime     @db.Timestamptz(6)
   dataset_name     String
   check_name       String
+  tested_records   Int?
+  check_category   String?
   test_dataset     test_dataset @relation(fields: [session_start_ts, dataset_name], references: [session_start_ts, dataset_name], onDelete: NoAction, onUpdate: NoAction, map: "test_dataset_check_session_start_ts_fkey")
 
   @@id([session_start_ts, dataset_name, check_name])
