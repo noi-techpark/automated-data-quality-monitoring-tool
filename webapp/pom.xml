@@ -41,7 +41,12 @@ SPDX-License-Identifier: CC0-1.0
 			<artifactId>flyway-core</artifactId>
 			<version>10.17.0</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+			<version>10.17.0</version>
+		</dependency>
+
 		<!-- dev libs -->
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
@@ -55,7 +60,7 @@ SPDX-License-Identifier: CC0-1.0
 			<version>${tomcat.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 	</dependencies>
 
 	<build>

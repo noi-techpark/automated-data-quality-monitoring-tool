@@ -17,6 +17,9 @@ RUN npm run build
 RUN mvn clean package
 
 FROM jetty:12-jdk21-alpine AS build
+USER root
+RUN apk add --no-cache wget
+USER jetty
 WORKDIR /var/lib/jetty
 RUN echo "--module=ee10-deploy" > start.d/deploy.ini
 COPY --from=build-env /app/target/*.war webapps/ROOT.war

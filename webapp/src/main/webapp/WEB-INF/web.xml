@@ -16,8 +16,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		<servlet-class>it.bz.noi.automated.data.quality.monitoring.tool.APIServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet>
+		<servlet-name>ReadinessServlet</servlet-name>
+		<servlet-class>it.bz.noi.automated.data.quality.monitoring.tool.ReadinessServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>APIServlet</servlet-name>
 		<url-pattern>/api</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ReadinessServlet</servlet-name>
+		<url-pattern>/health/ready</url-pattern>
+	</servlet-mapping>
+	<listener>
+		<listener-class>it.bz.noi.automated.data.quality.monitoring.tool.FlywayMigrationListener</listener-class>
+	</listener>
 </web-app>
