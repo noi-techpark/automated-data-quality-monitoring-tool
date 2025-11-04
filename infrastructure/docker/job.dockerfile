@@ -10,4 +10,4 @@ CMD ["sh", "-c", "sleep 20; npm run start"]
 
 FROM base AS dev
 #CMD ["sh", "-c", "until nc -z postgres 5432; do echo 'Waiting for DB...'; sleep 3; done; npx prisma db push --schema=./prisma/schema.prisma --skip-generate --accept-data-loss && npm run start"]
-CMD ["sh", "-c", "until nc -z postgres 5432; do echo 'Waiting for DB...'; sleep 15; done; npm run start"]
+CMD ["sh", "-c", "npm run start"]
