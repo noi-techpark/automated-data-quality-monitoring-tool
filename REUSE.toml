@@ -21,6 +21,7 @@ path = [
     "webapp/src/main/webapp/*",
     "database/*.sql",
     "webapp/src/main/resources/db/migration/*.sql",
+    "keycloak-accounts.json.example"
 ]
 SPDX-FileCopyrightText = "2025 Catch Solve di Davide Montesin"
 SPDX-License-Identifier = "CC0-1.0"
