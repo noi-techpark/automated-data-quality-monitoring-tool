@@ -46,8 +46,8 @@ jobs:
           X_KEYCLOAK_REALM: "noi"
           X_METADATA_BASE_URL: "https://tourism.api.opendatahub.com/v1/MetaData?pagesize=300&origin=webcomp-datasets-list"
           X_DATASET_CONTENT_PAGE_LIMIT: 4
-          X_JOB_KEYCLOAK_ACCOUNTS_JSON: "accounts.json"
-          X_JOB_CRON_SCHEDULE: "0 * * * *"
+          X_KEYCLOAK_ACCOUNTS_JSON: "accounts.json"
+          X_CRON_SCHEDULE: "0 * * * *"
           
       - name: Generate accounts.json
         run: |
