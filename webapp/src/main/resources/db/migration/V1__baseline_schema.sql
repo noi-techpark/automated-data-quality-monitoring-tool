@@ -20,7 +20,7 @@ SET row_security = off;
 -- Name: catchsolve_noiodh; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA catchsolve_noiodh;
+CREATE SCHEMA if not exists catchsolve_noiodh;
 
 
 SET default_tablespace = '';
