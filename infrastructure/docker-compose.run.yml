@@ -5,9 +5,19 @@ services:
     env_file: .env
     ports:
       - ${SERVER_PORT}:8080
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
   job:
     image: ${DOCKER_IMAGE_JOB}:${DOCKER_TAG}
     restart: unless-stopped
     env_file: .env
     volumes:
       - ./accounts.json:/accounts.json:ro
+    depends_on:
+      # since the webapp does DB migrations
+      webapp:
+        condition: service_healthy
