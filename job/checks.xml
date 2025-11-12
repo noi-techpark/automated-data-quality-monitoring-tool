@@ -82,7 +82,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<rule_language>javascript</rule_language>
 			<rule_expression><![CDATA[
 			
-				$.mvalue > 0
+				typeof $.mvalue === "number" && $.mvalue > 0
 
 			]]></rule_expression>
 		</data_quality_rule>
@@ -116,7 +116,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<rule_language>javascript</rule_language>
 			<rule_expression><![CDATA[
 			
-				$.mvalue > 10
+				typeof $.mvalue === "number" && $.mvalue > 10
 
 			]]></rule_expression>
 		</data_quality_rule>
@@ -147,7 +147,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<rule_language>javascript</rule_language>
 			<rule_expression><![CDATA[
 			
-				Number($.mvalue) > 0
+				typeof $.mvalue === "number" && $.mvalue > 0
 
 			]]></rule_expression>
 		</data_quality_rule>
@@ -178,7 +178,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<rule_language>javascript</rule_language>
 			<rule_expression><![CDATA[
 			
-				Number($.mvalue) > 0
+				typeof $.mvalue === "number" && $.mvalue > 0
 
 			]]></rule_expression>
 		</data_quality_rule>
@@ -209,7 +209,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<rule_language>javascript</rule_language>
 			<rule_expression><![CDATA[
 			
-				Number($.mvalue) > 0
+				typeof $.mvalue === "number" && $.mvalue > 0
 
 			]]></rule_expression>
 		</data_quality_rule>
