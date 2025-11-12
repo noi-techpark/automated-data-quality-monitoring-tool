@@ -59,10 +59,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 	<check>
 	
-		<name>EAQI-NO2 gt 10</name>
-		<category>EAQI-NO2 gt 10</category>
+		<name>NO2 - Ossidi di azoto gt 0</name>
+		<category>NO2 - Ossidi di azoto gt 0</category>
 		<description>
-			EAQI-NO2 gt 10
+			NO2 - Ossidi di azoto gt 0
 		</description>
 
 		<data_scope_filters>
@@ -71,7 +71,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<dataset_dataspace>environmental</dataset_dataspace>
 			<dataset_apitype>timeseries</dataset_apitype>
 
-			<apitype_timeseries_param_datatype>EAQI-NO2</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_datatype>NO2 - Ossidi di azoto</apitype_timeseries_param_datatype>
 			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
 			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
 			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
@@ -82,7 +82,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<rule_language>javascript</rule_language>
 			<rule_expression><![CDATA[
 			
-				$.mvalue === "good"
+				$.mvalue > 0
 
 			]]></rule_expression>
 		</data_quality_rule>
