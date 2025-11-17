@@ -58,7 +58,7 @@ export class DatasetCardComponent extends HTMLElement
 					padding: 0.6rem;
 				}
 				.view_dashboard:hover {
-					background-color: rgb(35, 75, 20);
+					/* background-color: rgb(35, 75, 20); */
 				}
 				
 				.wrapper {
