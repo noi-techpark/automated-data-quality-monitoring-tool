@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { kc } from "../auth.js";
+
 
 export class API3 {
 
@@ -11,9 +13,12 @@ export class API3 {
 		params.append('action', action);
 		params.append('filter_byexample', JSON.stringify(json));
 
+		const access_token = kc.token;
+		const headers: HeadersInit = access_token ? { Authorization: `Bearer ${access_token}` } : {};
+
 		// https://www.catch-solve.tech/noi-odh-testing-tool/api?
 		// http://localhost:8080/api?
-		const resp = await fetch('api?' + params.toString());
+		const resp = await fetch('api?' + params.toString(), { headers });
 		const respjson = await resp.json();
 		// wait for debug pourpose
 		// await new Promise((s) =>  { setTimeout(s, 1000)})
