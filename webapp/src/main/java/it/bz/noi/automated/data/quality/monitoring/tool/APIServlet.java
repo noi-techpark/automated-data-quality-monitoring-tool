@@ -28,7 +28,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
-import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 
 import jakarta.servlet.ServletConfig;
@@ -39,12 +38,31 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class APIServlet extends HttpServlet {
 
+	private ConfigurableJWTProcessor<SecurityContext> jwtProcessor;
+
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		try {
 			Class.forName("org.postgresql.Driver");
-		} catch (ClassNotFoundException e) {
+			JWKSource<SecurityContext> keySource = JWKSourceBuilder
+					.create(new URI(
+							"https://auth.opendatahub.com/auth/realms/noi/protocol/openid-connect/certs").toURL())
+					.retrying(true)
+					.build();
+
+			
+			// JWSKeySelector<SecurityContext> keySelector = new JWSAlgorithmFamilyJWSKeySelector<>(JWSAlgorithm.Family.RSA, keySource);
+			JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, keySource);
+
+			this.jwtProcessor = new DefaultJWTProcessor<>();
+			jwtProcessor.setJWSKeySelector(keySelector);
+
+			// This is already done by default
+			// jwtProcessor.setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier<>());
+			// jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType("JWT")));
+
+		} catch (ClassNotFoundException | URISyntaxException | MalformedURLException e) {
 			throw new ServletException(e);
 		}
 	}
@@ -60,7 +78,7 @@ public class APIServlet extends HttpServlet {
 		}
 	}
 
-	private static ArrayList<String> readAllowedODHUserRoles(HttpServletRequest req)
+	private ArrayList<String> readAllowedODHUserRoles(HttpServletRequest req)
 			throws ParseException, MalformedURLException, URISyntaxException, BadJOSEException, JOSEException {
 
 		ArrayList<String> user_odh_roles = new ArrayList<String>();
@@ -70,34 +88,12 @@ public class APIServlet extends HttpServlet {
 		}
 		String token = authorizationHeader.substring("Bearer ".length()).trim();
 
-				SignedJWT signedJWT = SignedJWT.parse(token);
+		SignedJWT signedJWT = SignedJWT.parse(token);
 		State state = signedJWT.getState();
 
 		System.out.println("State: " + state.name());
 
-		JWKSource<SecurityContext> keySource = JWKSourceBuilder
-				.create(new URI("https://auth.opendatahub.com/auth/realms/noi/protocol/openid-connect/certs").toURL())
-				.retrying(true)
-				.build();
-
-		/*
-		 * JWSKeySelector<SecurityContext> keySelector =
-		 * new JWSAlgorithmFamilyJWSKeySelector<>(JWSAlgorithm.Family.RSA, keySource);
-		 */
-
-		JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(
-				JWSAlgorithm.RS256,
-				keySource);
-
-		ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
-		jwtProcessor.setJWSKeySelector(keySelector);
-
-		jwtProcessor.setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier<>());
-
-		// jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new
-		// JOSEObjectType("JWT")));
-
-		JWTClaimsSet claim = jwtProcessor.process(signedJWT, null);
+		JWTClaimsSet claim = this.jwtProcessor.process(signedJWT, null);
 
 		// claim.get
 
