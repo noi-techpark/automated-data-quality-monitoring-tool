@@ -8,8 +8,17 @@
     src: url('SourceSansPro-Regular.ttf');
 }
 
+:root {
+	--font-color: #212529;
+	--primary-color: #ffffff;
+	--secondary-color: #000000;
+	--tertiary-color: #f3f3f3;
+	--quaternary-color: #565e64;
+	--events-tertiary: #50742f;
+}
+
 html {
-	color: #555;
+	color: var(--font-color);
 	font-size: 16px;
 	font-family: SourceSansPro
 }
