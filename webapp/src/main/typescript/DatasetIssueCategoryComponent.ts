@@ -87,7 +87,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 														
 							.view_details {
 								/* background-color: var(--dark-background); */
-								background-color: rgb(71, 105, 41);
+								background-color: black;
 								color: #ddd;
 								text-align: center;
 								padding: 0.6rem;
@@ -95,7 +95,7 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 							}
 							
 							.view_details:hover {
-								background-color: rgb(35, 75, 20);
+								/* background-color: rgb(35, 75, 20); */
 							}
 
 							.lastupdate {
