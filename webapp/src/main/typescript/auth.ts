@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import Keycloak from 'keycloak-js';
+import { jwtDecode } from 'jwt-decode';
 
 // https://www.keycloak.org/securing-apps/javascript-adapter
 
@@ -18,4 +19,26 @@ export async function initAuth() {
         // avoid full reload of page with check-sso & spa
         silentCheckSsoRedirectUri: `${location.origin}/silent-check-sso.html`,
     });
+}
+
+function getDecodedToken(): any {
+    console.log('kc auth', kc);
+    const token = kc.token!;
+    console.log('token', token);
+    const decoded: any = jwtDecode(token);
+    return decoded;
+}
+
+export function getUsedKeyRole(): string {
+    if (!kc.authenticated) {
+        return 'opendata';
+    }
+    const decoded: any = getDecodedToken();
+    if (decoded.resource_access["odh-mobility-v2"].roles.includes("BDP_BLC")) {
+        return "blc";
+    } else if (decoded.resource_access["odh-mobility-v2"].roles.includes("BDP_IDM")) {
+        return "idm";
+    } else {
+        return 'opendata';
+    }
 }
