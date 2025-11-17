@@ -34,11 +34,16 @@ export function getUsedKeyRole(): string {
         return 'opendata';
     }
     const decoded: any = getDecodedToken();
-    if (decoded.resource_access["odh-mobility-v2"].roles.includes("BDP_BLC")) {
-        return "blc";
-    } else if (decoded.resource_access["odh-mobility-v2"].roles.includes("BDP_IDM")) {
-        return "idm";
-    } else {
-        return 'opendata';
+    const resourceAccess = decoded.resource_access ?? {};
+    for (const key in resourceAccess) {
+        const access = resourceAccess[key];
+        const roles = access.roles ?? [];
+        if (roles.includes("BDP_BLC")) {
+            return "blc";
+        }
+        if (roles.includes("IDM")) {
+            return "idm";
+        }
     }
+    return 'opendata';
 }

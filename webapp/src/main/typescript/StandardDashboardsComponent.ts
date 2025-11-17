@@ -67,6 +67,7 @@ export class StandardDashboardsComponent extends HTMLElement
 		this.boxContainer.appendChild(loader)
 		let used_key = 'opendata'
 		used_key = getUsedKeyRole();
+		console.log('used key role', used_key);
 		const json = await API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({used_key: used_key})
 		loader.remove();
 		console.log(json)
