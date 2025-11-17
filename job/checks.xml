@@ -124,10 +124,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 	<check>
 	
-		<name>Reference data type: NO2-ALPHASENSE_RAW, period: 60</name>
-		<category>measurement should be greater than 0</category>
+		<name>NO2-ALPHASENSE_RAW, period: 60</name>
+		<category>NO2-ALPHASENSE_RAW, period: 60</category>
 		<description>
-			Reference data type: NO2-ALPHASENSE_RAW, period: 60: measurement should be greater than 0
+			NO2-ALPHASENSE_RAW, period: 60: measurement should be greater than 0
 		</description>
 
 		<data_scope_filters>
@@ -155,10 +155,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 	<check>
 	
-		<name>Reference data type: NO2-ALPHASENSE_RAW, period: 3600</name>
-		<category>measurement should be greater than 0</category>
+		<name>NO2-ALPHASENSE_RAW, period: 3600</name>
+		<category>NO2-ALPHASENSE_RAW, period: 3600</category>
 		<description>
-			Reference data type: NO2-ALPHASENSE_RAW, period: 3600: measurement should be greater than 0
+			NO2-ALPHASENSE_RAW, period: 3600: measurement should be greater than 0
 		</description>
 
 		<data_scope_filters>
@@ -186,10 +186,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 	<check>
 	
-		<name>Reference data type: NO2-ALPHASENSE_PROCESSED, period: 3600</name>
-		<category>measurement should be greater than 0</category>
+		<name>NO2-ALPHASENSE_PROCESSED, period: 3600</name>
+		<category>NO2-ALPHASENSE_PROCESSED, period: 3600</category>
 		<description>
-			Reference data type: NO2-ALPHASENSE_PROCESSED, period: 3600: measurement should be greater than 0
+			NO2-ALPHASENSE_PROCESSED, period: 3600: measurement should be greater than 0
 		</description>
 
 		<data_scope_filters>
