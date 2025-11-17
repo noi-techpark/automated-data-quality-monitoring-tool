@@ -38,6 +38,7 @@ export class MainComponent extends HTMLElement
 					align-items: center;
 					width: 100%;
 					gap: 1rem;
+					margin-bottom: 1rem;
 				}
 				.header-center {
 					flex-grow: 1;

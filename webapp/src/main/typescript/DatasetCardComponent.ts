@@ -52,14 +52,13 @@ export class DatasetCardComponent extends HTMLElement
 				}
 				
 				.view_dashboard {
-					/* background-color: var(--dark-background); */
-					background-color: rgb(71, 105, 41);
+					background-color: var(--dark-background);
 					color: #ddd;
 					text-align: center;
 					padding: 0.6rem;
 				}
 				.view_dashboard:hover {
-					background-color: rgb(35, 75, 20);
+					/* background-color: rgb(35, 75, 20); */
 				}
 				
 				.wrapper {

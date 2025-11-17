@@ -124,10 +124,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 	<check>
 	
-		<name>Reference data type: NO2-ALPHASENSE_RAW, period: 60</name>
-		<category>measurement should be greater than 0</category>
+		<name>NO2-Alphasense_raw, period: 60</name>
+		<category>NO2-Alphasense_raw, period: 60</category>
 		<description>
-			Reference data type: NO2-ALPHASENSE_RAW, period: 60: measurement should be greater than 0
+			NO2-Alphasense_raw, period: 60: measurement should be greater than 0
 		</description>
 
 		<data_scope_filters>
@@ -136,7 +136,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<dataset_dataspace>environmental</dataset_dataspace>
 			<dataset_apitype>timeseries</dataset_apitype>
 
-			<apitype_timeseries_param_datatype>NO2-ALPHASENSE_RAW</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_datatype>NO2-Alphasense_raw</apitype_timeseries_param_datatype>
 			<apitype_timeseries_param_mperiod>60</apitype_timeseries_param_mperiod>
 			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
 			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
@@ -155,10 +155,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 	<check>
 	
-		<name>Reference data type: NO2-ALPHASENSE_RAW, period: 3600</name>
-		<category>measurement should be greater than 0</category>
+		<name>NO2-Alphasense_raw, period: 3600</name>
+		<category>NO2-Alphasense_raw, period: 3600</category>
 		<description>
-			Reference data type: NO2-ALPHASENSE_RAW, period: 3600: measurement should be greater than 0
+			NO2-Alphasense_raw, period: 3600: measurement should be greater than 0
 		</description>
 
 		<data_scope_filters>
@@ -167,7 +167,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<dataset_dataspace>environmental</dataset_dataspace>
 			<dataset_apitype>timeseries</dataset_apitype>
 
-			<apitype_timeseries_param_datatype>NO2-ALPHASENSE_RAW</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_datatype>NO2-Alphasense_raw</apitype_timeseries_param_datatype>
 			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
 			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
 			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
@@ -186,10 +186,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 	<check>
 	
-		<name>Reference data type: NO2-ALPHASENSE_PROCESSED, period: 3600</name>
-		<category>measurement should be greater than 0</category>
+		<name>NO2-Alphasense_processed, period: 3600</name>
+		<category>NO2-Alphasense_processed, period: 3600</category>
 		<description>
-			Reference data type: NO2-ALPHASENSE_PROCESSED, period: 3600: measurement should be greater than 0
+			NO2-Alphasense_processed, period: 3600: measurement should be greater than 0
 		</description>
 
 		<data_scope_filters>
@@ -198,7 +198,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<dataset_dataspace>environmental</dataset_dataspace>
 			<dataset_apitype>timeseries</dataset_apitype>
 
-			<apitype_timeseries_param_datatype>NO2-ALPHASENSE_PROCESSED</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_datatype>NO2-Alphasense_processed</apitype_timeseries_param_datatype>
 			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
 			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
 			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>

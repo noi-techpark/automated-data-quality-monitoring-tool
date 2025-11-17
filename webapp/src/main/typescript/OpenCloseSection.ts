@@ -58,12 +58,14 @@ export class OpenCloseSection extends HTMLElement
 					 */
 					
 					.nextpagebutton {
-															margin: auto;
-															display: block;
-															background-color: black;
-															color: white;
-														}
-														
+						margin: auto;
+						display: block;
+						background-color: var(--dark-background);
+						color: var(--primary-color);
+						padding: 8px 16px;
+						border-radius: 6px;
+						cursor: pointer;
+					}
 					
 				</style>
 				<div class="header">
