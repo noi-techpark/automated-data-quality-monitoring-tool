@@ -63,13 +63,13 @@ jobs:
               "CLIENT_ID": "odh-data-quality-job-blc",
               "REALM": "noi",
               "CLIENT_SECRET": "${{ secrets.JOB_CLIENT_SECRET_BLC }}",
-              "ASSOCIATED_ROLE": "blc"
+              "ASSOCIATED_ROLE": "BDP_BLC"
             },
             {
               "CLIENT_ID": "odh-data-quality-job-idm",
               "REALM": "noi",
               "CLIENT_SECRET": "${{ secrets.JOB_CLIENT_SECRET_IDM }}",
-              "ASSOCIATED_ROLE": "idm"
+              "ASSOCIATED_ROLE": "IDM"
             }
           ]
           EOF
