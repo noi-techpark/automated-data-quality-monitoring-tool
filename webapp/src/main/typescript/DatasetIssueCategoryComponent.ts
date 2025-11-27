@@ -49,7 +49,8 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 								margin-top: 0.4rem;
 								margin-bottom: 0.4rem;
 								line-height: 1rem;
-								height: 4rem;
+								height: 5rem;
+								padding: 1rem;
 							}
 							.frame {
 								display: flex
