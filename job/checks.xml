@@ -60,7 +60,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	<check>
 	
 		<name>NO2 - Ossidi di azoto | datatype: NO2 - Ossidi di azoto | mperiod: 3600 | hours: 24->0 | mvalue &gt; 0</name>
-		<category>NO2 - Ossidi di azoto | mperiod 3600 | hours 24->0</category>
+		<category>NO2 - Ossidi di azoto | datatype: NO2 - Ossidi di azoto | mperiod: 3600 | hours: 24->0 | rule: mvalue gt 0</category>
 		<description>
 			Timeseries for datatype "NO2 - Ossidi di azoto" sampled every 3600 seconds over the last 24 hours to now (24->0).
 			Passes when mvalue exists, is numeric, and is greater than 0.
@@ -93,7 +93,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	<check>
 	
 		<name>nitrogen-dioxide | datatype: nitrogen-dioxide | mperiod: 3600 | hours: 24->0 | rule: mvalue &gt; 10</name>
-		<category>nitrogen-dioxide | mperiod 3600 | hours 24->0</category>
+		<category>nitrogen-dioxide | datatype: nitrogen-dioxide | mperiod: 3600 | hours: 24->0 | rule: mvalue gt 10</category>
 		<description>
 			Timeseries for datatype "nitrogen-dioxide" sampled every 3600 seconds over the last 24 hours to now (24->0).
 			Passes when mvalue exists, is numeric, and is greater than 10.
@@ -127,7 +127,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	<check>
 	
 		<name>NO2-Alphasense_raw | datatype: NO2-Alphasense_raw | mperiod: 60 | hours: 24->0 | rule: mvalue &gt; 0</name>
-		<category>NO2-Alphasense_raw | mperiod 60 | hours 24->0</category>
+		<category>NO2-Alphasense_raw | datatype: NO2-Alphasense_raw | mperiod: 60 | hours: 24->0 | rule: mvalue gt 0</category>
 		<description>
 			Timeseries for datatype "NO2-Alphasense_raw" sampled every 60 seconds over the last 24 hours to now (24->0).
 			Passes when mvalue exists, is numeric, and is greater than 0.
@@ -159,7 +159,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	<check>
 	
 		<name>NO2-Alphasense_raw | datatype: NO2-Alphasense_raw | mperiod: 3600 | hours: 24->0 | rule: mvalue &gt; 0</name>
-		<category>NO2-Alphasense_raw | mperiod 3600 | hours 24->0</category>
+		<category>NO2-Alphasense_raw | datatype: NO2-Alphasense_raw | mperiod: 3600 | hours: 24->0 | rule: mvalue gt 0</category>
 		<description>
 			Timeseries for datatype "NO2-Alphasense_raw" sampled every 3600 seconds over the last 24 hours to now (24->0).
 			Passes when mvalue exists, is numeric, and is greater than 0.
@@ -191,7 +191,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 	<check>
 	
 		<name>NO2-Alphasense_processed | datatype: NO2-Alphasense_processed | mperiod: 3600 | hours: 24->0 | rule: mvalue &gt; 0</name>
-		<category>NO2-Alphasense_processed | mperiod 3600 | hours 24->0</category>
+		<category>NO2-Alphasense_processed | datatype: NO2-Alphasense_processed | mperiod: 3600 | hours: 24->0 | rule: mvalue gt 0</category>
 		<description>
 			Timeseries for datatype "NO2-Alphasense_processed" sampled every 3600 seconds over the last 24 hours to now (24->0).
 			Passes when mvalue exists, is numeric, and is greater than 0.
