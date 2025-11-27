@@ -7,7 +7,6 @@
 import { DatasetCardComponent } from './DatasetCardComponent.js';
 import { Loader } from './Loader.js';
 import { API3 } from './api/api3.js';
-import { getUsedKeyRole } from './auth.js';
 import { cs_cast } from './quality.js';
 
 export class StandardDashboardsComponent extends HTMLElement
@@ -65,8 +64,7 @@ export class StandardDashboardsComponent extends HTMLElement
 		this.boxContainer.textContent = ('');
 		const loader = new Loader();
 		this.boxContainer.appendChild(loader)
-		let used_key = 'opendata'
-		used_key = getUsedKeyRole();
+		let used_key = sessionStorage.getItem('used_key_role')!;
 		console.log('used key role', used_key);
 		const json = await API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({used_key: used_key})
 		loader.remove();

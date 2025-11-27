@@ -83,9 +83,16 @@ export class API3 {
 		return resp;
 	}
 	
-	
-
 	// end crudl methods
+
+	static async get_auth_user_roles(): Promise<string[]>
+	{
+		const resp = await API3.call('auth_user_roles', {})
+		return resp;
+	}
+
+
+
 }
 
 // begin interfaces

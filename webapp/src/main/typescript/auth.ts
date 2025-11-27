@@ -14,36 +14,16 @@ export const kc = new Keycloak({
 });
 
 export async function initAuth() {
+
+    const roleKey = 'used_key_role';
+    if (!sessionStorage.getItem(roleKey)) {
+        sessionStorage.setItem(roleKey, 'opendata');
+    }
+
     await kc.init({
         onLoad: 'check-sso',
         // avoid full reload of page with check-sso & spa
         silentCheckSsoRedirectUri: `${location.origin}/silent-check-sso.html`,
     });
-}
-
-function getDecodedToken(): any {
-    console.log('kc auth', kc);
-    const token = kc.token!;
-    console.log('token', token);
-    const decoded: any = jwtDecode(token);
-    return decoded;
-}
-
-export function getUsedKeyRole(): string {
-    if (!kc.authenticated) {
-        return 'opendata';
-    }
-    const decoded: any = getDecodedToken();
-    const resourceAccess = decoded.resource_access ?? {};
-    for (const key in resourceAccess) {
-        const access = resourceAccess[key];
-        const roles = access.roles ?? [];
-        if (roles.includes("BDP_BLC")) {
-            return "blc";
-        }
-        if (roles.includes("IDM")) {
-            return "idm";
-        }
-    }
-    return 'opendata';
+    
 }

@@ -17,6 +17,8 @@ export class AuthComponent extends HTMLElement {
 	user_button
 	user_menu
 
+	select_role
+
 	constructor() {
 		super();
 		this.sroot = this.attachShadow({ mode: 'open' });
@@ -87,6 +89,11 @@ export class AuthComponent extends HTMLElement {
 			</div>
 			<div class="authenticated display-none auth-container">
 				<button class="user-button">User ▼</button>
+				<select>
+					<option value="opendata">opendata</option>
+					<option value="idm">IDM</option>
+					<option value="blc">BPM_BLC</option>
+				</select>
 				<div class="user-menu">
 					<button class="logout-button">Logout</button>
 					<!-- Altre voci future -->
@@ -121,6 +128,14 @@ export class AuthComponent extends HTMLElement {
 			}
 		});
 
+		this.select_role = this.sroot.querySelector('select') as HTMLSelectElement;
+
+		this.select_role.onchange = (e) => {
+			const selected_role = (e.target as HTMLSelectElement).value;
+			sessionStorage.setItem('used_key_role', selected_role);
+			location.reload(); // ricarica la pagina per applicare il nuovo ruolo
+		};
+
 		this.refreshLoginState();
 	}
 
@@ -138,6 +153,7 @@ export class AuthComponent extends HTMLElement {
 			
 			this.div_unauthenticated.classList.add('display-none');
 			this.div_authenticated.classList.remove('display-none');
+			this.select_role.value = sessionStorage.getItem('used_key_role')!;
 		} else {
 			this.div_authenticated.classList.add('display-none');
 			this.div_unauthenticated.classList.remove('display-none');

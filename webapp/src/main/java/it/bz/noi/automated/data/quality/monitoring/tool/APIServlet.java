@@ -13,9 +13,17 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Base64;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSObject.State;
@@ -71,7 +79,7 @@ public class APIServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			resp.addHeader("Access-Control-Allow-Origin", "*");
-			// ArrayList<String> user_odh_roles = APIServlet.readAllowedODHUserRoles(req);
+			ArrayList<String> user_odh_roles = this.readAllowedODHUserRoles(req);
 			APIHelper.processRequest(req, resp);
 		} catch (Exception exxx) {
 			throw new ServletException(exxx);
@@ -79,37 +87,38 @@ public class APIServlet extends HttpServlet {
 	}
 
 	private ArrayList<String> readAllowedODHUserRoles(HttpServletRequest req)
-			throws ParseException, MalformedURLException, URISyntaxException, BadJOSEException, JOSEException {
-
-		ArrayList<String> user_odh_roles = new ArrayList<String>();
+			throws ParseException, MalformedURLException, URISyntaxException, BadJOSEException, JOSEException, JsonMappingException, JsonProcessingException {
+			ArrayList<String> user_odh_roles = new ArrayList<String>();
 		String authorizationHeader = req.getHeader("Authorization");
 		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
 			return user_odh_roles;
 		}
 		String token = authorizationHeader.substring("Bearer ".length()).trim();
-
+	
 		SignedJWT signedJWT = SignedJWT.parse(token);
 		State state = signedJWT.getState();
 
-		System.out.println("State: " + state.name());
-
+		// validate token and some basic default checks on claims
 		JWTClaimsSet claim = this.jwtProcessor.process(signedJWT, null);
 
-		// claim.get
+		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectNode claimsJson = objectMapper.readValue(claim.toString(), ObjectNode.class);
 
-		// Header
-		System.out.println("Header: " + signedJWT.getHeader());
+		// Object resource_access = claim.getClaim("resource_access");
+		ObjectNode resource_access = (ObjectNode) claimsJson.get("resource_access");
 
-		// Payload
-		System.out.println("Payload: " + signedJWT.getPayload());
+		resource_access.fields().forEachRemaining(entry -> {
+			System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+			JsonNode value = entry.getValue();
+			if (value instanceof ObjectNode) {
+				ArrayNode roles = (ArrayNode) value.get("roles");
+				for (int r = 0; r < roles.size(); r++) {
+					String role = roles.get(r).asText();
+					user_odh_roles.add(role);
+				}
+			}
+		});
 
-		// Claims
-		System.out.println("Claims: " + signedJWT.getJWTClaimsSet());
-
-		// RSASSAVerifier verifier = new RSASSAVerifier(publicKey);
-
-		// boolean valid = token..verify(verifier);
-
-		return new ArrayList<String>();
+		return user_odh_roles;
 	}
 }
