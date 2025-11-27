@@ -45,7 +45,7 @@ public class APIHelper
 
 	private static final String YYYY_MM_DD_T_HH_MM_SS_XXX = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
-	public static void processRequest(HttpServletRequest req, HttpServletResponse resp) throws SQLException, IOException, ParseException
+	public static void processRequest(HttpServletRequest req, HttpServletResponse resp, ArrayList<String> user_odh_roles) throws SQLException, IOException, ParseException
 	{
 		ObjectMapper om = new ObjectMapper();
 
@@ -88,7 +88,7 @@ public class APIHelper
 				break;
 			case "catchsolve_noiodh.catchsolve_noiodh__test_dataset_max_ts_vw":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__test_dataset_maxts_vw(filterJson);
+				list = list__catchsolve_noiodh__test_dataset_maxts_vw(filterJson, user_odh_roles);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw":
@@ -195,7 +195,7 @@ public class APIHelper
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_maxts_vw(ObjectNode filter) throws SQLException
+	private static ArrayNode list__catchsolve_noiodh__test_dataset_maxts_vw(ObjectNode filter, ArrayList<String> user_odh_roles) throws SQLException
 	{
 		String sql = """
 				select *
@@ -204,8 +204,16 @@ public class APIHelper
 				 order by dataset_name
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("used_key")).textValue());
+		String textValue = ((TextNode)filter.get("used_key")).textValue();
+		checkUserAllowed(user_odh_roles, textValue);
+		wherevalues.add(textValue);
 		return execute_query(sql, wherevalues);
+	}
+
+	private static void checkUserAllowed(ArrayList<String> user_odh_roles, String used_key) throws SQLException
+	{
+		if (!user_odh_roles.contains(used_key + "x"))
+			throw new SQLException("User not allowed to access dataset using role: " + used_key + ", he has roles: " + String.join(", ", user_odh_roles));
 	}
 
 	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(ObjectNode filter) throws ParseException, SQLException

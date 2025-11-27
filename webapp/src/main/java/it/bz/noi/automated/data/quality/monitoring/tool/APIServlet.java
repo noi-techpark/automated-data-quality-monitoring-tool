@@ -80,7 +80,7 @@ public class APIServlet extends HttpServlet {
 		try {
 			resp.addHeader("Access-Control-Allow-Origin", "*");
 			ArrayList<String> user_odh_roles = this.readAllowedODHUserRoles(req);
-			APIHelper.processRequest(req, resp);
+			APIHelper.processRequest(req, resp, user_odh_roles);
 		} catch (Exception exxx) {
 			throw new ServletException(exxx);
 		}
