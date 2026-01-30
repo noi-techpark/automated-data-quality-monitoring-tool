@@ -25,24 +25,8 @@ html {
 	font-family: SourceSansPro
 }
 
-.MainComponent .logo {
-	height: 2rem;
-}
-
-.MainComponent .body {
-	display: flex;
-	border-top: 1px solid #ccc;
-}
-
-.MainComponent .projects {
-	flex-grow: 100;
-	border-left: 1px solid #ccc;
-	margin-left: 1rem;
-	padding: 1rem;
-}
-
-.MainComponent cs-menu-element {
-	margin-top: 1rem;
+body {
+	margin: 0px;
 }
 
 .ProjectsElement {
@@ -118,4 +102,9 @@ html {
 
 .display-none {
 	display: none;
+}
+
+cs-main-component {
+	height:100vh;
+	overflow: hidden;
 }

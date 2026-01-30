@@ -2,13 +2,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-
+import { CommonWebComponent } from "./CommonWebComponent.js";
 import { LabelAndData } from "./LabelAndData.js"
 import { API3, catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__row } from "./api/api3.js"
 import { cs_cast } from "./quality.js"
+import template from './DatasetIssueCategoryComponent.html?raw'
 
 
-export class DatasetIssueCategoryComponent extends HTMLElement
+export class DatasetIssueCategoryComponent extends CommonWebComponent
 {
 	
 	template
@@ -25,121 +26,10 @@ export class DatasetIssueCategoryComponent extends HTMLElement
 	}
 	
 	constructor() {
-		super()
+		super(template);
 		this.connected_promise = new Promise(s => this.connected_func = s)
-		const sroot = this.attachShadow({ mode: 'open' })
-		sroot.innerHTML = `
-						<style>
-							:host {
-								display: inline-block;
-								box-shadow: 4px 4px #ccc;
-							}
-							.category {
-								border: 1px solid gray;
-								width: 12rem;
-								display: inline-block;
-								/* margin: 1rem; */
-							}
-							.category > img {
-								width: 100%;
-							}
-							.category .category_name {
-								font-weight: bold;
-								text-align: center;
-								margin-top: 0.4rem;
-								margin-bottom: 0.4rem;
-								line-height: 1rem;
-								height: 5rem;
-								padding: 1rem;
-							}
-							.frame {
-								display: flex
-							}
-							.frame .content {
-								flex-grow: 100;
-								display: flex;
-							}
-							.chartdiv {
-								width:  100px;
-								height: 100px;
-								margin: auto;
-								position: relative;
-								margin-top: 0.4rem;
-							}
-							
-							.chartdiv .perc {
-								position: absolute;
-								top:  calc(50% - 0.8rem);
-								left: calc(50% - 1.6rem);
-								font-size: 1.5rem;
-								font-weight: bold;
-								color: #000;
-							}
-							
-							details {
-								margin-top: 0.4rem;
-								margin-bottom: 0.4rem;
-							}
-							
-							details > * {
-								padding: 0.5em;
-								border-bottom: 1px solid #ccc;
-							}
-														
-							.view_details {
-								/* background-color: var(--dark-background); */
-								background-color: black;
-								color: #ddd;
-								text-align: center;
-								padding: 0.6rem;
-								cursor: pointer;
-							}
-							
-							.view_details:hover {
-								/* background-color: rgb(35, 75, 20); */
-							}
-
-							.lastupdate {
-								margin-top: 0.4rem;
-								font-size: 0.7rem;
-								margin-bottom: 0.4rem;
-								margin-left: 0.4rem;
-								margin-right: 0.4rem;
-							}
-							
-							.nr_records, details, .checked_nr_records {
-								margin-left: 0.4rem;
-								margin-right: 0.4rem;
-							}
-
-						</style>
-						<div class="category">
-							<!-- <img src="kpi-pie-chart.png"> -->
-							<div class="chartdiv">
-								<div class="perc">12%</div>
-								<canvas class="chart"></canvas>
-							</div>
-							<div class="category_name">Completeness</div>
-							<span></span>
-							<cs-label-and-data label="checked recs" class="checked_nr_records"></cs-label-and-data>
-							<cs-label-and-data label="quality-assured recs" class="nr_records"></cs-label-and-data>
-							<div class="lastupdate">
-								<span class="data"></span>
-								<span></span>
-							</div>
-							<!-- <div class="nr_records">123</div> -->
-							<div class="more">
-								<details>
-									<summary>carried out tests</summary>
-								</details>
-								<div class="view_details">View details</div>
-							</div>
-						</div>
-						`;
-
-		customElements.upgrade(sroot);
-		this.template = cs_cast(HTMLElement, sroot.querySelector('.category'));
-		this.more_div = cs_cast(HTMLElement, sroot.querySelector('.more'));
+		this.template = cs_cast(HTMLElement, this.sroot.querySelector('.category'));
+		this.more_div = cs_cast(HTMLElement, this.sroot.querySelector('.more'));
 	}
 	
 	hideMoreDiv()  {

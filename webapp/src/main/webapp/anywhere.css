@@ -1,0 +1,156 @@
+/*
+ * SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/*
+
+*[data-component-name] {
+    position: relative;
+    xdisplay: block;
+    padding: 6px;
+    border: 6px solid #aaa;
+}
+
+*[data-component-name]::after {
+  content: attr(data-component-name);
+  position: absolute;
+  top: -0.7em;
+  left: 0.3em;
+  background: white;
+  padding: 0 4px;
+  font-size: 0.7em;
+  z-index: 100;
+}
+
+
+
+*/
+
+input {
+  padding: 4px;
+  height: 1.3em;
+}
+
+xdiv {
+  padding: 6px;
+  border: 1px solid #ccc;
+}
+
+
+select {
+  border-radius: 6px;
+  border: 1px solid gray;
+  padding: 2px 6px;
+}
+
+/*
+div:not(:has(> :not(div):not([data-component-name]))) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+*/
+
+/*
+
+:where(div):where(:not(:has(> :where(:not(div)):where(:not([data-component-name]))))) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+:where(*[data-component-name]):where(:not(:has(> :where(:not(div)):where(:not([data-component-name]))))) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+*/
+
+/*
+*[data-component-name]:not(:has(> :not(div):not([data-component-name]))) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+*/
+
+
+
+
+/*
+
+div {
+  xdisplay: flex;
+  xflex-direction: column;
+  xgap: 6px;
+  xmargin-bottom: 6px;
+  padding: 6px;
+  border: 1px solid #ccc;
+}
+
+div:not(:last-child) {
+  margin-bottom: 6px;
+}
+*/
+
+/* minimal tailwind like rules to use when una tantum layout rule */
+
+[data-isvisible="false"] {
+  display: none !important;
+}
+
+.display-none
+{
+  display: none !important;
+}
+
+button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+button {
+  background-color: black;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #333;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.gap-medium {
+  gap: 10px;
+}
+
+.flex-align-items-center {
+  align-items: center;
+}
+
+.padding-medium  {
+  padding: 10px;
+}

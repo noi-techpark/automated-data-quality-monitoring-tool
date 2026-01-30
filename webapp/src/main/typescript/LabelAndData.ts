@@ -2,83 +2,67 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { CommonWebComponent } from "./CommonWebComponent.js";
+import { cs_cast } from "./quality.js";
+import template from './LabelAndData.html?raw'
 
-import { cs_cast, throwNPE } from "./quality.js";
-
-export class LabelAndData extends HTMLElement
+export class LabelAndData extends CommonWebComponent
 {
 	label
-	data 
+	data
+	
+	private state: {
+		labelValue: string
+		dataValue: string
+		qualityLevel: undefined | "good" | "warn" | "fail"
+	}
 	
 	constructor()
 	{
-		super();
-		const sroot = this.attachShadow({mode: 'open'});
-		sroot.innerHTML = `
-		<style>
-			:host {
-				display: flex;
-				border-top: 1px solid #ccc;
-				padding-top: 0.3rem;
-				padding-bottom: 0.3rem;
-				align-items: center;
-			}
-			span {
-				font-size: 0.7rem;
-			}
-			span.label {
-				flex-grow: 1;
-				margin-right: 0.3rem;
-				padding: 0.2rem
-			}
-			span.data {
-				padding: 0.2rem;
-				border-radius: 0.3rem;
-				margin-right: 0.3rem;
-				background-color: var(--dark-background);
-				color: #ddd;
-				min-width: 2rem;
-				text-align: right;
-			}
-			:host(.fail) span.label {
-				background-color: #faa;
-				color: #400;
-				font-weight: bold;
-			}
-			:host(.good) span.label {
-				background-color: #afa;
-				color: #040;
-				font-weight: bold;
-			}
-			:host(.warn) span.label {
-				background-color: #ffa;
-				color: #440;
-				font-weight: bold;
-			}
-		</style>
-		<span class="data">.</span>
-		<span class="label"></span>
-		`
+		super(template)
 		
-		this.label = cs_cast(HTMLSpanElement, sroot.querySelector('.label'))
-		this.setLabel(this.getAttribute('label') !== null ? this.getAttribute('label')! : 'label')
-		this.data  = cs_cast(HTMLSpanElement, sroot.querySelector('.data'))
+		this.label = cs_cast(HTMLSpanElement, this.sroot.querySelector('.label'))
+		this.data  = cs_cast(HTMLSpanElement, this.sroot.querySelector('.data'))
+		this.state = {
+			labelValue: this.getAttribute('label') !== null ? this.getAttribute('label')! : 'label',
+			dataValue: this.data.textContent ?? '',
+			qualityLevel: undefined,
+		}
+		this.#resync_derived_resources()
 		
 	}
 	
 	setLabel(s: string)
 	{
-		this.label.textContent = s
+		if (this.state.labelValue === s)
+			return
+		this.state.labelValue = s
+		this.#resync_derived_resources()
 	}
 
 	setData(s: string)
 	{
-		this.data.textContent = s
+		if (this.state.dataValue === s)
+			return
+		this.state.dataValue = s
+		this.#resync_derived_resources()
 	}
 	
 	setQualityLevel(severity: "good" | "warn" | "fail")
 	{
-		this.classList.add(severity)
+		if (this.state.qualityLevel === severity)
+			return
+		this.state.qualityLevel = severity
+		this.#resync_derived_resources()
+	}
+
+	#resync_derived_resources(): void
+	{
+		this.label.textContent = this.state.labelValue
+		this.data.textContent = this.state.dataValue
+		this.classList.remove("good", "warn", "fail")
+		if (this.state.qualityLevel !== undefined)
+			this.classList.add(this.state.qualityLevel)
 	}
 	
 }

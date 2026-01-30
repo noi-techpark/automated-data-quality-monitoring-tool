@@ -1,0 +1,66 @@
+<!--
+  SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<style>
+    @import url("all-webcomponent.css");
+
+	@import url("anywhere.css");
+	:host {
+		display: block;
+	}
+	.header {
+		display: flex;
+		align-items: center;
+	}
+	.label {
+		flex-grow: 1;
+		cursor: pointer;
+		padding: 0.4rem;
+		user-select: none;
+	}
+	.openclose {
+		cursor: pointer;
+		padding: 0.4rem;
+		user-select: none;
+	}
+	.openclose::before {
+		content: "";
+		display: inline-block;
+		width: 0.8rem;
+		height: 0.8rem;
+		background-color: currentColor;
+		-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+		transform: rotate(180deg);
+	}
+	.openclose.close::before {
+		transform: rotate(0deg);
+	}
+	.content {
+		overflow: hidden;
+		transition: transform 1s;
+		transform-origin: top;
+	}
+	
+	/*
+	span.label::before {
+	  content: "";
+	  display: inline-block;
+	  width: 8px;
+	  height: 8px;
+	  background-color: red;
+	  border-radius: 50%;
+	  margin-right: 5px;
+	}
+	 */
+	
+</style>
+<div class="header">
+<span class="label">title</span>
+<span class="actions">actions</span>
+<span class="openclose"></span>
+</div>
+<div class="content"></div>

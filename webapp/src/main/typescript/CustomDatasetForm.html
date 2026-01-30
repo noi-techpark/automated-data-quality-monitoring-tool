@@ -1,0 +1,307 @@
+<!--
+  SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<style>
+    @import url("anywhere.css");
+    @import url("all-webcomponent.css");
+
+    :host {
+        display: block;
+        padding: 24px;
+        color: #141414;
+        background: transparent;
+        font-family: "IBM Plex Sans", "Trebuchet MS", "Verdana", sans-serif;
+        height: 100%;
+        overflow: scroll;
+    }
+
+    .checks.isnotvalid {
+        border: 1px solid red;
+    }
+
+    .form-is-valid {
+        color: #b91c1c;
+        font-size: 0.9rem;
+    }
+
+    .form-shell {
+        max-width: 980px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .form-header {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        padding: 12px 4px;
+        border-bottom: 3px solid #111111;
+    }
+
+    .form-progress {
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+
+    .form-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .section {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        padding: 16px;
+    }
+
+    .section-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #111111;
+        margin-bottom: 12px;
+    }
+
+    .section-title .step {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+        text-align: center;
+        border-radius: 50%;
+        background: #111111;
+        color: #ffffff;
+        font-size: 0.8rem;
+        margin-right: 8px;
+    }
+
+    .section-body {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 170px 1fr;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #111111;
+    }
+
+    .row-inline {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    cs-auto-complete,
+    .dashboard-name {
+        width: 100%;
+    }
+
+    .dashboard-name {
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 0;
+        background: #ffffff;
+        font-size: 0.95rem;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 0;
+        border: 1px solid #111111;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+    }
+
+    .checks-section .checks {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .checks-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .checks-footer {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .no-field-names {
+        color: #6b7280;
+        font-size: 0.85rem;
+    }
+
+    button.add-check,
+    button.save-dashboard {
+        border: none;
+        background: #111111;
+        color: #ffffff;
+        border-radius: 0;
+        padding: 10px 16px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+    }
+
+    button.save-dashboard.primary-action {
+        width: 100%;
+        padding: 14px 18px;
+        font-size: 1rem;
+    }
+
+    .footer {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    [data-isvisible="false"] {
+        display: none;
+    }
+
+    @media (max-width: 720px) {
+        :host {
+            padding: 16px;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .row-inline {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+
+</style>
+    <div class="pleasewait">
+        <div class="pleasewait-box">
+            <div class="pleasewait-message">elaboration in progress</div>
+            <button class="pleasewait-ok" type="button">ok</button>
+        </div>
+    </div>
+    <button class="testing" style="display: none">test #1</button>
+    <div class="form-shell">
+        <div class="form-header">
+            <div class="form-title">Dataset settings</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="step">1.</span> Dashboard name</div>
+            <div class="section-body">
+                <div class="form-row">
+                    <span class="form-label">Name</span>
+                    <input class="dashboard-name" type="text" data-testid="input-dashboard-name">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="step">2.</span> Data provider</div>
+            <div class="section-body">
+                <div class="form-row">
+                    <span class="form-label">Data provider</span>
+                    <cs-auto-complete
+                        class="dataproviders"
+                        data-testid="select-dataprovides"
+                    ></cs-auto-complete>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="step">3.</span> Dataset</div>
+            <div class="section-body">
+                <div class="form-row">
+                    <span class="form-label">Dataset</span>
+                    <div class="row-inline">
+                        <cs-auto-complete
+                            class="datasets"
+                            data-testid="select-datasets"
+                        ></cs-auto-complete>
+                        <span class="dataset-type pill"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="step">4.</span> Timeseries</div>
+            <div class="section-body">
+                <div class="form-row timeseries-na-row">
+                    <span class="form-label">Timeseries</span>
+                    <span class="timeseries-na">N/A</span>
+                </div>
+                <div class="form-row timeseries-active-row">
+                    <span class="form-label">Status</span>
+                    <cs-auto-complete
+                        class="timeseries-active-status"
+                    ></cs-auto-complete>
+                </div>
+                <div class="form-row timeseries_div">
+                    <span class="form-label">Datatype</span>
+                    <cs-auto-complete
+                        class="timeseries-datatype"
+                        data-testid="select-datatype"
+                    ></cs-auto-complete>
+                </div>
+                <div class="form-row period_div">
+                    <span class="form-label">Period</span>
+                    <cs-auto-complete
+                        class="timeseries-mperiod"
+                    ></cs-auto-complete>
+                </div>
+            </div>
+        </div>
+
+        <div class="section checks-section">
+            <div class="section-title"><span class="step">5.</span> Checks</div>
+            <div class="section-body">
+                <div class="checks-toolbar">
+                    <span class="no-field-names">no metadata found for this dataset</span>
+                </div>
+                <div class="checks flex-col gap-medium"></div>
+                <div class="checks-footer">
+                    <button class="add-check">Add check</button>
+                </div>
+            </div>
+        </div>
+
+            <span class="form-is-valid">?</span>
+            <button class="save-dashboard primary-action">save dashboard</button>
+    </div>
+    <!--
+    <img src="new-dataset.png">
+    -->

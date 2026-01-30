@@ -1,0 +1,143 @@
+<!--
+  SPDX-FileCopyrightText: 2025 Catch Solve di Davide Montesin
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<style>
+    @import url("anywhere.css");
+    @import url("all-webcomponent.css");
+
+	:host {
+		position: relative;
+		border: 1px solid #ccc;
+		margin: 0.5rem;
+		border-radius: 4px;
+		cursor: pointer;
+		width: 13rem;
+		box-shadow: 4px 4px #ccc;
+	}
+	.menu {
+		position: absolute;
+		top: 0.35rem;
+		right: 0.35rem;
+		z-index: 3;
+	}
+	.menu-button {
+		border: 1px solid #000;
+		background: #000;
+		border-radius: 6px;
+		padding: 0.1rem 0.4rem;
+		font-weight: 700;
+		color: #fff;
+		cursor: pointer;
+		z-index: 10;
+	}
+	.menu-button:hover {
+		background: #222;
+	}
+	.menu-list {
+		position: absolute;
+		top: 1.7rem;
+		right: 0;
+		min-width: 7rem;
+		background: #000;
+		border: 1px solid #000;
+		border-radius: 6px;
+		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+		display: none;
+		z-index: 4;
+	}
+	.menu.open .menu-list {
+		display: block;
+	}
+	.menu-item {
+		padding: 0.4rem 0.6rem;
+		cursor: pointer;
+		white-space: nowrap;
+		color: #fff;
+	}
+	.menu-item:hover {
+		background: #222;
+	}
+	.menu-item.delete {
+		color: #fca5a5;
+	}
+	.title {
+		font-weight: bold;
+		margin-top: .7rem;
+		margin-bottom: 0.3rem;
+		text-align: center;
+		overflow: hidden;
+		height: 2rem;
+		line-height: 1rem;
+	}
+	
+	/*
+	:host(:hover) .title {
+		text-decoration: underline;
+	}
+	 */
+	
+	.ts {
+		font-size: 0.7rem
+	}
+
+	.buttons {
+		background-color: var(--dark-background);
+		color: #ddd;
+
+	}
+	
+	.view_dashboard {
+		/* text-align: center;
+		padding: 0.6rem; */
+	}
+	.view_dashboard:hover {
+		/* background-color: rgb(35, 75, 20); */
+	}
+	
+	.wrapper {
+		padding: 1rem;
+	}
+
+	.lastupdate {
+		margin-top: 0.4rem;
+		font-size: 0.7rem;
+	}
+	
+	img {
+		height: 100px;
+		width: 100%;
+		object-fit: contain;
+		margin-bottom: 0.5rem;
+	}
+
+	div[data-length="0"] {
+		background-color: #aaa;
+		opacity: 0.5;
+	}
+
+</style>
+<div class="menu display-none">
+	<button class="menu-button" type="button">...</button>
+	<div class="menu-list">
+		<div class="menu-item edit">Edit</div>
+		<div class="menu-item delete">Remove</div>
+	</div>
+</div>
+<div class="wrapper">
+	<div class="title">XXX</div>
+	<img class="img">
+	<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
+	<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
+	<cs-label-and-data class="totissues" xstyle="display: none">total issues</cs-label-and-data>
+	<div class="lastupdate">
+		🕑 <span class="data"></span>
+		<span></span>
+	</div>
+</div>
+<div class="buttons flex-row gap-medium ">
+	<div class="view_dashboard flex-grow padding-medium">View dashboard</div>
+	<div class="edit display-none padding-medium">✎</div>
+</div>

@@ -2,10 +2,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-
+import { CommonWebComponent } from "./CommonWebComponent.js";
 import { cs_cast, throwNPE } from "./quality.js";
+import template from './OpenCloseSection.html?raw'
 
-export class OpenCloseSection extends HTMLElement
+export class OpenCloseSection extends CommonWebComponent
 {
 	
 	content
@@ -17,70 +18,12 @@ export class OpenCloseSection extends HTMLElement
 	onopen = () => {}
 	
 	constructor() {
-		super()
-		const sroot = this.attachShadow({ mode: 'open' })
-		sroot.innerHTML = `
-				<style>
-					:host {
-						display: block;
-					}
-					.header {
-						display: flex;
-						align-items: center;
-					}
-					.label {
-						flex-grow: 1;
-						cursor: pointer;
-						padding: 0.4rem;
-						user-select: none;
-					}
-					.openclose {
-						cursor: pointer;
-						padding: 0.4rem;
-						user-select: none;
-					}
-					.content {
-						overflow: hidden;
-						transition: transform 1s;
-						transform-origin: top;
-					}
-					
-					/*
-					span.label::before {
-					  content: "";
-					  display: inline-block;
-					  width: 8px;
-					  height: 8px;
-					  background-color: red;
-					  border-radius: 50%;
-					  margin-right: 5px;
-					}
-					 */
-					
-					.nextpagebutton {
-						margin: auto;
-						display: block;
-						background-color: var(--dark-background);
-						color: var(--primary-color);
-						padding: 8px 16px;
-						border-radius: 6px;
-						cursor: pointer;
-					}
-					
-				</style>
-				<div class="header">
-				<span class="label">title</span>
-				<span class="actions">actions</span>
-				<span class="openclose"></span>
-				</div>
-				<div class="content"></div>
-				`
+		super(template)
 
-		customElements.upgrade(sroot)
-		this.label = cs_cast(HTMLSpanElement, sroot.querySelector('.label'))
-		this.actions = cs_cast(HTMLSpanElement, sroot.querySelector('.actions'))
-		this.content = cs_cast(HTMLDivElement, sroot.querySelector('.content'))
-		this.openclose = cs_cast(HTMLSpanElement, sroot.querySelector('.openclose'))
+		this.label = cs_cast(HTMLSpanElement, this.sroot.querySelector('.label'))
+		this.actions = cs_cast(HTMLSpanElement, this.sroot.querySelector('.actions'))
+		this.content = cs_cast(HTMLDivElement, this.sroot.querySelector('.content'))
+		this.openclose = cs_cast(HTMLSpanElement, this.sroot.querySelector('.openclose'))
 		this.openclose.onclick = () => {
 			this.toggle();
 		}
@@ -92,7 +35,7 @@ export class OpenCloseSection extends HTMLElement
 	{
 		this.open = !this.open
 		this.content.style.height     = !this.open ? '0rem' : 'auto'
-		this.openclose.textContent    = !this.open ? '▼' : '▲'
+		this.openclose.classList.toggle('close', !this.open)
 		if (this.open)
 		{
 			this.content.textContent = '' // svuola la sezione

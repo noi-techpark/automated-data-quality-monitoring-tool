@@ -12,16 +12,14 @@ export class API3 {
 		const params = new URLSearchParams();
 		params.append('action', action);
 		params.append('filter_byexample', JSON.stringify(json));
+		const current_role = sessionStorage.getItem('used_key_role');
+		params.append('current_role', current_role!);
 
 		const access_token = kc.token;
 		const headers: HeadersInit = access_token ? { Authorization: `Bearer ${access_token}` } : {};
 
-		// https://www.catch-solve.tech/noi-odh-testing-tool/api?
-		// http://localhost:8080/api?
 		const resp = await fetch('api?' + params.toString(), { headers });
 		const respjson = await resp.json();
-		// wait for debug pourpose
-		// await new Promise((s) =>  { setTimeout(s, 1000)})
 		return respjson;
 	}
 
@@ -33,6 +31,21 @@ export class API3 {
 	{
 		const resp = await API3.call('catchsolve_noiodh.catchsolve_noiodh__test_dataset_max_ts_vw', filter)
 		return resp;
+	}
+
+	static async list__catchsolve_noiodh__custom_dashboards
+	(filter: catchsolve_noiodh__custom_dashboards__byexample):
+	 Promise<catchsolve_noiodh__custom_dashboards__row[]>
+	{
+		const resp = await API3.call('catchsolve_noiodh.custom_dashboards', filter)
+		return resp;
+	}
+
+	static async get__catchsolve_noiodh__custom_dashboards_next_id():
+	 Promise<number>
+	{
+		const resp = await API3.call('catchsolve_noiodh.custom_dashboards_next_id', {})
+		return resp[0]?.id ?? NaN;
 	}
 	
 	static async list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw
@@ -87,7 +100,7 @@ export class API3 {
 
 	static async get_auth_user_roles(): Promise<string[]>
 	{
-		const resp = await API3.call('auth_user_roles', {})
+		const resp = await API3.call('auth_roles', {})
 		return resp;
 	}
 
@@ -159,6 +172,18 @@ export interface catchsolve_noiodh__test_dataset_max_ts_vw__row {
 	failed_records: number
 	session_start_ts: string
 	tested_records: number
+}
+
+export interface catchsolve_noiodh__custom_dashboards__row {
+	id: number
+	name: string
+	test_definition_json: string
+	user_id: string
+	user_role: string
+}
+
+export interface catchsolve_noiodh__custom_dashboards_next_id__row {
+	id: number
 }
 
 export interface catchsolve_noiodh__test_dataset_record_check_failed__row {
@@ -238,6 +263,14 @@ export interface catchsolve_noiodh__test_dataset_max_ts_vw__byexample {
 	session_start_ts?: string
 	tested_records?: number
 	used_key?: string
+}
+
+export interface catchsolve_noiodh__custom_dashboards__byexample {
+	id?: number
+	name?: string
+	test_definition_json?: string
+	user_id?: string
+	user_role?: string
 }
 
 export interface catchsolve_noiodh__test_dataset_record_check_failed__byexample {

@@ -1,0 +1,61 @@
+<!--
+  SPDX-FileCopyrightText: 2025 Catch Solve di Davide Montesin
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<link rel="stylesheet" href="index.css">
+<style>
+    @import url("all-webcomponent.css");
+
+	@import url("anywhere.css");
+	:host {
+		position: relative;
+		display: inline-block;
+		font-family: sans-serif;
+	}
+	.display-none {
+		display: none;
+	}
+	.auth-container {
+		position: relative;
+	}
+	.user-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+	.openclose-icon {
+		display: inline-block;
+		width: 0.8rem;
+		height: 0.8rem;
+		background-color: currentColor;
+		-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+	}
+	.user-menu {
+		position: absolute;
+		top: 100%;
+		right: 0;
+		background: white;
+		border: 1px solid #ccc;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+		display: none;
+		min-width: 120px;
+		z-index: 10;
+	}
+	.user-menu.show {
+		display: block;
+	}
+</style>
+<div class="unauthenticated display-none">
+	<button>Login</button>
+</div>
+<div class="authenticated display-none auth-container">
+	<button class="user-button"><span class="user-label">User</span><span class="openclose-icon"></span></button>
+	<select></select>
+	<div class="user-menu">
+		<button class="logout-button">Logout</button>
+		<!-- Altre voci future -->
+	</div>
+</div>

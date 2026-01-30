@@ -1,0 +1,76 @@
+<!--
+  SPDX-FileCopyrightText: 2025 Catch Solve di Davide Montesin
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<style>
+    @import url("anywhere.css");
+    @import url("all-webcomponent.css");
+
+    :host {
+        display: block;
+        font-family: "IBM Plex Sans", "Trebuchet MS", "Verdana", sans-serif;
+    }
+
+    .maindiv {
+        padding: 10px 12px;
+        border-radius: 0;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .field-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .compare-value {
+        padding: 8px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 0;
+        font-size: 0.95rem;
+    }
+
+    .delete {
+        border: none;
+        background: #111111;
+        color: #ffffff;
+        width: 36px;
+        height: 36px;
+        border-radius: 0;
+        cursor: pointer;
+    }
+
+    @media (max-width: 720px) {
+        .maindiv {
+            grid-template-columns: 1fr;
+        }
+
+        .delete {
+            justify-self: end;
+        }
+    }
+
+</style>
+<div class="flex-row gap-medium maindiv">
+
+    <cs-auto-complete class="field-name flex-grow" data-testid="input-field-name"></cs-auto-complete>
+
+    <div class="field-meta" style="display: none">
+        <div class="field-name-type"></div>
+        <div class="field-name-is-array"></div>
+    </div>
+
+    <cs-auto-complete class="operation flex-grow" data-testid="input-operation"></cs-auto-complete>
+
+    <input class="compare-value flex-grow" data-testid="input-compare-value">
+
+    <button class="delete">🗑</button>
+</div>

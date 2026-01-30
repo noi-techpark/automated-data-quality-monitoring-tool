@@ -14,19 +14,21 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSObject.State;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.jwk.source.JWKSourceBuilder;
 import com.nimbusds.jose.proc.BadJOSEException;
@@ -79,46 +81,161 @@ public class APIServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			resp.addHeader("Access-Control-Allow-Origin", "*");
-			ArrayList<String> user_odh_roles = this.readAllowedODHUserRoles(req);
-			APIHelper.processRequest(req, resp, user_odh_roles);
+			UserAuthInfo userAuth = this.readAllowedODHUserRoles(req);
+			APIHelper.processRequest(req, resp, userAuth);
 		} catch (Exception exxx) {
 			throw new ServletException(exxx);
 		}
 	}
 
-	private ArrayList<String> readAllowedODHUserRoles(HttpServletRequest req)
-			throws ParseException, MalformedURLException, URISyntaxException, BadJOSEException, JOSEException, JsonMappingException, JsonProcessingException {
-			ArrayList<String> user_odh_roles = new ArrayList<String>();
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		try
+		{
+			resp.addHeader("Access-Control-Allow-Origin", "*");
+			UserAuthInfo userAuth = this.readAllowedODHUserRoles(req);
+			String action = req.getParameter("action");
+			switch (action)
+			{
+				case "insert_custom_dashboard":
+						String test_definition_json = req.getParameter("test_definition_json");
+						insert_custom_dashboard(userAuth, test_definition_json);
+					break;
+				case "delete_custom_dashboard":
+						String id = req.getParameter("id");
+						delete_custom_dashboard(userAuth, id);
+					break;
+			}
+		}
+		catch(Exception e)
+		{
+			throw new ServletException(e);
+		}
+	}
+
+	private void insert_custom_dashboard(UserAuthInfo userAuth, String test_definition_json) throws SQLException {
+		try (Connection conn = DriverManager.getConnection(System.getenv("JDBC_URL")))
+		{
+			ObjectNode payload;
+			try {
+				payload = (ObjectNode)new ObjectMapper().readTree(test_definition_json);
+			} catch (JsonProcessingException e) {
+				throw new SQLException("Invalid test_definition_json payload", e);
+			}
+			long id = payload.get("id").asLong();
+			String userId = userAuth.getSub();
+			String userRole = userAuth.getCurrentRole();
+			String name = payload.path("name").asText();
+			JsonNode testDefinitionNode = payload.get("test_definition_json");
+			String testDefinition = testDefinitionNode == null ? null : testDefinitionNode.toString();
+			try (PreparedStatement pstmt = conn.prepareStatement(""" 
+				insert into catchsolve_noiodh.custom_dashboards
+					(id, user_id, user_role, name, test_definition_json)
+				values (?,?,?,?,?)
+				on conflict (id) do update
+					set user_id = excluded.user_id,
+						user_role = excluded.user_role,
+						name = excluded.name,
+						test_definition_json = excluded.test_definition_json
+			""")) {
+				pstmt.setLong(1, id);
+				pstmt.setString(2, userId);
+				pstmt.setString(3, userRole);
+				pstmt.setString(4, name);
+				pstmt.setString(5, testDefinition);
+				pstmt.executeUpdate();
+			}
+		}
+	}
+
+	private void delete_custom_dashboard(UserAuthInfo userAuth, String id) throws SQLException {
+		if (userAuth.isAnonymous())
+			return;
+		long dashboardId = Long.parseLong(id);
+		try (Connection conn = DriverManager.getConnection(System.getenv("JDBC_URL")))
+		{
+			String userId = userAuth.getSub();
+			String userRole = userAuth.getCurrentRole();
+			try (PreparedStatement pstmt = conn.prepareStatement(""" 
+				delete from catchsolve_noiodh.custom_dashboards
+				 where id = ? and user_id = ? and user_role = ?
+			""")) {
+				pstmt.setLong(1, dashboardId);
+				pstmt.setString(2, userId);
+				pstmt.setString(3, userRole);
+				pstmt.executeUpdate();
+			}
+		}
+	}
+
+	public static final class UserAuthInfo {
+		private final ArrayList<String> roles;
+		private final String sub;
+		private final String currentRole;
+
+		private UserAuthInfo(ArrayList<String> roles, String sub, String currentRole) {
+			this.roles = roles;
+			this.sub = sub;
+			boolean isValidRole = "opendata".equals(currentRole)
+					|| (currentRole != null && roles.contains(currentRole));
+			if (!isValidRole)
+				throw new IllegalStateException(currentRole);
+			this.currentRole = currentRole;
+		}
+
+		public ArrayList<String> getRoles()
+		{
+			return this.roles;
+		}
+
+		public boolean isAnonymous()
+		{
+			return this.sub == null;
+		}
+
+		public String getSub()
+		{
+			return this.sub;
+		}
+
+		public String getCurrentRole()
+		{
+			return this.currentRole;
+		}
+	}
+
+	private UserAuthInfo readAllowedODHUserRoles(HttpServletRequest req)
+			throws ParseException, BadJOSEException, JOSEException, JsonProcessingException {
+		ArrayList<String> user_odh_roles = new ArrayList<String>();
+		String currentRole = req.getParameter("current_role");
 		String authorizationHeader = req.getHeader("Authorization");
 		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-			return user_odh_roles;
+			return new UserAuthInfo(user_odh_roles, null, currentRole);
 		}
 		String token = authorizationHeader.substring("Bearer ".length()).trim();
 	
 		SignedJWT signedJWT = SignedJWT.parse(token);
-		State state = signedJWT.getState();
 
 		// validate token and some basic default checks on claims
 		JWTClaimsSet claim = this.jwtProcessor.process(signedJWT, null);
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		ObjectNode claimsJson = objectMapper.readValue(claim.toString(), ObjectNode.class);
-
-		// Object resource_access = claim.getClaim("resource_access");
-		ObjectNode resource_access = (ObjectNode) claimsJson.get("resource_access");
-
-		resource_access.fields().forEachRemaining(entry -> {
-			System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-			JsonNode value = entry.getValue();
-			if (value instanceof ObjectNode) {
-				ArrayNode roles = (ArrayNode) value.get("roles");
-				for (int r = 0; r < roles.size(); r++) {
-					String role = roles.get(r).asText();
-					user_odh_roles.add(role);
+		String sub = claim.getSubject();
+		Object resourceAccessObj = claim.getClaim("resource_access");
+		if (resourceAccessObj instanceof Map<?, ?> resourceAccess) {
+			for (Object valueObj : resourceAccess.values()) {
+				if (valueObj instanceof Map<?, ?> valueMap) {
+					Object rolesObj = valueMap.get("roles");
+					if (rolesObj instanceof Iterable<?> rolesList) {
+						for (Object roleObj : rolesList) {
+							if (roleObj != null) {
+								user_odh_roles.add(roleObj.toString());
+							}
+						}
+					}
 				}
 			}
-		});
+		}
 
-		return user_odh_roles;
+		return new UserAuthInfo(user_odh_roles, sub, currentRole);
 	}
 }

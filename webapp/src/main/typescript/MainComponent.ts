@@ -2,9 +2,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-
+import { CommonWebComponent } from './CommonWebComponent.js'
 import {MenuComponent} from './MenuComponent.js'
 import {StandardDashboardsComponent} from './StandardDashboardsComponent.js'
+import {CustomDashboardsComponent} from './CustomDashboardsComponent.js'
 
 
 import {DatasetIssuesDetail} from './DatasetIssuesDetail.js'
@@ -12,12 +13,15 @@ import { cs_cast, cs_notnull } from './quality.js';
 import { DatasetIssuesByCategories } from './DatasetIssuesByCategories.js';
 
 import { AuthComponent } from './AuthComponent.js'
+import { CustomDatasetForm } from './CustomDatasetForm.js';
+import { API3 } from './api/api3.js'
+import { kc } from './auth.js'
+import template from './MainComponent.html?raw'
 
-export class MainComponent extends HTMLElement
+export class MainComponent extends CommonWebComponent
 {
-	sroot
-	
 	dashboards: StandardDashboardsComponent|null = null;
+	customDashboards: CustomDashboardsComponent|null = null;
 	
 	changingSection
 	
@@ -25,36 +29,7 @@ export class MainComponent extends HTMLElement
 
 	constructor()
 	{
-		super()
-		this.sroot = this.attachShadow({ mode: 'open' })
-		this.sroot.innerHTML = `
-			<link rel="stylesheet" href="index.css">
-			<style>
-				cs-menu-element {
-					width: 12rem;
-				}
-				.header {
-					display: flex;
-					align-items: center;
-					width: 100%;
-					gap: 1rem;
-					margin-bottom: 1rem;
-				}
-				.header-center {
-					flex-grow: 1;
-					text-align: center;
-				}
-			</style>
-			<div class="MainComponent">
-				<div class="header">
-					<img class="logo" src="NOI_OPENDATAHUB_NEW_BK_nospace-01.svg">
-					<div class="header-center"></div>
-				</div>
-				<div class="body">
-					<div class="projects"></div>
-				</div>
-			</div>
-		`
+		super(template)
 		this.changingSection = this.sroot.querySelector('.projects')!
 		
 		this.logo = cs_cast(HTMLImageElement, this.sroot.querySelector('.logo'))
@@ -62,17 +37,14 @@ export class MainComponent extends HTMLElement
 			location.hash = ''
 		}
 		
-		// Sposta AuthComponent a destra della header
 		this.sroot.querySelector('.header')!.appendChild(new AuthComponent())
 		
 		const menu: MenuComponent = new MenuComponent();
+		menu.setAttribute("data-testid", "leftmenu")
 		menu.refresh()
 		this.changingSection.parentElement!.prepend(menu);
 		
-		// this.projectsComponent = new ProjectsElement();
-		// projects.appendChild(this.projectsComponent.element);
-		
-		const onhashchange = () => {
+		const onhashchange = async () => {
 			
 			console.log('hash')
 			console.log(location.hash)
@@ -83,9 +55,9 @@ export class MainComponent extends HTMLElement
 			if (cleanedhash.startsWith('#state='))
 				cleanedhash = ''
 			
-			if (cleanedhash == '')
+			if (cleanedhash === '')
 			{
-				if (this.dashboards == null)
+				if (this.dashboards === null)
 				{
 					this.dashboards = new StandardDashboardsComponent();
 					this.dashboards.refresh();
@@ -94,7 +66,7 @@ export class MainComponent extends HTMLElement
 				menu.selectItem('')
 			}
 
-			if (cleanedhash.indexOf('#page=dataset-categories&') == 0)
+			if (cleanedhash.indexOf('#page=dataset-categories&') === 0)
 			{
 				this.changingSection.textContent = ''
 				const detail = new DatasetIssuesByCategories();
@@ -122,6 +94,92 @@ export class MainComponent extends HTMLElement
 				detail.refresh(session_start_ts, dataset_name, category_name, failed_records, tot_records);
 				menu.selectItem(dataset_name)
 			}
+
+			if (cleanedhash.startsWith('#customdataset'))
+			{
+				this.changingSection.textContent = ''
+				const params = new URLSearchParams(cleanedhash.substring('#customdataset'.length))
+				const idParam = params.get('id')
+				if (idParam !== null)
+				{
+					menu.selectItem(`custom:${idParam}`)
+					const form = new CustomDatasetForm()
+					form.setAttribute('data-testid', 'custom-dataset-form')
+					form.addEventListener('save-custom-dashboard', async () => {
+						const elaborationHandle = form.setElaborationInProgress()
+						let shouldCloseImmediately = true
+						try {
+							const draft = form.getCustomDashboardDraft()
+							const payload: { id: number; name: string; test_definition_json: any } = {
+								id: draft.id!,
+								name: draft.name,
+								test_definition_json: draft.test_definition_json
+							}
+
+							const body = new URLSearchParams()
+							body.set('action', 'insert_custom_dashboard')
+							body.set('test_definition_json', JSON.stringify(payload))
+							body.set('current_role', sessionStorage.getItem('used_key_role') ?? '')
+
+							const headers: HeadersInit = { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+							if (kc.token) {
+								headers.Authorization = `Bearer ${kc.token}`
+							}
+
+							const response = await fetch('api', {
+								method: 'POST',
+								headers,
+								body
+							})
+							if (response.ok) {
+								elaborationHandle.setText('success')
+								elaborationHandle.closeAfter(2000)
+								shouldCloseImmediately = false
+							} else {
+								elaborationHandle.setText(`error ${response.status}`)
+								elaborationHandle.closeAfter(2000)
+								shouldCloseImmediately = false
+							}
+						} catch {
+							elaborationHandle.setText('error')
+							elaborationHandle.closeAfter(2000)
+							shouldCloseImmediately = false
+						} finally {
+							if (shouldCloseImmediately) {
+								elaborationHandle.close()
+							}
+						}
+					})
+					this.changingSection.appendChild(form)
+					const elaborationHandle = form.setElaborationInProgress()
+					const rows = await API3.list__catchsolve_noiodh__custom_dashboards({ id: Number(idParam) })
+					if (rows.length === 0) {
+						await form.loadCustomDashboard({}, Number(idParam), 'noname')
+						elaborationHandle.close()
+						return
+					}
+					const dashboard = rows[0]
+					let definition: any
+					try {
+						definition = JSON.parse(dashboard.test_definition_json)
+					} catch {
+						elaborationHandle.close()
+						return
+					}
+					await form.loadCustomDashboard(definition, dashboard.id, dashboard.name)
+					elaborationHandle.close()
+				}
+				else
+				{
+					menu.selectItem('custom')
+					if (this.customDashboards === null)
+					{
+						this.customDashboards = new CustomDashboardsComponent();
+						this.customDashboards.refresh();
+					}
+					this.changingSection.appendChild(this.customDashboards)
+				}
+			}
 		}
 		
 		window.onpopstate = (e) => {
@@ -129,6 +187,14 @@ export class MainComponent extends HTMLElement
 		}
 
 		onhashchange()
+
+		this.querySelector('.testing').onclick = () => {
+			if (this.dashboards != null)
+			{
+				const first = this.dashboards.testing_htmlelements()[0]
+				first.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+			}
+		}
 
 		
 	}

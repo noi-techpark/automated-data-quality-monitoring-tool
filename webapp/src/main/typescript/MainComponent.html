@@ -1,0 +1,67 @@
+<!--
+  SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<link rel="stylesheet" href="index.css">
+<style>
+    @import url("anywhere.css");
+    @import url("all-webcomponent.css");
+
+	cs-menu-element {
+		width: 16rem;
+		flex-shrink: 0;
+		height: 100%;
+		overflow: scroll;
+	}
+	.header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+	.header-center {
+		flex-grow: 1;
+		text-align: center;
+	}
+
+
+
+	.logo {
+		height: 2rem;
+	}
+
+	.body {
+		border-top: 1px solid #ccc;
+		min-height: 0; /* don't go outside parent */
+	}
+
+	.projects {
+		flex-grow: 100;
+		border-left: 1px solid #ccc;
+		padding: 1rem;
+		overflow: scroll;
+	}
+
+	:host {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.MainComponent {
+		min-height: 0; /* don't go outside parent */
+		flex-grow: 1;
+	}
+
+
+</style>
+<div class="MainComponent flex-col padding-medium gap-medium">
+	<div class="header">
+		<img class="logo" src="NOI_OPENDATAHUB_NEW_BK_nospace-01.svg">
+		<div class="header-center"></div>
+	</div>
+	<button class="testing" style="display: none";>testing</button>
+	<div class="body flex-row flex-grow">
+		<div class="projects"></div>
+	</div>
+</div>

@@ -1,0 +1,113 @@
+<!--
+  SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<style>
+    @import url("all-webcomponent.css");
+
+	@import url("anywhere.css");
+
+	:host {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		box-sizing: border-box;
+	}
+
+	.title {
+		padding: 0.5rem 0.4rem;
+		font-weight: 600;
+		font-size: 0.75rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: #111111;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	div.submenus {
+		padding-left: 0;
+		overflow: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	div.submenus_custom {
+		padding-left: 0;
+		overflow: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+
+
+	div.submenus > * {
+		margin: 0;
+		margin-left: 1rem;
+		padding: 0.35rem 0.5rem;
+		cursor: pointer;
+		border-radius: 6px;
+		line-height: 1.3;
+	}
+	div.submenus > *:hover {
+		background: #e5e7eb;
+	}
+	div.submenus_custom > .flex-row {
+		align-items: center;
+		gap: 0.35rem;
+		margin-left: 1rem;
+		padding: 0.35rem 0.5rem;
+		border-radius: 6px;
+		cursor: pointer;
+	}
+	div.submenus_custom > .flex-row:hover {
+		background: #e5e7eb;
+	}
+	.selected {
+		background: #e5e7eb;
+		color: #111111;
+		font-weight: 600;
+	}
+	.title.standard-title.close ~ .submenus {
+		display: none;
+	}
+	.title.custom-title.close ~ .submenus_custom {
+		display: none;
+	}
+	.openclose {
+		cursor: pointer;
+		color: var(--events-tertiary);
+	}
+	.openclose:before {
+		content: "";
+		display: inline-block;
+		width: 0.8rem;
+		height: 0.8rem;
+		background-color: var(--events-tertiary);
+		-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+		transform: rotate(180deg);
+	}
+	.title.close .openclose:before {
+		transform: rotate(0deg);
+	}
+	.newbutton {
+		width: 1.8rem;
+		height: 1.8rem;
+		border: 1px solid #111111;
+		background: #111111;
+		color: #ffffff;
+		border-radius: 4px;
+		line-height: 1;
+		cursor: pointer;
+	}
+</style>
+<div class="title standard-title"><span class="openclose"></span> standard dashboards</div>
+<div class="submenus"></div>
+<div class="title custom-title flex-row flex-align-items-center gap-medium"><span class="openclose"></span><span class="flex-grow">custom dashboards</span></div>
+<div class="submenus_custom flex-col gap-medium"></div>
