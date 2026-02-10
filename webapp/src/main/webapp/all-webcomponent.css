@@ -1,0 +1,95 @@
+/*
+ * SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+:host {
+    
+    xborder: 6px solid #aaa;
+    xpadding: 6px;
+    display: inline-block;
+    xflex-direction: column;
+    xgap: 6px;
+}
+
+
+:host {
+    position: relative;
+}
+
+:xhost::after {
+  content: attr(data-component-name);
+  position: absolute;
+  top: -11px;
+  left: 0.3em;
+  background: white;
+  padding: 0 4px;
+  font-size: 0.7em;
+  z-index: 1;
+  background-color: #888;
+  color: white;
+}
+
+
+.pleasewait {
+  display: none;
+}
+
+.pleasewait.elaborationinprogress {
+  position: absolute;
+  display: block;
+  background-color: rgba(255, 255, 255, .5);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  xbackground-image:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.18) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.18) 75%, rgba(255, 255, 255, 0.18)),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.18) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.18) 75%, rgba(255, 255, 255, 0.18));
+  background-size: 18px 18px;
+  background-position: 0 0, 9px 9px;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  font-weight: bold;
+  border: 2px dashed #0002;
+  border-radius: 0.35em;
+}
+.pleasewait-box {
+  position: absolute;
+  top: 2em;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1em;
+  color: #666;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1em 2em;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 0.35em;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  align-items: center;
+}
+.pleasewait-message {
+  animation: pleasewait-color 1s ease-in-out infinite;
+  text-align: center;
+}
+.pleasewait-ok {
+  padding: 0.35em 1.2em;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.pleasewait:not(.requires-ok) .pleasewait-ok {
+  display: none;
+}
+@keyframes pleasewait-color {
+  0%, 25%, 100% {
+    color: #666;
+  }
+  25%, 75% {
+    color: #111;
+  }
+}

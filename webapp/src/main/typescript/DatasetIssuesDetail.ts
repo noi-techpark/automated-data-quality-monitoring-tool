@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-
+import { CommonWebComponent } from "./CommonWebComponent.js";
 import { cs_cast, throwNPE } from "./quality.js";
 import {API3, catchsolve_noiodh__test_dataset_record_check_failed__row} from './api/api3.js';
 import { OpenCloseSection } from "./OpenCloseSection.js";
@@ -10,8 +10,9 @@ import { SectionRow } from "./SectionRow.js";
 import { Loader } from "./Loader.js";
 import { DatasetIssueCategoryComponent } from "./DatasetIssueCategoryComponent.js";
 import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
+import template from './DatasetIssuesDetail.html?raw'
 
-export class DatasetIssuesDetail extends HTMLElement
+export class DatasetIssuesDetail extends CommonWebComponent
 {
 	
 	container 
@@ -23,8 +24,6 @@ export class DatasetIssuesDetail extends HTMLElement
 	last_tot_records: number|null = null
 	
 	current_tab: 'issues' | 'records' = 'issues'
-	
-	sroot
 	
 	canvas
 	
@@ -63,82 +62,9 @@ export class DatasetIssuesDetail extends HTMLElement
 	}
 	
 	constructor() {
-		super()
+		super(template)
 		this.chartjs_success = (s) => {} // dummy initialization, next line will init chartjs_success but compiler don't understand this!
 		this.chartjs_promise = new Promise(s => this.chartjs_success = s)
-		this.sroot = this.attachShadow({ mode: 'open' })
-		this.sroot.innerHTML = `
-				<style>
-					:host {
-						padding: 0.5rem;
-						display: block;
-					}
-					.container {
-						border: 1px solid #ccc;
-						border-radius: 0.3rem;
-					}
-					
-					.container > * {
-						border-bottom: 1px solid #ccc;
-					}
-					.header {
-						display: flex;
-					}
-					.header .chart {
-						width: 50%;
-					}
-					
-					.actions {
-						border: 1px solid black;
-						width: 10rem;
-						margin-left: auto;
-						display: flex;
-						border-radius: 0.4rem;
-						margin-bottom: 0.5rem;
-					}
-					
-					.actions span.selected {
-						color: white;
-						background-color: black;
-					}
-					
-					.actions span {
-						flex-grow: 50;
-						text-align: center;
-						cursor: pointer;
-					}
-					
-					.nextpagebutton {
-						margin: auto;
-						display: block;
-						background-color: var(--dark-background);
-						color: var(--primary-color);
-						padding: 8px 16px;
-						border-radius: 6px;
-						cursor: pointer;
-					}
-				
-				</style>
-				<!-- <img src="kpi-detail.png" style="max-width: 100%"> -->
-				<div class="header">
-					<div>
-						<cs-dataset-issue-category></cs-dataset-issue-category>
-					</div>
-					<div class="chart">
-						<canvas></canvas>
-					</div>
-					<!--<cs-general-info-and-settings></cs-general-info-and-settings>-->
-				</div>
-				<div style="width: calc(100% - 20px)">
-					<div style="text-align: right" class="actions">
-						<span class="issues">Issues</span>
-						<span class="records">Records</span>
-					</div>
-					<div class="container"></div>
-				</div>
-				`
-
-		customElements.upgrade(this.sroot)
 
 		this.container = cs_cast(HTMLDivElement, this.sroot.querySelector('.container'))
 		

@@ -2,30 +2,18 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-
+import { CommonWebComponent } from "./CommonWebComponent.js";
 import { cs_cast, throwNPE } from "./quality.js";
+import template from './SectionRow.html?raw'
 
-export class SectionRow extends HTMLElement
+export class SectionRow extends CommonWebComponent
 {
 	label
 
 	constructor() {
-		super()
-		const sroot = this.attachShadow({ mode: 'open' })
-		sroot.innerHTML = `
-				<style>
-					:host {
-						display: block;
-						border: 1px solid #eee;
-						padding: 1rem;
-					}
-					
-				</style>
-				<span class="label">title</span>
-				`
+		super(template)
 
-		customElements.upgrade(sroot)
-		this.label = cs_cast(HTMLSpanElement, sroot.querySelector('.label'))
+		this.label = cs_cast(HTMLSpanElement, this.sroot.querySelector('.label'))
 
 	}
 	

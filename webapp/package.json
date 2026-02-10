@@ -1,12 +1,11 @@
 {
   "type": "module",
   "scripts": {
-    "build": "esbuild src/main/typescript/main.ts --bundle --outfile=src/main/webapp/js/bundle.js"
+    "build": "esbuild --loader:.html=text src/main/typescript/main.ts --bundle --outfile=src/main/webapp/js/bundle.js"
   },
   "dependencies": {
     "jwt-decode": "^4.0.0",
-    "keycloak-js": "^26.2.1",
-    "parcel": "^2.16.0"
+    "keycloak-js": "^26.2.1"
   },
   "devDependencies": {
     "@types/keycloak-js": "^2.5.4",

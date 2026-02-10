@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.icu.text.SimpleDateFormat;
 import com.ibm.icu.util.TimeZone;
 
+import it.bz.noi.automated.data.quality.monitoring.tool.APIServlet.UserAuthInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -45,7 +46,7 @@ public class APIHelper
 
 	private static final String YYYY_MM_DD_T_HH_MM_SS_XXX = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
-	public static void processRequest(HttpServletRequest req, HttpServletResponse resp) throws SQLException, IOException, ParseException
+	public static void processRequest(HttpServletRequest req, HttpServletResponse resp, UserAuthInfo auth) throws SQLException, IOException, ParseException
 	{
 		ObjectMapper om = new ObjectMapper();
 
@@ -88,7 +89,7 @@ public class APIHelper
 				break;
 			case "catchsolve_noiodh.catchsolve_noiodh__test_dataset_max_ts_vw":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__test_dataset_maxts_vw(filterJson);
+				list = list__catchsolve_noiodh__test_dataset_maxts_vw(filterJson, auth.getRoles());
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw":
@@ -110,6 +111,24 @@ public class APIHelper
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__test_dataset_history_vw(filterJson);
 				resp.getWriter().write(list.toPrettyString());
+				break;
+			case "catchsolve_noiodh.custom_dashboards":
+				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+				list = list__catchsolve_noiodh__custom_dashboards(filterJson, auth);
+				resp.getWriter().write(list.toPrettyString());
+				break;
+			case "catchsolve_noiodh.custom_dashboards_next_id":
+				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+				list = list__catchsolve_noiodh__custom_dashboards_next_id();
+				resp.getWriter().write(list.toPrettyString());
+				break;
+			case "auth_roles":
+				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+				ArrayNode rolesList = om.createArrayNode();
+				for (String role : auth.getRoles()) {
+					rolesList.add(role);
+				}
+				resp.getWriter().write(rolesList.toPrettyString());
 				break;
 
 
@@ -195,7 +214,7 @@ public class APIHelper
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_maxts_vw(ObjectNode filter) throws SQLException
+	private static ArrayNode list__catchsolve_noiodh__test_dataset_maxts_vw(ObjectNode filter, ArrayList<String> user_odh_roles) throws SQLException
 	{
 		String sql = """
 				select *
@@ -204,8 +223,48 @@ public class APIHelper
 				 order by dataset_name
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("used_key")).textValue());
+		String textValue = ((TextNode)filter.get("used_key")).textValue();
+		checkUserAllowed(user_odh_roles, textValue);
+		wherevalues.add(textValue);
 		return execute_query(sql, wherevalues);
+	}
+
+	private static ArrayNode list__catchsolve_noiodh__custom_dashboards(ObjectNode filter, UserAuthInfo auth) throws SQLException
+	{
+		if (auth.isAnonymous())
+			return new ObjectMapper().createArrayNode();
+		String userRole = auth.getCurrentRole();
+		String userId = auth.getSub();
+		Integer id = null;
+		if (filter.get("id") != null && !filter.get("id").isNull())
+			id = filter.get("id").asInt();
+		ArrayList<Object> wherevalues = new ArrayList<>();
+		StringBuilder sql = new StringBuilder("""
+				select id, user_id, user_role, name, test_definition_json
+				  from catchsolve_noiodh.custom_dashboards
+				 where user_id = ? and user_role = ?
+				""");
+		wherevalues.add(userId);
+		wherevalues.add(userRole);
+		if (id != null)
+		{
+			sql.append(" and id = ?");
+			wherevalues.add(id);
+		}
+		sql.append(" order by name");
+		return execute_query(sql.toString(), wherevalues);
+	}
+
+	private static ArrayNode list__catchsolve_noiodh__custom_dashboards_next_id() throws SQLException
+	{
+		String sql = "select nextval('catchsolve_noiodh.custom_dashboards_id_seq') as id";
+		return execute_query(sql, new ArrayList<>());
+	}
+
+	private static void checkUserAllowed(ArrayList<String> user_odh_roles, String used_key) throws SQLException
+	{
+		if (!user_odh_roles.contains(used_key))
+			throw new SQLException("User not allowed to access dataset using role: " + used_key + ", he has roles: " + String.join(", ", user_odh_roles));
 	}
 
 	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(ObjectNode filter) throws ParseException, SQLException
@@ -351,13 +410,18 @@ public class APIHelper
 		return jsdate;
 	}
 
-	public static String get_dataset_list() throws IOException
-	{
-		// https://tourism.api.opendatahub.com/v1/MetaData?pagesize=1000&origin=webcomp-datasets-list
-		URL url =   URI.create("https://tourism.api.opendatahub.com/v1/MetaData?pagesize=1000&origin=webcomp-datasets-list").toURL();
-		URLConnection urlc = url.openConnection();
-		String json = new String(urlc.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-		return json;
-	}
+    public static String get_dataset_list() throws IOException
+    {
+        // Base URL can be overridden via environment variable TOURISM_API_BASE_JAVA
+        String base = System.getenv("TOURISM_API_BASE_JAVA");
+        if (base == null || base.isBlank()) {
+            base = "https://tourism.api.opendatahub.com";
+        }
+        String endpoint = base + "/v1/MetaData?pagesize=1000&origin=webcomp-datasets-list";
+        URL url = URI.create(endpoint).toURL();
+        URLConnection urlc = url.openConnection();
+        String json = new String(urlc.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        return json;
+    }
 
 }

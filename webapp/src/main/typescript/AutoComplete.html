@@ -1,0 +1,80 @@
+<!--
+  SPDX-FileCopyrightText: 2025 Catch Solve di Davide Montesin
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<style>
+    @import url("anywhere.css");
+    @import url("all-webcomponent.css");
+
+    :host(.invalid):not(.empty-value) input {
+        border: 2px solid red;
+    }
+
+
+    :host(.invalid.empty-value) input {
+        background-color: rgb(255, 255, 194);
+    }
+
+    
+
+    :host {
+        position: relative;
+    }
+
+    .list {
+        position: absolute;
+        max-height: 16em;
+        overflow-y: scroll;
+        overscroll-behavior: none;
+        background-color: white;
+        z-index: 2;
+    }
+
+    .list > div {
+        min-height: 1em;
+    }
+
+    .option {
+        border: 1px dotted var(--quaternary-color)
+    }
+
+    .option > div {
+        padding: 8px;
+        cursor: pointer;
+    }
+
+    .option > div:not(:last-child) {
+        border-bottom: 1px solid var(--quaternary-color)
+    }
+
+    .openclose {
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 0.9rem;
+        height: 0.9rem;
+    }
+    .openclose::before {
+        content: "";
+        display: inline-block;
+        width: 0.8rem;
+        height: 0.8rem;
+        background-color: currentColor;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+
+</style>
+<div class="flex-row gap-medium flex-align-items-center">
+    <input data-testid="input-search" class="flex-grow">
+    <div data-testid="button-openclose" class="openclose"></div>
+</div>
+<div class="list">
+    <div class="nooptions">no options found!</div>
+    <div class="option padding-medium" data-testid="options">
+        <div class="option-row"></div>
+    </div>
+</div>

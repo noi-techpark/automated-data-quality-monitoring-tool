@@ -1,0 +1,58 @@
+<!--
+  SPDX-FileCopyrightText: 2024 Catch Solve di Davide Montesin
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<style>
+    @import url("anywhere.css");
+    @import url("all-webcomponent.css");
+
+	:host {
+		border: 1px solid #ccc;
+		margin: 0.6rem;
+		border-radius: 0.4rem;
+		padding: 0.4rem;
+	}
+	.row {
+		display: flex;
+		margin-bottom: 0.6rem;
+		font-size: 0.8rem;
+	}
+
+	.row .label {
+		font-weight: bold;
+		display: inline-block;
+		width: 8rem;
+	}
+	
+	.row .data {
+		width: 8rem;
+	}
+	
+	.title {
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		font-weight: bold;
+	}
+
+</style>
+<div class="title">General Info &amp; Setting</div>
+<div>
+	<div class="row dataset">
+		<span class="label">dataset</span>
+		<span class="data">data</span>
+	</div>
+	<div class="row tested_records">
+		<span class="label">tested records</span>
+		<span class="data">data</span>
+	</div>
+	<div class="row failed_records">
+		<span class="label">failed records</span>
+		<span class="data">data</span>
+	</div>
+	<div class="row last_checked">
+		<span class="label">last checked</span>
+		<span class="data">data</span>
+	</div>
+</div>

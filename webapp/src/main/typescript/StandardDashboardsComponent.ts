@@ -2,18 +2,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-
-
+import { CommonWebComponent } from './CommonWebComponent.js';
 import { DatasetCardComponent } from './DatasetCardComponent.js';
 import { Loader } from './Loader.js';
 import { API3 } from './api/api3.js';
-import { getUsedKeyRole } from './auth.js';
 import { cs_cast } from './quality.js';
+import template from './StandardDashboardsComponent.html?raw'
 
-export class StandardDashboardsComponent extends HTMLElement
+export class StandardDashboardsComponent extends CommonWebComponent
 {
-	sroot
-	
 	boxContainer;
 	
 	boxes: DatasetCardComponent[] = []
@@ -21,19 +18,7 @@ export class StandardDashboardsComponent extends HTMLElement
 
 	constructor()
 	{
-		super()
-		
-		this.sroot = this.attachShadow({ mode: 'open' })
-		this.sroot.innerHTML = `
-			<link rel="stylesheet" href="index.css">
-			<div class="ProjectsElement">
-				<div class="title" style="padding: 1rem">standard dashboards</div>
-				<div class="searchbar">
-					<input> 🔍 <span class="clearinput">✕</span>
-				</div>
-				<div class="container"></div>
-			</div>
-		`
+		super(template)
 		this.boxContainer = cs_cast(HTMLDivElement, this.sroot.querySelector('.container'))
 
 		this.boxContainer.textContent = ("loading ...");
@@ -56,7 +41,10 @@ export class StandardDashboardsComponent extends HTMLElement
 		}
 		
 	}
-	
+
+	testing_htmlelements(): DatasetCardComponent[] {
+		return this.boxes
+	}
 
 	async refresh()
 	{
@@ -65,8 +53,7 @@ export class StandardDashboardsComponent extends HTMLElement
 		this.boxContainer.textContent = ('');
 		const loader = new Loader();
 		this.boxContainer.appendChild(loader)
-		let used_key = 'opendata'
-		used_key = getUsedKeyRole();
+		let used_key = sessionStorage.getItem('used_key_role')!;
 		console.log('used key role', used_key);
 		const json = await API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({used_key: used_key})
 		loader.remove();

@@ -2,10 +2,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-
+import { CommonWebComponent } from "./CommonWebComponent.js";
 import { cs_cast, throwNPE } from "./quality.js";
+import template from './GeneralInfoAndSettings.html?raw'
 
-export class GeneralInfoAndSettings extends HTMLElement
+export class GeneralInfoAndSettings extends CommonWebComponent
 {
 	
 	private dataset_name
@@ -15,64 +16,12 @@ export class GeneralInfoAndSettings extends HTMLElement
 	
 	constructor()
 	{
-		super();
-		const sroot = this.attachShadow({mode: 'open'});
-		sroot.innerHTML = `
-		<style>
-			:host {
-				border: 1px solid #ccc;
-				margin: 0.6rem;
-				border-radius: 0.4rem;
-				padding: 0.4rem;
-			}
-			.row {
-				display: flex;
-				margin-bottom: 0.6rem;
-				font-size: 0.8rem;
-			}
+		super(template)
 		
-			.row .label {
-				font-weight: bold;
-				display: inline-block;
-				width: 8rem;
-			}
-			
-			.row .data {
-				width: 8rem;
-			}
-			
-			.title {
-				margin-top: 1rem;
-				margin-bottom: 1rem;
-				font-weight: bold;
-			}
-
-		</style>
-		<div class="title">General Info &amp; Setting</div>
-		<div>
-			<div class="row dataset">
-				<span class="label">dataset</span>
-				<span class="data">data</span>
-			</div>
-			<div class="row tested_records">
-				<span class="label">tested records</span>
-				<span class="data">data</span>
-			</div>
-			<div class="row failed_records">
-				<span class="label">failed records</span>
-				<span class="data">data</span>
-			</div>
-			<div class="row last_checked">
-				<span class="label">last checked</span>
-				<span class="data">data</span>
-			</div>
-		</div>
-		`
-		
-		this.dataset_name   = cs_cast(HTMLSpanElement, sroot.querySelector('.dataset .data'))
-		this.tested_records = cs_cast(HTMLSpanElement, sroot.querySelector('.tested_records .data'))
-		this.failed_records = cs_cast(HTMLSpanElement, sroot.querySelector('.failed_records .data'))
-		this.last_checked   = cs_cast(HTMLSpanElement, sroot.querySelector('.last_checked .data'))
+		this.dataset_name   = cs_cast(HTMLSpanElement, this.sroot.querySelector('.dataset .data'))
+		this.tested_records = cs_cast(HTMLSpanElement, this.sroot.querySelector('.tested_records .data'))
+		this.failed_records = cs_cast(HTMLSpanElement, this.sroot.querySelector('.failed_records .data'))
+		this.last_checked   = cs_cast(HTMLSpanElement, this.sroot.querySelector('.last_checked .data'))
 		
 	}
 	

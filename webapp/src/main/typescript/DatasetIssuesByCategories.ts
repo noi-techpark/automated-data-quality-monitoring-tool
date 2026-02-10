@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-
-
+import { CommonWebComponent } from "./CommonWebComponent.js";
 import { cs_cast, throwNPE } from "./quality.js";
 import {API3, catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__row} from './api/api3.js';
 import { OpenCloseSection } from "./OpenCloseSection.js";
@@ -12,8 +11,9 @@ import { Loader } from "./Loader.js";
 import { LabelAndData } from "./LabelAndData.js";
 import { DatasetIssueCategoryComponent } from "./DatasetIssueCategoryComponent.js";
 import { GeneralInfoAndSettings } from "./GeneralInfoAndSettings.js";
+import template from './DatasetIssuesByCategories.html?raw'
 
-export class DatasetIssuesByCategories extends HTMLElement
+export class DatasetIssuesByCategories extends CommonWebComponent
 {
 	
 	content
@@ -27,66 +27,13 @@ export class DatasetIssuesByCategories extends HTMLElement
 		this.connected_func(null)
 	}
 	
-	sroot
-	
 	// info_and_settings
 	
 	noissues
 	
 	constructor() {
-		super()
+		super(template)
 		this.connected_promise = new Promise(s => this.connected_func = s)
-		this.sroot = this.attachShadow({ mode: 'open' })
-		this.sroot.innerHTML = `
-						<style>
-							:host {
-							}
-							.category {
-								border: 1px solid gray;
-								width: 12rem;
-								display: inline-block;
-								margin: 1rem;
-							}
-							.category > img {
-								width: 100%;
-							}
-							.category .category_name {
-								font-weight: bold;
-							}
-							.frame {
-								display: flex;
-								align-items: start;
-							}
-							.frame .content {
-								flex-grow: 100;
-								display: flex;
-								align-items: start;
-							}
-							.chartdiv {
-								width:  100px;
-								height: 100px;
-								margin: auto;
-							}
-							details > *:nth-child(even) {
-							  background-color: #ccc;
-							}
-							
-							.content > * {
-								margin-top: 1rem;
-								margin-left: 1rem;
-							}
-							.noissues {
-								display: none;
-							}
-						</style>
-						<div class="frame">
-							<div class="noissues">sound good, no problems found here!</div>
-							<div class="content"></div>
-							<!--<cs-general-info-and-settings></cs-general-info-and-settings>-->
-							<!--<img src="kpi-general-info.png">-->
-						</div>
-						`;
-		customElements.upgrade(this.sroot);
 		this.content = cs_cast(HTMLElement, this.sroot.querySelector('.content'));
 		// this.info_and_settings = cs_cast(GeneralInfoAndSettings, this.sroot.querySelector('cs-general-info-and-settings'));
 
@@ -119,4 +66,3 @@ export class DatasetIssuesByCategories extends HTMLElement
 }
 
 customElements.define('cs-dataset-categories', DatasetIssuesByCategories)
-

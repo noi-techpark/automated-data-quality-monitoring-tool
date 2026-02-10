@@ -2,13 +2,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-
+import { CommonWebComponent } from "./CommonWebComponent.js";
 import { cs_cast, throwNPE } from "./quality.js";
 
 import { LabelAndData } from "./LabelAndData.js"
 import { catchsolve_noiodh__test_dataset_max_ts_vw__row } from "./api/api3.js";
+import template from './DatasetCardComponent.html?raw'
 
-export class DatasetCardComponent extends HTMLElement
+export class DatasetCardComponent extends CommonWebComponent
 {
 	dtitle
 	img
@@ -16,105 +17,85 @@ export class DatasetCardComponent extends HTMLElement
 	checkattr
 	failedrecs
 	lastupdate
+
+	#editdiv
+	#edit_hash: string
+	#menu
+	#menuButton
+	#menuList
+	#menuEdit
+	#menuDelete
+	#menuDeleteHandler: (() => void) | null
 	
 	constructor()
 	{
-		super()
-		const sroot = this.attachShadow({mode: 'open'})
-		sroot.innerHTML = `
-			<style>
-				:host {
-					border: 1px solid #ccc;
-					margin: 0.5rem;
-					border-radius: 4px;
-					cursor: pointer;
-					width: 13rem;
-					box-shadow: 4px 4px #ccc;
-				}
-				.title {
-					font-weight: bold;
-					margin-top: .7rem;
-					margin-bottom: 0.3rem;
-					text-align: center;
-					overflow: hidden;
-					height: 2rem;
-					line-height: 1rem;
-				}
-				
-				/*
-				:host(:hover) .title {
-					text-decoration: underline;
-				}
-				 */
-				
-				.ts {
-					font-size: 0.7rem
-				}
-				
-				.view_dashboard {
-					background-color: var(--dark-background);
-					color: #ddd;
-					text-align: center;
-					padding: 0.6rem;
-				}
-				.view_dashboard:hover {
-					/* background-color: rgb(35, 75, 20); */
-				}
-				
-				.wrapper {
-					padding: 1rem;
-				}
+		super(template)
 
-				.lastupdate {
-					margin-top: 0.4rem;
-					font-size: 0.7rem;
-				}
-				
-				img {
-					height: 100px;
-					width: 100%;
-					object-fit: contain;
-					margin-bottom: 0.5rem;
-				}
-
-				div[data-length="0"] {
-					background-color: #aaa;
-					opacity: 0.5;
-				}
-	
-			</style>
-			<div class="wrapper">
-				<div class="title">XXX</div>
-				<img class="img">
-				<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
-				<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
-				<cs-label-and-data class="totissues" xstyle="display: none">total issues</cs-label-and-data>
-				<div class="lastupdate">
-					🕑 <span class="data"></span>
-					<span></span>
-				</div>
-			</div>
-			<div class="view_dashboard">View dashboard</div>
-		`
-
-		customElements.upgrade(sroot)
-
-		this.checkrecs  = cs_cast(LabelAndData,      sroot.querySelector('.checktrec'))
-		this.checkattr  = cs_cast(LabelAndData,      sroot.querySelector('.checkattr'))
-		this.failedrecs = cs_cast(LabelAndData,     sroot.querySelector('.totissues'))
-		this.dtitle     = cs_cast(HTMLDivElement,    sroot.querySelector('.title'))
-		this.img        = cs_cast(HTMLImageElement,  sroot.querySelector('.img'))
-		this.lastupdate = cs_cast(HTMLSpanElement,      sroot.querySelector('.lastupdate .data'))
+		this.checkrecs  = cs_cast(LabelAndData,      this.sroot.querySelector('.checktrec'))
+		this.checkattr  = cs_cast(LabelAndData,      this.sroot.querySelector('.checkattr'))
+		this.failedrecs = cs_cast(LabelAndData,      this.sroot.querySelector('.totissues'))
+		this.dtitle     = cs_cast(HTMLDivElement,    this.sroot.querySelector('.title'))
+		this.img        = cs_cast(HTMLImageElement,  this.sroot.querySelector('.img'))
+		this.lastupdate = cs_cast(HTMLSpanElement,   this.sroot.querySelector('.lastupdate .data'))
+		this.#editdiv   = cs_cast(HTMLDivElement,   this.sroot.querySelector('.edit'))
+		this.#menu      = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu'))
+		this.#menuButton = cs_cast(HTMLButtonElement, this.sroot.querySelector('.menu-button'))
+		this.#menuList   = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu-list'))
+		this.#menuEdit   = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu-item.edit'))
+		this.#menuDelete = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu-item.delete'))
 				
 		// this.img.style.display = 'none';
 		
 		this.checkrecs.setLabel('total checks')
 		this.checkattr.setLabel('checked attrs')
 		this.failedrecs.setLabel('passed checks')
+
+		this.#edit_hash = ''
+		this.#menuDeleteHandler = null
+
+		this.#menuButton.onclick = (event) => {
+			event.stopPropagation()
+			this.#menu.classList.toggle('open')
+		}
+		this.#menuEdit.onclick = (event) => {
+			event.stopPropagation()
+			this.#menu.classList.remove('open')
+			location.hash = this.#edit_hash			
+		}
+		this.#menuDelete.onclick = (event) => {
+			event.stopPropagation()
+			this.#menu.classList.remove('open')
+			this.#menuDeleteHandler?.()
+		}
+		/*
+		document.addEventListener('click', (event) => {
+			if (event.composedPath().includes(this)) {
+				return
+			}
+			this.#menu.classList.remove('open')
+		})
+		 */
 		
 		// this.failedrecs.setSeverity("fail")
 		// this.failedrecs.setData('123')
 
+	}
+
+	set edit_hash(v: string) {
+		this.#edit_hash = v
+	}
+
+	set menu_on_delete(v: (() => void) | null) {
+		this.#menuDeleteHandler = v
+		this.#resync_menu()
+	}
+
+	#resync_menu() {
+		const showMenu = this.#edit_hash !== ''
+		this.#menu.classList.toggle('display-none', !showMenu)
+		if (!showMenu) {
+			this.#menu.classList.remove('open')
+		}
 	}
 
 	
@@ -150,8 +131,10 @@ export class DatasetCardComponent extends HTMLElement
 				this.failedrecs.setQualityLevel("fail")
 		}
 		 */
+		this.#editdiv.classList.toggle('display-none', this.#edit_hash === '')
 		this.lastupdate.textContent = dateformat
 		this.onclick = () => {
+			this.#menu.classList.remove('open')
 			const escapedDatasetName = encodeURIComponent(dataset.dataset_name ?? '')
 			location.hash = '#page=dataset-categories' + '&dataset_name=' + escapedDatasetName 
 							+ "&session_start_ts=" + dataset.session_start_ts
