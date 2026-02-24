@@ -74,6 +74,13 @@ export class MenuComponent extends CommonWebComponent
 		const loader = new Loader();
 		this.sroot.appendChild(loader)
 		Promise.all([json_promise, custom_dashboards_promise]).then(([json, customDashboards]) => {
+			const datasetByName = new Map(json.map((dataset) => [dataset.dataset_name, dataset]))
+			const datasetByCustomDashboardId = new Map(
+				customDashboards.map((dashboard) => {
+					const definition = JSON.parse(dashboard.test_definition_json)
+					return [dashboard.id, datasetByName.get(definition.dataset)]
+				})
+			)
 			for (let dataset of json)
 			{
 				const menu1_submenu = document.createElement('div');
@@ -96,15 +103,20 @@ export class MenuComponent extends CommonWebComponent
 				const label = document.createElement('span');
 				label.textContent = dashboard.name;
 				label.className = 'flex-grow'
-				const editButton = document.createElement('span');
-				editButton.textContent = '✎';
-				editButton.onclick = (event) => {
-					event.stopPropagation();
-					location.hash = `#customdataset?id=${dashboard.id}`;
+				menuCustom.onclick = () => {
+					const dataset = datasetByCustomDashboardId.get(dashboard.id)
+					if (dataset) {
+						location.hash = '#page=dataset-categories' +
+						                '&dataset_name=' + dataset.dataset_name +
+										'&session_start_ts=' + dataset.session_start_ts
+										+ "&failed_records=" + dataset.failed_records
+										+ "&tested_records=" + dataset.tested_records
+					} else {
+						location.hash = `#customdataset?id=${dashboard.id}`
+					}
 				};
 				this.menuitemByName[`custom:${dashboard.id}`] = menuCustom
 				menuCustom.appendChild(label);
-				menuCustom.appendChild(editButton);
 				submenusCustom.appendChild(menuCustom);
 			}
 			loader.remove();
