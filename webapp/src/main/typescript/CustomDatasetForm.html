@@ -102,6 +102,11 @@
         color: #111111;
     }
 
+    .readonly-value {
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+
     .row-inline {
         display: flex;
         gap: 10px;
@@ -224,6 +229,14 @@
                 <div class="form-row">
                     <span class="form-label">Name</span>
                     <input class="dashboard-name" type="text" data-testid="input-dashboard-name">
+                </div>
+                <div class="form-row">
+                    <span class="form-label">User</span>
+                    <span class="current-user readonly-value"></span>
+                </div>
+                <div class="form-row">
+                    <span class="form-label">Role</span>
+                    <span class="current-role readonly-value"></span>
                 </div>
             </div>
         </div>
