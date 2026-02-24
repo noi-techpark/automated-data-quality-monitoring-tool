@@ -338,6 +338,8 @@ export class CustomDatasetForm extends CommonWebComponent
         state.current_timeseries_mperiod = definition.timeseries?.mperiod ?? ''
         const checks = Array.isArray(definition.checks) ? definition.checks : []
         const fieldNames = field_names(state)
+        this.#currentUser.textContent = definition.user_id ?? this.#currentUser.textContent ?? 'anonymous'
+        this.#currentRole.textContent = definition.user_role ?? this.#currentRole.textContent ?? 'opendata'
         state.qualityChecks = checks.map((row: any) => ({
             __id: crypto.randomUUID(),
             field_name: row.field_name ?? '',
@@ -429,6 +431,8 @@ export class CustomDatasetForm extends CommonWebComponent
                 data_provider: state.current_dataprovider,
                 dataset: state.current_filtered_dataset,
                 dataset_type: datasets_filtered_current_type(state),
+                user_id: this.#currentUser.textContent ?? 'anonymous',
+                user_role: this.#currentRole.textContent ?? 'opendata',
                 timeseries: {
                     active_status: state.current_timeseries_active_status,
                     datatype: state.current_timeseries_datatype,
