@@ -25,11 +25,11 @@ export class API3 {
 
 	// begin crudl methods
 
-	static async list__catchsolve_noiodh__test_dataset_max_ts_vw
-	(filter: catchsolve_noiodh__test_dataset_max_ts_vw__byexample):
-	 Promise<catchsolve_noiodh__test_dataset_max_ts_vw__row[]>
+	static async list__catchsolve_noiodh__standard_dashboards_latest
+	(filter: catchsolve_noiodh__standard_dashboards_latest__byexample):
+	 Promise<catchsolve_noiodh__standard_dashboards_latest__row[]>
 	{
-		const resp = await API3.call('catchsolve_noiodh.catchsolve_noiodh__test_dataset_max_ts_vw', filter)
+		const resp = await API3.call('catchsolve_noiodh.standard_dashboards_latest', filter)
 		return resp;
 	}
 
@@ -166,7 +166,7 @@ export interface catchsolve_noiodh__test_dataset_history_vw__row {
 	session_start_ts: string
 }
 
-export interface catchsolve_noiodh__test_dataset_max_ts_vw__row {
+export interface catchsolve_noiodh__standard_dashboards_latest__row {
 	dataset_img_url: string
 	dataset_name: string
 	failed_records: number
@@ -256,7 +256,7 @@ export interface catchsolve_noiodh__test_dataset_history_vw__byexample {
 	session_start_ts?: string
 }
 
-export interface catchsolve_noiodh__test_dataset_max_ts_vw__byexample {
+export interface catchsolve_noiodh__standard_dashboards_latest__byexample {
 	dataset_img_url?: string
 	dataset_name?: string
 	failed_records?: number

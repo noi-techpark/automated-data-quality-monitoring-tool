@@ -66,7 +66,7 @@ export class MenuComponent extends CommonWebComponent
 
 		let menuready_fun: (x: null) => void
 		this.menuready_promise = new Promise(s => menuready_fun = s);
-		const json_promise = API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({used_key: currentRole})
+		const json_promise = API3.list__catchsolve_noiodh__standard_dashboards_latest({used_key: currentRole})
 		const custom_dashboards_promise = isOpendata
 			? Promise.resolve([] as catchsolve_noiodh__custom_dashboards__row[])
 			: API3.list__catchsolve_noiodh__custom_dashboards({

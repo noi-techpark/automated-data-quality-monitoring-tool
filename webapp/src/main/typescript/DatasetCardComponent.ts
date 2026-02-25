@@ -6,7 +6,7 @@ import { CommonWebComponent } from "./CommonWebComponent.js";
 import { cs_cast, throwNPE } from "./quality.js";
 
 import { LabelAndData } from "./LabelAndData.js"
-import { catchsolve_noiodh__test_dataset_max_ts_vw__row } from "./api/api3.js";
+import { catchsolve_noiodh__standard_dashboards_latest__row } from "./api/api3.js";
 import template from './DatasetCardComponent.html?raw'
 
 export class DatasetCardComponent extends CommonWebComponent
@@ -99,7 +99,7 @@ export class DatasetCardComponent extends CommonWebComponent
 	}
 
 	
-	refresh(dataset: catchsolve_noiodh__test_dataset_max_ts_vw__row)
+	refresh(dataset: catchsolve_noiodh__standard_dashboards_latest__row)
 	{
 		const datestr = dataset.session_start_ts
 		const date = new Date(datestr)

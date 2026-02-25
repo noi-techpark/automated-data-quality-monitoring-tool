@@ -5,7 +5,7 @@
 import { CommonWebComponent } from './CommonWebComponent.js';
 import { DatasetCardComponent } from './DatasetCardComponent.js';
 import { Loader } from './Loader.js';
-import { API3, catchsolve_noiodh__test_dataset_max_ts_vw__row } from './api/api3.js';
+import { API3, catchsolve_noiodh__standard_dashboards_latest__row } from './api/api3.js';
 import { kc } from './auth.js';
 import { cs_cast } from './quality.js';
 import template from './CustomDashboardsComponent.html?raw'
@@ -51,7 +51,7 @@ export class CustomDashboardsComponent extends CommonWebComponent
 		const used_key = sessionStorage.getItem('used_key_role') ?? ''
 		const [datasets, dashboards] = await Promise.all([
 			// TODO manage custom dataset test too
-			[] as catchsolve_noiodh__test_dataset_max_ts_vw__row[],
+			[] as catchsolve_noiodh__standard_dashboards_latest__row[],
 			API3.list__catchsolve_noiodh__custom_dashboards({})
 		])
 		loader.remove();
@@ -130,7 +130,7 @@ export class CustomDashboardsComponent extends CommonWebComponent
 		return card
 	}
 
-	private buildFallbackDataset(datasetName: string): catchsolve_noiodh__test_dataset_max_ts_vw__row
+	private buildFallbackDataset(datasetName: string): catchsolve_noiodh__standard_dashboards_latest__row
 	{
 		return {
 			dataset_img_url: '',

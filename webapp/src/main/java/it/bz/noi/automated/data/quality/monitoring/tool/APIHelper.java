@@ -87,9 +87,9 @@ public class APIHelper
 				list = list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(filterJson);
 				resp.getWriter().write(list.toPrettyString());
 				break;
-			case "catchsolve_noiodh.catchsolve_noiodh__test_dataset_max_ts_vw":
+			case "catchsolve_noiodh.standard_dashboards_latest":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__test_dataset_maxts_vw(filterJson, auth.getRoles());
+				list = list__catchsolve_noiodh__standard_dashboards_latest(filterJson, auth.getRoles());
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw":
@@ -214,7 +214,7 @@ public class APIHelper
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_maxts_vw(ObjectNode filter, ArrayList<String> user_odh_roles) throws SQLException
+	private static ArrayNode list__catchsolve_noiodh__standard_dashboards_latest(ObjectNode filter, ArrayList<String> user_odh_roles) throws SQLException
 	{
 		String sql = """
 				select *
