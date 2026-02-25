@@ -34,8 +34,8 @@ export class API3 {
 	}
 
 	static async list__catchsolve_noiodh__custom_dashboards
-	(filter: catchsolve_noiodh__custom_dashboards__byexample):
-	 Promise<catchsolve_noiodh__custom_dashboards__row[]>
+	(filter: catchsolve_noiodh__standard_dashboards_latest__byexample):
+	 Promise<catchsolve_noiodh__standard_dashboards_latest__row[]>
 	{
 		const resp = await API3.call('catchsolve_noiodh.custom_dashboards', filter)
 		return resp;
@@ -172,6 +172,7 @@ export interface catchsolve_noiodh__standard_dashboards_latest__row {
 	failed_records: number
 	session_start_ts: string
 	tested_records: number
+	custom_dashboard_id?: number
 }
 
 export interface catchsolve_noiodh__custom_dashboards__row {

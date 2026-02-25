@@ -48,25 +48,18 @@ export class CustomDashboardsComponent extends CommonWebComponent
 		this.boxContainer.textContent = ('');
 		const loader = new Loader();
 		this.boxContainer.appendChild(loader)
-		const used_key = sessionStorage.getItem('used_key_role') ?? ''
-		const [datasets, dashboards] = await Promise.all([
-			// TODO manage custom dataset test too
-			[] as catchsolve_noiodh__standard_dashboards_latest__row[],
-			API3.list__catchsolve_noiodh__custom_dashboards({})
-		])
+		const dashboards = await API3.list__catchsolve_noiodh__custom_dashboards({})
 		loader.remove();
-		const datasetByName = new Map(datasets.map((row) => [row.dataset_name, row]))
 		for (let dashboard of dashboards)
 		{
-			const dataset = datasetByName.get(dashboard.name) ?? this.buildFallbackDataset(dashboard.name)
 			const box = new DatasetCardComponent();
-			box.edit_hash = `#customdataset?id=${dashboard.id}`;
-			box.menu_edit_hash = `#customdataset?id=${dashboard.id}`
+			box.edit_hash = `#customdataset?id=${dashboard.custom_dashboard_id}`;
+			// box.menu_edit_hash = `#customdataset?id=${dashboard.custom_dashboard_id}`
 			box.menu_on_delete = async () => {
-				if (!confirm(`Delete "${dashboard.name}"?`)) {
+				if (!confirm(`Delete "${dashboard.dataset_name}"?`)) {
 					return
 				}
-				const ok = await this.deleteCustomDashboard(dashboard.id)
+				const ok = await this.deleteCustomDashboard(dashboard.custom_dashboard_id!)
 				if (!ok) {
 					alert('Delete failed')
 					return
@@ -79,15 +72,11 @@ export class CustomDashboardsComponent extends CommonWebComponent
 				box.remove()
 			}
 			this.boxContainer.appendChild(box)
-			box.refresh(dataset)
-			/*
-			box.onclick = () => {
-				location.hash = `#customdataset?id=${dashboard.id}`;
-				window.scrollTo(0,0);
-			}
-			 */
+			
+			box.refresh(dashboard)
+		
 			this.boxes.push(box)
-			this.titles.push(dashboard.name)
+			this.titles.push(dashboard.dataset_name)
 		}
 		this.boxContainer.appendChild(this.createAddDatasetCard())
 	}

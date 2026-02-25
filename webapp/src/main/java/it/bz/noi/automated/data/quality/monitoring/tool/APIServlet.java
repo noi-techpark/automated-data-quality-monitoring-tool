@@ -159,8 +159,6 @@ public class APIServlet extends HttpServlet {
 	}
 
 	private void delete_custom_dashboard(UserAuthInfo userAuth, String id) throws SQLException {
-		if (userAuth.isAnonymous())
-			return;
 		long dashboardId = Long.parseLong(id);
 		try (Connection conn = DriverManager.getConnection(System.getenv("JDBC_URL")))
 		{
@@ -196,11 +194,6 @@ public class APIServlet extends HttpServlet {
 		public ArrayList<String> getRoles()
 		{
 			return this.roles;
-		}
-
-		public boolean isAnonymous()
-		{
-			return this.sub == null;
 		}
 
 		public String getSub()

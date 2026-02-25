@@ -72,6 +72,7 @@ export class MenuComponent extends CommonWebComponent
 		const loader = new Loader();
 		this.sroot.appendChild(loader)
 		Promise.all([json_promise, custom_dashboards_promise]).then(([json, customDashboards]) => {
+			/*
 			const datasetByName = new Map(json.map((dataset) => [dataset.dataset_name, dataset]))
 			const datasetByCustomDashboardId = new Map(
 				customDashboards.map((dashboard) => {
@@ -79,6 +80,7 @@ export class MenuComponent extends CommonWebComponent
 					return [dashboard.id, datasetByName.get(definition.dataset)]
 				})
 			)
+			 */
 			for (let dataset of json)
 			{
 				const menu1_submenu = document.createElement('div');
@@ -99,9 +101,10 @@ export class MenuComponent extends CommonWebComponent
 				const menuCustom = document.createElement('div');
 				menuCustom.className = 'flex-row'
 				const label = document.createElement('span');
-				label.textContent = dashboard.name;
+				label.textContent = dashboard.dataset_name;
 				label.className = 'flex-grow'
 				menuCustom.onclick = () => {
+					/*
 					const dataset = datasetByCustomDashboardId.get(dashboard.id)
 					if (dataset) {
 						location.hash = '#page=dataset-categories' +
@@ -112,8 +115,10 @@ export class MenuComponent extends CommonWebComponent
 					} else {
 						location.hash = `#customdataset?id=${dashboard.id}`
 					}
+					 */
 				};
-				this.menuitemByName[`custom:${dashboard.id}`] = menuCustom
+				// TODO
+				// this.menuitemByName[`custom:${dashboard.id}`] = menuCustom
 				menuCustom.appendChild(label);
 				submenusCustom.appendChild(menuCustom);
 			}

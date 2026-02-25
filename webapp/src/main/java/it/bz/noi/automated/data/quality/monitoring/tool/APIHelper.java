@@ -217,11 +217,18 @@ public class APIHelper
 	private static ArrayNode list__catchsolve_noiodh__standard_dashboards_latest(UserAuthInfo auth) throws SQLException
 	{
 		String sql = """
-				select *
-				  from catchsolve_noiodh.test_dataset_max_ts_vw
-				  where used_key = ?
-				    and owner = 'public'
-				 order by dataset_name
+				select
+					owner,
+					used_key,
+					dataset_name,
+					session_start_ts,
+					tested_records,
+					dataset_img_url,
+					failed_records
+		    	from catchsolve_noiodh.test_dataset_max_ts_vw
+				where used_key = ?
+				and owner = 'public'
+				order by dataset_name;
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
 		wherevalues.add(auth.getCurrentRole());
@@ -230,8 +237,6 @@ public class APIHelper
 
 	private static ArrayNode list__catchsolve_noiodh__custom_dashboards(ObjectNode filter, UserAuthInfo auth) throws SQLException
 	{
-		if (auth.isAnonymous())
-			return new ObjectMapper().createArrayNode();
 		String userRole = auth.getCurrentRole();
 		String userId = auth.getSub();
 		Integer id = null;
@@ -239,18 +244,45 @@ public class APIHelper
 			id = filter.get("id").asInt();
 		ArrayList<Object> wherevalues = new ArrayList<>();
 		StringBuilder sql = new StringBuilder("""
-				select id, user_id, user_role, name, test_definition_json
-				  from catchsolve_noiodh.custom_dashboards
-				 where user_id = ? and user_role = ?
+				select
+					owner,
+					used_key,
+					dataset_name,
+					session_start_ts,
+					tested_records,
+					dataset_img_url,
+					failed_records,
+					custom_dashboard_id
+				from catchsolve_noiodh.test_dataset_max_ts_vw
+				where owner = ?
+				and used_key = ?
+				-- needed in the case no test is performed at the beginning
+				union
+				select
+					user_id,
+					user_role,
+					name,
+					to_timestamp(0),
+					0,
+					'',
+					0,
+					id as custom_dashboard_id
+				from catchsolve_noiodh.custom_dashboards
+				where user_id = ?
+				and user_role = ?
 				""");
+		wherevalues.add(userId);
+		wherevalues.add(userRole);
 		wherevalues.add(userId);
 		wherevalues.add(userRole);
 		if (id != null)
 		{
+			if (true)
+				throw new RuntimeException();
 			sql.append(" and id = ?");
 			wherevalues.add(id);
 		}
-		sql.append(" order by name");
+		sql.append(" order by dataset_name");
 		return execute_query(sql.toString(), wherevalues);
 	}
 
