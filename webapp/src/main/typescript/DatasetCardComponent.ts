@@ -18,14 +18,9 @@ export class DatasetCardComponent extends CommonWebComponent
 	failedrecs
 	lastupdate
 
-	#editdiv
 	#edit_hash: string
 	#menu
 	#menuButton
-	#menuList
-	#menuEdit
-	#menuDelete
-	#menuDeleteHandler: (() => void) | null
 	
 	constructor()
 	{
@@ -37,12 +32,8 @@ export class DatasetCardComponent extends CommonWebComponent
 		this.dtitle     = cs_cast(HTMLDivElement,    this.sroot.querySelector('.title'))
 		this.img        = cs_cast(HTMLImageElement,  this.sroot.querySelector('.img'))
 		this.lastupdate = cs_cast(HTMLSpanElement,   this.sroot.querySelector('.lastupdate .data'))
-		this.#editdiv   = cs_cast(HTMLDivElement,   this.sroot.querySelector('.edit'))
 		this.#menu      = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu'))
 		this.#menuButton = cs_cast(HTMLButtonElement, this.sroot.querySelector('.menu-button'))
-		this.#menuList   = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu-list'))
-		this.#menuEdit   = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu-item.edit'))
-		this.#menuDelete = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu-item.delete'))
 				
 		// this.img.style.display = 'none';
 		
@@ -51,30 +42,11 @@ export class DatasetCardComponent extends CommonWebComponent
 		this.failedrecs.setLabel('passed checks')
 
 		this.#edit_hash = ''
-		this.#menuDeleteHandler = null
 
 		this.#menuButton.onclick = (event) => {
 			event.stopPropagation()
-			this.#menu.classList.toggle('open')
-		}
-		this.#menuEdit.onclick = (event) => {
-			event.stopPropagation()
-			this.#menu.classList.remove('open')
 			location.hash = this.#edit_hash			
 		}
-		this.#menuDelete.onclick = (event) => {
-			event.stopPropagation()
-			this.#menu.classList.remove('open')
-			this.#menuDeleteHandler?.()
-		}
-		/*
-		document.addEventListener('click', (event) => {
-			if (event.composedPath().includes(this)) {
-				return
-			}
-			this.#menu.classList.remove('open')
-		})
-		 */
 		
 		// this.failedrecs.setSeverity("fail")
 		// this.failedrecs.setData('123')
@@ -86,16 +58,12 @@ export class DatasetCardComponent extends CommonWebComponent
 	}
 
 	set menu_on_delete(v: (() => void) | null) {
-		this.#menuDeleteHandler = v
 		this.#resync_menu()
 	}
 
 	#resync_menu() {
 		const showMenu = this.#edit_hash !== ''
 		this.#menu.classList.toggle('display-none', !showMenu)
-		if (!showMenu) {
-			this.#menu.classList.remove('open')
-		}
 	}
 
 	
@@ -131,10 +99,8 @@ export class DatasetCardComponent extends CommonWebComponent
 				this.failedrecs.setQualityLevel("fail")
 		}
 		 */
-		this.#editdiv.classList.toggle('display-none', this.#edit_hash === '')
 		this.lastupdate.textContent = dateformat
 		this.onclick = () => {
-			this.#menu.classList.remove('open')
 			const escapedDatasetName = encodeURIComponent(dataset.dataset_name ?? '')
 			location.hash = '#page=dataset-categories' + '&dataset_name=' + escapedDatasetName 
 							+ "&session_start_ts=" + dataset.session_start_ts
