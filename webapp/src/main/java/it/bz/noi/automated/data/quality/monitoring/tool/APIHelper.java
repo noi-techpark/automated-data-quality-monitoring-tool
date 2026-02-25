@@ -89,7 +89,7 @@ public class APIHelper
 				break;
 			case "catchsolve_noiodh.standard_dashboards_latest":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__standard_dashboards_latest(filterJson, auth.getRoles());
+				list = list__catchsolve_noiodh__standard_dashboards_latest(auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw":
@@ -214,18 +214,17 @@ public class APIHelper
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__standard_dashboards_latest(ObjectNode filter, ArrayList<String> user_odh_roles) throws SQLException
+	private static ArrayNode list__catchsolve_noiodh__standard_dashboards_latest(UserAuthInfo auth) throws SQLException
 	{
 		String sql = """
 				select *
 				  from catchsolve_noiodh.test_dataset_max_ts_vw
 				  where used_key = ?
+				    and owner = 'public'
 				 order by dataset_name
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
-		String textValue = ((TextNode)filter.get("used_key")).textValue();
-		checkUserAllowed(user_odh_roles, textValue);
-		wherevalues.add(textValue);
+		wherevalues.add(auth.getCurrentRole());
 		return execute_query(sql, wherevalues);
 	}
 

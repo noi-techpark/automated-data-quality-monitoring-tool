@@ -6,6 +6,7 @@ import { CommonWebComponent } from './CommonWebComponent.js';
 import { Loader } from './Loader.js';
 import {API3, catchsolve_noiodh__custom_dashboards__row} from './api/api3.js';
 import { cs_cast } from './quality.js';
+import { kc } from './auth.js';
 import template from './MenuComponent.html?raw'
 
 export class MenuComponent extends CommonWebComponent
@@ -26,10 +27,10 @@ export class MenuComponent extends CommonWebComponent
 		this.menuitemByName[''] = title
 		this.menuitemByName['custom'] = customTitle
 
-		const currentRole = sessionStorage.getItem('used_key_role') ?? 'opendata'
-		const isOpendata = currentRole === 'opendata'
-		customTitle.classList.toggle('display-none', isOpendata)
-		submenusCustom.classList.toggle('display-none', isOpendata)
+		const isPublic: boolean = !kc.authenticated;
+
+		// customTitle.classList.toggle('display-none', isPublic)
+		// submenusCustom.classList.toggle('display-none', isPublic)
 		
 		title.onclick = () => {
 			title.classList.toggle('close')
@@ -66,11 +67,8 @@ export class MenuComponent extends CommonWebComponent
 
 		let menuready_fun: (x: null) => void
 		this.menuready_promise = new Promise(s => menuready_fun = s);
-		const json_promise = API3.list__catchsolve_noiodh__standard_dashboards_latest({used_key: currentRole})
-		const custom_dashboards_promise = isOpendata
-			? Promise.resolve([] as catchsolve_noiodh__custom_dashboards__row[])
-			: API3.list__catchsolve_noiodh__custom_dashboards({
-			})
+		const json_promise = API3.list__catchsolve_noiodh__standard_dashboards_latest({})
+		const custom_dashboards_promise = API3.list__catchsolve_noiodh__custom_dashboards({})
 		const loader = new Loader();
 		this.sroot.appendChild(loader)
 		Promise.all([json_promise, custom_dashboards_promise]).then(([json, customDashboards]) => {
