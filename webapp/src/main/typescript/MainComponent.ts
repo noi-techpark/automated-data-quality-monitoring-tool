@@ -111,7 +111,7 @@ export class MainComponent extends CommonWebComponent
 						try {
 							const draft = form.getCustomDashboardDraft()
 							const payload: { id: number; name: string; test_definition_json: any } = {
-								id: draft.id!,
+								id: Number(idParam),
 								name: draft.name,
 								test_definition_json: draft.test_definition_json
 							}
@@ -152,7 +152,7 @@ export class MainComponent extends CommonWebComponent
 					})
 					this.changingSection.appendChild(form)
 					const elaborationHandle = form.setElaborationInProgress()
-					const rows = await API3.list__catchsolve_noiodh__custom_dashboards({ id: Number(idParam) })
+					const rows = await API3.list__catchsolve_noiodh__custom_dashboard({ id: Number(idParam) })
 					if (rows.length === 0) {
 						await form.loadCustomDashboard({}, Number(idParam), 'noname')
 						elaborationHandle.close()

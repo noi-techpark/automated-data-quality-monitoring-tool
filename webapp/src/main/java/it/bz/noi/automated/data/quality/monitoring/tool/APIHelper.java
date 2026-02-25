@@ -117,6 +117,11 @@ public class APIHelper
 				list = list__catchsolve_noiodh__custom_dashboards(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
+			case "catchsolve_noiodh.custom_dashboard":
+				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+				list = list__catchsolve_noiodh__custom_dashboard(filterJson, auth);
+				resp.getWriter().write(list.toPrettyString());
+				break;
 			case "catchsolve_noiodh.custom_dashboards_next_id":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__catchsolve_noiodh__custom_dashboards_next_id();
@@ -233,6 +238,31 @@ public class APIHelper
 		ArrayList<Object> wherevalues = new ArrayList<>();
 		wherevalues.add(auth.getCurrentRole());
 		return execute_query(sql, wherevalues);
+	}
+
+	private static ArrayNode list__catchsolve_noiodh__custom_dashboard(ObjectNode filter, UserAuthInfo auth) throws SQLException
+	{
+		String userRole = auth.getCurrentRole();
+		String userId = auth.getSub();
+		Integer id = null;
+		if (filter.get("id") != null && !filter.get("id").isNull())
+			id = filter.get("id").asInt();
+		ArrayList<Object> wherevalues = new ArrayList<>();
+		StringBuilder sql = new StringBuilder("""
+				select
+					user_id,
+					user_role,
+					name,
+					test_definition_json
+				from catchsolve_noiodh.custom_dashboards
+				where user_id = ?
+				and user_role = ?
+				and id = ?
+				""");
+		wherevalues.add(userId);
+		wherevalues.add(userRole);
+		wherevalues.add(id);
+		return execute_query(sql.toString(), wherevalues);
 	}
 
 	private static ArrayNode list__catchsolve_noiodh__custom_dashboards(ObjectNode filter, UserAuthInfo auth) throws SQLException

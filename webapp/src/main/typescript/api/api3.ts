@@ -41,6 +41,15 @@ export class API3 {
 		return resp;
 	}
 
+
+	static async list__catchsolve_noiodh__custom_dashboard
+	(filter: catchsolve_noiodh__custom_dashboards__byexample):
+	 Promise<catchsolve_noiodh__custom_dashboards__row[]>
+	{
+		const resp = await API3.call('catchsolve_noiodh.custom_dashboard', filter)
+		return resp;
+	}
+
 	static async get__catchsolve_noiodh__custom_dashboards_next_id():
 	 Promise<number>
 	{
