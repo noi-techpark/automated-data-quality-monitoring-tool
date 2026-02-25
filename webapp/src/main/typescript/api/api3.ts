@@ -12,8 +12,8 @@ export class API3 {
 		const params = new URLSearchParams();
 		params.append('action', action);
 		params.append('filter_byexample', JSON.stringify(json));
-		const current_role = sessionStorage.getItem('used_key_role');
-		params.append('current_role', current_role!);
+		const current_role = sessionStorage.getItem('used_key_role') ?? 'opendata';
+		params.append('current_role', current_role);
 
 		const access_token = kc.token;
 		const headers: HeadersInit = access_token ? { Authorization: `Bearer ${access_token}` } : {};
