@@ -49,6 +49,10 @@ import jakarta.servlet.http.HttpServletResponse;
 public class APIServlet extends HttpServlet {
 
 	private ConfigurableJWTProcessor<SecurityContext> jwtProcessor;
+	
+	private static final class NotAuthorizedException extends Exception {
+		private static final long serialVersionUID = 1L;
+	}
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -83,6 +87,8 @@ public class APIServlet extends HttpServlet {
 			resp.addHeader("Access-Control-Allow-Origin", "*");
 			UserAuthInfo userAuth = this.readAllowedODHUserRoles(req);
 			APIHelper.processRequest(req, resp, userAuth);
+		} catch (NotAuthorizedException exxx) {
+			resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 		} catch (Exception exxx) {
 			throw new ServletException(exxx);
 		}
@@ -106,6 +112,10 @@ public class APIServlet extends HttpServlet {
 						delete_custom_dashboard(userAuth, id);
 					break;
 			}
+		}
+		catch(NotAuthorizedException e)
+		{
+			resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 		catch(Exception e)
 		{
@@ -205,13 +215,13 @@ public class APIServlet extends HttpServlet {
 	}
 
 	private UserAuthInfo readAllowedODHUserRoles(HttpServletRequest req)
-			throws ParseException, BadJOSEException, JOSEException, JsonProcessingException {
+			throws ParseException, BadJOSEException, JOSEException, JsonProcessingException, NotAuthorizedException {
 		String currentRole = req.getParameter("current_role");
 		String authorizationHeader = req.getHeader("Authorization");
-		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
 			ArrayList<String> user_odh_roles = new ArrayList<>(1);
 			user_odh_roles.add("opendata");
-			return new UserAuthInfo(user_odh_roles, null, currentRole);
+		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+			return new UserAuthInfo(user_odh_roles, "public", currentRole);
 		}
 		String token = authorizationHeader.substring("Bearer ".length()).trim();
 	
@@ -219,8 +229,6 @@ public class APIServlet extends HttpServlet {
 
 		// validate token and some basic default checks on claims
 		JWTClaimsSet claim = this.jwtProcessor.process(signedJWT, null);
-
-		ArrayList<String> user_odh_roles = new ArrayList<String>();
 
 		String sub = claim.getSubject();
 		Object resourceAccessObj = claim.getClaim("resource_access");
@@ -237,6 +245,10 @@ public class APIServlet extends HttpServlet {
 					}
 				}
 			}
+		}
+
+		if (!user_odh_roles.contains(currentRole)) {
+			throw new NotAuthorizedException();
 		}
 
 		return new UserAuthInfo(user_odh_roles, sub, currentRole);
