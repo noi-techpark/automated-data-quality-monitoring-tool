@@ -21,15 +21,17 @@ model rules {
 }
 
 model test_dataset {
-  id                 BigInt               @unique @default(autoincrement())
-  session_start_ts   DateTime             @db.Timestamptz(6)
-  dataset_name       String
-  tested_records     Int                  @default(0)
-  dataset_img_url    String               @default("")
-  errors             String?
-  dataset_dataspace  String?
-  used_key           String?
-  test_dataset_check test_dataset_check[]
+  id                  BigInt               @unique @default(autoincrement())
+  session_start_ts    DateTime             @db.Timestamptz(6)
+  dataset_name        String
+  tested_records      Int                  @default(0)
+  dataset_img_url     String               @default("")
+  errors              String?
+  dataset_dataspace   String?
+  used_key            String?
+  owner               String               @default("public")
+  custom_dashboard_id Int?
+  test_dataset_check  test_dataset_check[]
 
   @@id([session_start_ts, dataset_name])
   @@unique([session_start_ts, dataset_name], map: "session_start_ts_dataset_name_unique")
@@ -63,4 +65,12 @@ model test_dataset_record_check_failed {
 
   @@index([session_start_ts, dataset_name, check_category, check_name], map: "test_dataset_record_check_fai_session_start_ts_dataset_name_idx")
   @@map("test_dataset_record_check_failed")
+}
+
+model custom_dashboards {
+  id                   BigInt @unique @default(autoincrement())
+  user_id              String
+  user_role            String
+  name                 String
+  test_definition_json String
 }

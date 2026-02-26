@@ -62,6 +62,7 @@ export interface DataQualityRule {
 }
 
 export interface Check {
+  owner: string;
   name: string;
   category: string;
   description: string;
@@ -70,7 +71,7 @@ export interface Check {
   data_quality_rule: DataQualityRule;
 }
 
-export async function doTestFor(
+export async function doPublicTestFor(
   sessionStartTs: Date,
   KEYCLOAK_BASE_URL: string,
   KEYCLOAK_CLIENT_ID: string,
