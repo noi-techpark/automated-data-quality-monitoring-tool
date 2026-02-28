@@ -68,7 +68,7 @@ export class AuthComponent extends CommonWebComponent {
 			const token = kc.token!;
 			const decoded: any = jwtDecode(token);
 			const username = decoded.preferred_username || decoded.name || 'User';
-			this.user_label.textContent = username;
+			this.user_label.textContent = [username, decoded.sub].filter(Boolean).join(' ');
 			
 			this.div_unauthenticated.classList.add('display-none');
 			this.div_authenticated.classList.remove('display-none');

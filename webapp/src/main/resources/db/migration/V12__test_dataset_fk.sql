@@ -1,0 +1,9 @@
+
+ALTER TABLE catchsolve_noiodh.test_dataset_record_check_failed
+ADD COLUMN test_dataset_id bigint;
+
+ALTER TABLE catchsolve_noiodh.test_dataset_record_check_failed
+ADD CONSTRAINT fk_test_dataset_record_check_failed_dataset
+FOREIGN KEY (test_dataset_id)
+REFERENCES catchsolve_noiodh.test_dataset(id)
+ON DELETE CASCADE;

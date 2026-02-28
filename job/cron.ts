@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { readFileSync } from 'fs';
 import path from 'path';
-import { doPublicTestFor } from '.';
+import { doPrivateTestFor, doPublicTestFor } from '.';
 
 console.log("\r\n\r\n          _ _               _           _           \r\n  ___  __| | |_    ___   __| |_  ___ __| |_____ _ _ \r\n \/ _ \\\/ _` | \' \\  |___| \/ _| \' \\\/ -_) _| \/ \/ -_) \'_|\r\n \\___\/\\__,_|_||_|       \\__|_||_\\___\\__|_\\_\\___|_|  \r\n                                                    \r\n\r\n");
 
@@ -79,7 +79,7 @@ async function onTick() {
         const test_start_ts = new Date();
         console.log('Cron job executed at', test_start_ts.toISOString());
         console.log(`Account for client_id=${account.CLIENT_ID}, realm=${account.REALM}, associated_role=${account.ASSOCIATED_ROLE}`);
-        await doPublicTestFor(
+        await doPrivateTestFor(
           test_start_ts,
           KEYCLOAK_BASE_URL,
           account.CLIENT_ID,

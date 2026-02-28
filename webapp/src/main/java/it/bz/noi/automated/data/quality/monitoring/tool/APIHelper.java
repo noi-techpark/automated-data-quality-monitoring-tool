@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.LongNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.icu.text.SimpleDateFormat;
@@ -287,7 +288,7 @@ public class APIHelper
 				where owner = ?
 				and used_key = ?
 				-- needed in the case no test is performed at the beginning
-				union
+				union all
 				select
 					user_id,
 					user_role,
@@ -297,23 +298,24 @@ public class APIHelper
 					'',
 					0,
 					id as custom_dashboard_id
-				from catchsolve_noiodh.custom_dashboards
+				from catchsolve_noiodh.custom_dashboards as cd
 				where user_id = ?
 				and user_role = ?
+				and not exists (
+					select 1
+					from catchsolve_noiodh.test_dataset_max_ts_vw v
+					where v.owner = cd.user_id
+					  and v.used_key = cd.user_role
+					  and v.dataset_name = cd.name
+				)
 				""");
 		wherevalues.add(userId);
 		wherevalues.add(userRole);
 		wherevalues.add(userId);
 		wherevalues.add(userRole);
-		if (id != null)
-		{
-			if (true)
-				throw new RuntimeException();
-			sql.append(" and id = ?");
-			wherevalues.add(id);
-		}
 		sql.append(" order by dataset_name");
-		return execute_query(sql.toString(), wherevalues);
+		String sqltxt = sql.toString();
+		return execute_query(sqltxt, wherevalues);
 	}
 
 	private static ArrayNode list__catchsolve_noiodh__custom_dashboards_next_id() throws SQLException
@@ -435,7 +437,8 @@ public class APIHelper
 				{
 					String name = meta.getColumnLabel(c + 1);
 					Object value = rs.getObject(c + 1);
-					JsonNode valueJson = switch (value.getClass().getName())
+					System.out.println("readin " + name + " value");
+					JsonNode valueJson = value == null ? NullNode.instance : switch (value.getClass().getName())
 					{
 						case "java.lang.String" -> TextNode.valueOf((String)value);
 						case "java.lang.Long" -> LongNode.valueOf((Long)value);
