@@ -180,7 +180,7 @@ for (const item of metadata_json.Items) {
         // this is an approximation as multiple rules can apply to same record in different scope urls
         // to avoid overcounting we should define unique record ids across rules and datasets
         dataset_tested_record_count += rule_tested_record_count;
-        await updateTestedRecords(item.Shortname, dataset_tested_record_count, sessionStartTs, OWNER, KEYCLOAK_ASSOCIATED_ROLE);
+        await updateTestedRecords(p_test_dataset_id, dataset_tested_record_count);
     
     }
 }
@@ -246,7 +246,7 @@ for (let i = 0; i < rules.length; i++) {
             }
 
             const  dataset_tested_record_count = rule_tested_record_count;
-            await updateTestedRecords(rule.name, dataset_tested_record_count, sessionStartTs, rule.owner, KEYCLOAK_ASSOCIATED_ROLE);
+            await updateTestedRecords(p_test_dataset_id, dataset_tested_record_count);
 
 
             break;
@@ -450,13 +450,10 @@ sessionStartTs: Date, datasetName: string, checkName: string, category: string, 
 }
  */
 
-async function updateTestedRecords(datasetName: string, testedRecordCount: number, sessionStartTs: Date, p_owner: string, p_used_key: string): Promise<void> {
+async function updateTestedRecords(testDatasetId: number, testedRecordCount: number): Promise<void> {
     await prisma.test_dataset.updateMany({
         where: {
-            session_start_ts: sessionStartTs,
-            dataset_name: datasetName,
-            owner: p_owner,
-            used_key: p_used_key
+            id: testDatasetId
         },
         data: {
             tested_records: testedRecordCount
