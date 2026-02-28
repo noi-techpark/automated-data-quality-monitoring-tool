@@ -88,12 +88,8 @@ export class MenuComponent extends CommonWebComponent
 				this.menuitemByName[dataset.dataset_name] = menu1_submenu
 				this.submenus.appendChild(menu1_submenu);
 				menu1_submenu.onclick = () => {
-					location.hash = '#page=dataset-categories' +
-					                '&dataset_name=' + dataset.dataset_name + 
-									'&session_start_ts=' + dataset.session_start_ts 
-									+ "&failed_records=" + dataset.failed_records
-									+ "&tested_records=" + dataset.tested_records
-
+					if (dataset.test_dataset_id != null)
+						location.hash = '#page=dataset-categories&test_dataset_id=' + dataset.test_dataset_id
 				}
 			}
 			for (let dashboard of customDashboards)
@@ -104,18 +100,11 @@ export class MenuComponent extends CommonWebComponent
 				label.textContent = dashboard.dataset_name;
 				label.className = 'flex-grow'
 				menuCustom.onclick = () => {
-					/*
-					const dataset = datasetByCustomDashboardId.get(dashboard.id)
-					if (dataset) {
-						location.hash = '#page=dataset-categories' +
-						                '&dataset_name=' + dataset.dataset_name +
-										'&session_start_ts=' + dataset.session_start_ts
-										+ "&failed_records=" + dataset.failed_records
-										+ "&tested_records=" + dataset.tested_records
+					if (dashboard.test_dataset_id != null) {
+						location.hash = '#page=dataset-categories&test_dataset_id=' + dashboard.test_dataset_id
 					} else {
 						location.hash = `#customdataset?id=${dashboard.id}`
 					}
-					 */
 				};
 				// TODO
 				// this.menuitemByName[`custom:${dashboard.id}`] = menuCustom

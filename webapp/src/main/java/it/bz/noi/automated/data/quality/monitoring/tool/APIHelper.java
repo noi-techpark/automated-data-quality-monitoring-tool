@@ -230,7 +230,8 @@ public class APIHelper
 					session_start_ts,
 					tested_records,
 					dataset_img_url,
-					failed_records
+					failed_records,
+					test_dataset_id
 		    	from catchsolve_noiodh.test_dataset_max_ts_vw
 				where used_key = ?
 				and owner = 'public'
@@ -283,7 +284,8 @@ public class APIHelper
 					tested_records,
 					dataset_img_url,
 					failed_records,
-					custom_dashboard_id
+					custom_dashboard_id,
+					test_dataset_id
 				from catchsolve_noiodh.test_dataset_max_ts_vw
 				where owner = ?
 				and used_key = ?
@@ -297,7 +299,8 @@ public class APIHelper
 					0,
 					'',
 					0,
-					id as custom_dashboard_id
+					id as custom_dashboard_id,
+					null as test_dataset_id
 				from catchsolve_noiodh.custom_dashboards as cd
 				where user_id = ?
 				and user_role = ?

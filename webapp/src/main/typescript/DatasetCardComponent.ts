@@ -101,11 +101,10 @@ export class DatasetCardComponent extends CommonWebComponent
 		 */
 		this.lastupdate.textContent = dateformat
 		this.onclick = () => {
-			const escapedDatasetName = encodeURIComponent(dataset.dataset_name ?? '')
-			location.hash = '#page=dataset-categories' + '&dataset_name=' + escapedDatasetName 
-							+ "&session_start_ts=" + dataset.session_start_ts
-							+ "&failed_records=" + dataset.failed_records
-							+ "&tested_records=" + dataset.tested_records
+			if (dataset.test_dataset_id != null)
+				location.hash = '#page=dataset-categories&test_dataset_id=' + dataset.test_dataset_id
+			else if (dataset.custom_dashboard_id != null)
+				location.hash = '#customdataset?id=' + dataset.custom_dashboard_id
 			window.scrollTo(0,0);
 		}
 	}

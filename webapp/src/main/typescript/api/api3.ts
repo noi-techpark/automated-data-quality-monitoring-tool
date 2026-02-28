@@ -182,6 +182,7 @@ export interface catchsolve_noiodh__standard_dashboards_latest__row {
 	session_start_ts: string
 	tested_records: number
 	custom_dashboard_id?: number
+	test_dataset_id?: number
 }
 
 export interface catchsolve_noiodh__custom_dashboards__row {
