@@ -277,6 +277,7 @@ export interface catchsolve_noiodh__test_dataset_history_vw__byexample {
 	check_stats?: string
 	dataset_name?: string
 	session_start_ts?: string
+	test_dataset_id?: number
 }
 
 export interface catchsolve_noiodh__standard_dashboards_latest__byexample {

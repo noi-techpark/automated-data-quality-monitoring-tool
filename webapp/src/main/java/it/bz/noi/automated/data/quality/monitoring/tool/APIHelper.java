@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.icu.text.SimpleDateFormat;
@@ -148,14 +149,23 @@ public class APIHelper
 	private static ArrayNode list__test_dataset_history_vw(ObjectNode filter) throws SQLException
 	{
 		String sql = """
-				select *
-				  from catchsolve_noiodh.test_dataset_history_vw
-				 where dataset_name = ?
-				   and check_category = ?
-				 order by dataset_name, session_start_ts asc
+				
+ 
+			with t as ( 
+				select session_start_ts, check_category, check_name , count(DISTINCT f.record_jsonpath) AS check_stats_agg
+				from catchsolve_noiodh.test_dataset_record_check_failed f
+				where (t.session_start_ts >= (CURRENT_TIMESTAMP - '30 days'::interval))))
+				  and test_data_id
+				group by 1,2,3
+			)
+			select session_start_ts, check_category, 
+				json_agg(jsonb_build_object('check_name', check_name, 'failed_recs', check_stats_agg))::text AS check_stats
+			from t
+			group by 1,2
+ 
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
+		wherevalues.add(((NumericNode)filter.get("test_dataset_id")).numberValue().intValue());
 		wherevalues.add(((TextNode)filter.get("check_category")).textValue());
 		return execute_query(sql, wherevalues);
 	}

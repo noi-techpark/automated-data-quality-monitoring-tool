@@ -22,6 +22,7 @@ export class DatasetIssuesDetail extends CommonWebComponent
 	last_check_category: string|null = null
 	last_failed_records: number|null = null
 	last_tot_records: number|null = null
+	last_test_dataset_id: number|null=null
 	
 	current_tab: 'issues' | 'records' = 'issues'
 	
@@ -152,16 +153,16 @@ export class DatasetIssuesDetail extends CommonWebComponent
 		this.last_dataset_name = data.dataset_name
 		this.last_check_category = data.check_category
 		this.last_failed_records = data.failed_records
-		this.last_tot_records = data.tot_records;
+		this.last_tot_records = data.tot_records
+		this.last_test_dataset_id = data.test_dataset_id
 		
 		// this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records)
 		
-		
-		(async () => {
+		;(async () => {
 					
-					
+					// TOD invece di dataset_name usa 
 					const data = await API3.list__catchsolve_noiodh__test_dataset_history_vw({
-						dataset_name: this.last_dataset_name!,
+						test_dataset_id: this.last_test_dataset_id!,					
 						check_category: this.last_check_category!
 					})
 					
