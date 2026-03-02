@@ -131,19 +131,31 @@ export class DatasetIssuesDetail extends CommonWebComponent
 		return groupBy; 
 	}
 	
-	async refresh(p_session_start_ts: string, p_dataset_name: string, p_category_name: string, p_failed_records: number, p_tot_records: number) {
-		
-		this.last_session_start_ts = p_session_start_ts
-		this.last_dataset_name = p_dataset_name
-		this.last_check_category = p_category_name
-		this.last_failed_records = p_failed_records
-		this.last_tot_records = p_tot_records
+	async refresh(p_category_name: string, p_test_dataset_id: number) {
+
+
+		const resp = await API3.list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw({
+			test_dataset_id: p_test_dataset_id,
+			check_category: p_category_name
+		})
+
+		if (resp.length != 1)
+			alert(resp.length)
+
+		const data = resp[0]
+
+		const category = cs_cast(DatasetIssueCategoryComponent, this.sroot.querySelector('cs-dataset-issue-category'))
+		category.hideMoreDiv()
+		category.refresh(data)
+
+		this.last_session_start_ts = data.session_start_ts
+		this.last_dataset_name = data.dataset_name
+		this.last_check_category = data.check_category
+		this.last_failed_records = data.failed_records
+		this.last_tot_records = data.tot_records;
 		
 		// this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records)
 		
-		console.log(p_session_start_ts)
-		console.log(p_dataset_name)
-		console.log(p_category_name);
 		
 		(async () => {
 					
@@ -225,16 +237,7 @@ export class DatasetIssuesDetail extends CommonWebComponent
 									
 		})();
 		
-		const category = cs_cast(DatasetIssueCategoryComponent, this.sroot.querySelector('cs-dataset-issue-category'))
-		category.hideMoreDiv()
-		category.refresh(
-		{
-			dataset_name: p_dataset_name,
-			session_start_ts: p_session_start_ts,
-			check_category: p_category_name,
-			failed_records: p_failed_records,
-			tot_records: p_tot_records
-		})
+
 		
 		this.container.textContent = ''
 		

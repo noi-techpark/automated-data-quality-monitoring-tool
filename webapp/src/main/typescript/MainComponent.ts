@@ -72,6 +72,7 @@ export class MainComponent extends CommonWebComponent
 				const detail = new DatasetIssuesByCategories();
 				this.changingSection.appendChild(detail)
 				const params = new URLSearchParams(cleanedhash.substring(1));
+				/*
 				const [standardDatasets, customDatasets] = await Promise.all([
 					API3.list__catchsolve_noiodh__standard_dashboards_latest({used_key: sessionStorage.getItem('used_key_role')!}),
 					API3.list__catchsolve_noiodh__custom_dashboards({})
@@ -79,8 +80,11 @@ export class MainComponent extends CommonWebComponent
 				const dataset = [...standardDatasets, ...customDatasets].find((row) => row.test_dataset_id === parseInt(cs_notnull(params.get('test_dataset_id'))))
 				if (dataset == null)
 					return
-				detail.refresh(dataset.session_start_ts, dataset.dataset_name, dataset.failed_records, dataset.tested_records);
-				menu.selectItem(dataset.dataset_name)
+				 */
+				const test_dataset_id = parseInt(cs_notnull(params.get('test_dataset_id')))
+				detail.refresh(test_dataset_id);
+				// TODO
+				// menu.selectItem(dataset.dataset_name)
 			}
 			
 			if (cleanedhash.startsWith('#page=summary&'))
@@ -89,13 +93,16 @@ export class MainComponent extends CommonWebComponent
 				const detail = new DatasetIssuesDetail();
 				this.changingSection.appendChild(detail)
 				const params = new URLSearchParams(cleanedhash.substring(1));
-				const session_start_ts = cs_notnull(params.get('session_start_ts'))
-				const dataset_name = cs_notnull(params.get('dataset_name'))
+				// const session_start_ts = cs_notnull(params.get('session_start_ts'))
+				// const dataset_name = cs_notnull(params.get('dataset_name'))
 				const category_name = cs_notnull(params.get('category_name'))
-				const failed_records = parseInt(cs_notnull(params.get('failed_records')))
-				const tot_records = parseInt(cs_notnull(params.get('tot_records')))
-				detail.refresh(session_start_ts, dataset_name, category_name, failed_records, tot_records);
-				menu.selectItem(dataset_name)
+				// const failed_records = parseInt(cs_notnull(params.get('failed_records')))
+				// const tot_records = parseInt(cs_notnull(params.get('tot_records')))
+				const test_dataset_id = parseInt(cs_notnull(params.get('test_dataset_id')))
+				
+				detail.refresh(category_name, test_dataset_id);
+				// TODO
+				// menu.selectItem(dataset_name)
 			}
 
 			if (cleanedhash.startsWith('#customdataset'))

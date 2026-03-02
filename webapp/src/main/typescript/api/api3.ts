@@ -61,8 +61,18 @@ export class API3 {
 	(filter: catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__byexample):
 	 Promise<catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__row[]>
 	{
-		const resp = await API3.call('catchsolve_noiodh.test_dataset_check_category_failed_recors_vw', filter)
-		return resp;
+		const params = new URLSearchParams();
+		params.append('action', 'catchsolve_noiodh.test_dataset_check_category_failed_recors_vw');
+		params.append('test_dataset_id', '' + filter.test_dataset_id);
+		const current_role = sessionStorage.getItem('used_key_role') ?? 'opendata';
+		params.append('current_role', current_role);
+
+		const access_token = kc.token;
+		const headers: HeadersInit = access_token ? { Authorization: `Bearer ${access_token}` } : {};
+
+		const resp = await fetch('api?' + params.toString(), { headers });
+		const respjson = await resp.json();
+		return respjson;
 	}
 	
 	static async list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw
@@ -156,7 +166,8 @@ export interface catchsolve_noiodh__test_dataset_check_category_failed_recors_vw
 	dataset_name: string
 	failed_records: number
 	session_start_ts: string
-	tot_records: number
+	tot_records: number,
+	test_dataset_id: number
 }
 
 export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw__row {
@@ -246,6 +257,7 @@ export interface catchsolve_noiodh__test_dataset_check_category_failed_recors_vw
 	dataset_name?: string
 	failed_records?: number
 	session_start_ts?: string
+	test_dataset_id?: number
 	tot_records?: number
 }
 

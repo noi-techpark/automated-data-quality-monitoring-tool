@@ -79,8 +79,11 @@ public class APIHelper
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_check_category_failed_recors_vw":
+				resp.setContentType("application/json");
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(filterJson);
+				list = list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(
+						Long.parseLong(req.getParameter("test_dataset_id")),
+						req.getParameter("check_category"));
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_check_category_check_name_failed_recors_vw":
@@ -333,19 +336,30 @@ public class APIHelper
 			throw new SQLException("User not allowed to access dataset using role: " + used_key + ", he has roles: " + String.join(", ", user_odh_roles));
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(ObjectNode filter) throws ParseException, SQLException
+	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(long testDatasetId, String checkCategory) throws SQLException
 	{
-		String sql = """
-				select *
-				  from catchsolve_noiodh.test_dataset_check_category_failed_recors_vw
-				 where dataset_name = ?
-				   and session_start_ts = ?
-				 order by check_category
-				""";
+		StringBuilder sql = new StringBuilder("""
+				select session_start_ts,
+					dataset_name,
+					check_category,
+					check_name,
+					test_dataset_id,
+					(select tested_records from catchsolve_noiodh.test_dataset t where t.id = f.test_dataset_id) as tot_records,
+					count(DISTINCT f.record_jsonpath) as failed_records
+				from catchsolve_noiodh.test_dataset_record_check_failed  f
+				where test_dataset_id = ?
+				""");
+		if (checkCategory != null)
+			sql.append(" and check_category = ?");
+		sql.append("""
+				group by 1,2,3,4,5,6
+				order by check_name
+				""");
 		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
-		wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
-		return execute_query(sql, wherevalues);
+		wherevalues.add(testDatasetId);
+		if (checkCategory != null)
+			wherevalues.add(checkCategory);
+		return execute_query(sql.toString(), wherevalues);
 	}
 
 	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(ObjectNode filter) throws ParseException, SQLException
