@@ -83,8 +83,7 @@ public class APIHelper
 				resp.setContentType("application/json");
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(
-						Long.parseLong(req.getParameter("test_dataset_id")),
-						req.getParameter("check_category"));
+						Long.parseLong(req.getParameter("test_dataset_id")));
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_check_category_check_name_failed_recors_vw":
@@ -346,7 +345,7 @@ public class APIHelper
 			throw new SQLException("User not allowed to access dataset using role: " + used_key + ", he has roles: " + String.join(", ", user_odh_roles));
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(long testDatasetId, String checkCategory) throws SQLException
+	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(long testDatasetId) throws SQLException
 	{
 		StringBuilder sql = new StringBuilder("""
 				select session_start_ts,
@@ -359,16 +358,12 @@ public class APIHelper
 				from catchsolve_noiodh.test_dataset_record_check_failed  f
 				where test_dataset_id = ?
 				""");
-		if (checkCategory != null)
-			sql.append(" and check_category = ?");
 		sql.append("""
 				group by 1,2,3,4,5,6
 				order by check_name
 				""");
 		ArrayList<Object> wherevalues = new ArrayList<>();
 		wherevalues.add(testDatasetId);
-		if (checkCategory != null)
-			wherevalues.add(checkCategory);
 		return execute_query(sql.toString(), wherevalues);
 	}
 

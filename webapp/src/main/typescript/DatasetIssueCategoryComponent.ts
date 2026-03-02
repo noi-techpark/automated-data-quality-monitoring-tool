@@ -36,7 +36,7 @@ export class DatasetIssueCategoryComponent extends CommonWebComponent
 		this.more_div.style.display = 'none'
 	}
 	
-	async refresh(data: {dataset_name: string, tot_records: number, failed_records: number, check_category: string, session_start_ts: string, test_dataset_id: number})
+	async refresh(data: {dataset_name: string, tot_records: number, failed_records: number, check_category: string, session_start_ts: string, test_dataset_id: number, check_name: string})
 	{
 
 		const cat = this.template
@@ -71,7 +71,7 @@ export class DatasetIssueCategoryComponent extends CommonWebComponent
 			location.hash = '#page=summary&session_start_ts=' + data.session_start_ts + '&dataset_name=' + encodeURIComponent(data.dataset_name) + '&category_name=' + data.check_category +
 							'&failed_records=' + data.failed_records + '&tot_records=' + data.tot_records 
 			 */
-			location.hash = '#page=summary&test_dataset_id=' + data.test_dataset_id + '&category_name=' + encodeURIComponent(data.check_category)
+			location.hash = '#page=summary&test_dataset_id=' + data.test_dataset_id + '&check_name=' + encodeURIComponent(data.check_name)
 		}
 		
 		const cat_details =  cs_cast(HTMLElement, cat.querySelector('details'))

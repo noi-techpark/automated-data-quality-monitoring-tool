@@ -163,6 +163,7 @@ export interface catchsolve_noiodh__test_dataset_check_category_check_name_recor
 
 export interface catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__row {
 	check_category: string
+	check_name: string
 	dataset_name: string
 	failed_records: number
 	session_start_ts: string
