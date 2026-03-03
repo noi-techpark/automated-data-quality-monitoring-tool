@@ -112,6 +112,7 @@ public class APIHelper
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_history_vw":
+				resp.setContentType("application/json");
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__test_dataset_history_vw(filterJson);
 				resp.getWriter().write(list.toPrettyString());
@@ -148,24 +149,24 @@ public class APIHelper
 	private static ArrayNode list__test_dataset_history_vw(ObjectNode filter) throws SQLException
 	{
 		String sql = """
-				
- 
-			with t as ( 
-				select session_start_ts, check_category, check_name , count(DISTINCT f.record_jsonpath) AS check_stats_agg
-				from catchsolve_noiodh.test_dataset_record_check_failed f
-				where (t.session_start_ts >= (CURRENT_TIMESTAMP - '30 days'::interval))))
-				  and test_data_id
-				group by 1,2,3
-			)
-			select session_start_ts, check_category, 
-				json_agg(jsonb_build_object('check_name', check_name, 'failed_recs', check_stats_agg))::text AS check_stats
-			from t
-			group by 1,2
+				with t as (
+				select regexp_replace(
+									dataset_query_url,
+									'\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z',
+									'YYYY-MM-DDTHH:MM:SS.000Z',
+									'g'
+									) as dataset_query_url_fixed,
+									*
+				from catchsolve_noiodh.test_dataset
+				order by session_start_ts
+				)
+				select session_start_ts,check_name, (select count(DISTINCT record_jsonpath) from  catchsolve_noiodh.test_dataset_record_check_failed tdrcf where tdrcf.test_dataset_id = t.id ) as failed_recs
+				from t
+				where (dataset_query_url_fixed, owner, used_key , check_name )  = (select dataset_query_url_fixed, owner, used_key, check_name  from t as t2 where t2.id = ?)
  
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
 		wherevalues.add(((NumericNode)filter.get("test_dataset_id")).numberValue().intValue());
-		wherevalues.add(((TextNode)filter.get("check_category")).textValue());
 		return execute_query(sql, wherevalues);
 	}
 

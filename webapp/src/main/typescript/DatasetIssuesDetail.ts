@@ -164,7 +164,10 @@ export class DatasetIssuesDetail extends CommonWebComponent
 						test_dataset_id: this.last_test_dataset_id!,					
 						check_category: this.last_check_category!
 					})
-					
+
+
+					console.log('history data', data)
+
 					// const goodarr  = []
 					// const failarr  = []
 					
@@ -175,17 +178,17 @@ export class DatasetIssuesDetail extends CommonWebComponent
 					{
 						const row = data[x]
 						labels.push(row.session_start_ts.slice(0,16).replace('T', ' '))
-						const check_stats = JSON.parse(row.check_stats);
-						console.log(check_stats)
-						for (let c = 0; c < check_stats.length; c++)
+						// const check_stats = JSON.parse(row.check_stats);
+						// console.log(check_stats)
+						// for (let c = 0; c < check_stats.length; c++)
 						{
-							const check_stat = check_stats[c]
+							// const check_stat = data[x]
 							let found = false;
 							for (let d = 0; d < datasets.length; d++)
 							{
-								if (datasets[d].label == check_stat.check_name)
+								if (datasets[d].label == row.check_name)
 								{
-									datasets[d].data.push(check_stat.failed_recs)
+									datasets[d].data.push(row.failed_recs)
 									found = true
 									break;
 								}
@@ -193,8 +196,8 @@ export class DatasetIssuesDetail extends CommonWebComponent
 							if (!found)
 							{
 								datasets.push({
-									label: check_stat.check_name,
-									data: [check_stat.failed_recs],
+									label: row.check_name,
+									data: [row.failed_recs],
 									fill: false,
 									backgroundColor: '#aaa',
 									borderColor: '#aaa',
