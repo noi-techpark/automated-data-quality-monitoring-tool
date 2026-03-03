@@ -71,7 +71,7 @@ export class DatasetIssueCategoryComponent extends CommonWebComponent
 			location.hash = '#page=summary&session_start_ts=' + data.session_start_ts + '&dataset_name=' + encodeURIComponent(data.dataset_name) + '&category_name=' + data.check_category +
 							'&failed_records=' + data.failed_records + '&tot_records=' + data.tot_records 
 			 */
-			location.hash = '#page=summary&test_dataset_id=' + data.test_dataset_id + '&check_name=' + encodeURIComponent(data.check_name)
+			location.hash = '#page=summary&test_dataset_id=' + data.test_dataset_id
 		}
 		
 		const cat_details =  cs_cast(HTMLElement, cat.querySelector('details'))

@@ -81,8 +81,8 @@ export class MainComponent extends CommonWebComponent
 				if (dataset == null)
 					return
 				 */
-				const test_dataset_id = parseInt(cs_notnull(params.get('test_dataset_id')))
-				detail.refresh(test_dataset_id);
+				const test_dataset_ids = cs_notnull(params.get('test_dataset_ids'))
+				detail.refresh(test_dataset_ids);
 				// TODO
 				// menu.selectItem(dataset.dataset_name)
 			}
@@ -95,12 +95,12 @@ export class MainComponent extends CommonWebComponent
 				const params = new URLSearchParams(cleanedhash.substring(1));
 				// const session_start_ts = cs_notnull(params.get('session_start_ts'))
 				// const dataset_name = cs_notnull(params.get('dataset_name'))
-				const category_name = cs_notnull(params.get('category_name'))
+				// const category_name = cs_notnull(params.get('category_name'))
 				// const failed_records = parseInt(cs_notnull(params.get('failed_records')))
 				// const tot_records = parseInt(cs_notnull(params.get('tot_records')))
-				const test_dataset_id = parseInt(cs_notnull(params.get('test_dataset_id')))
+				const test_dataset_id = cs_notnull(params.get('test_dataset_id'))
 				
-				detail.refresh(category_name, test_dataset_id);
+				detail.refresh(test_dataset_id);
 				// TODO
 				// menu.selectItem(dataset_name)
 			}

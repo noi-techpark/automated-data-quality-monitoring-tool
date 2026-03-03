@@ -149,7 +149,7 @@ for (const item of metadata_json.Items) {
 
     let dataset_tested_record_count = 0;
 
-    const rules_of_dataset: Map<string, Check[]> = await findRulesForDatasetGroupByUrlAndQueryParams(item, rules, sessionStartTs);
+    const rules_of_dataset: Map<string, Check[]> = findRulesForDatasetGroupByUrlAndQueryParams(item, rules, sessionStartTs);
     for (const [url, rules] of rules_of_dataset.entries()) {
 
         console.log(`   Scope URL: ${url}`);
@@ -200,12 +200,75 @@ export async function doPrivateTestFor(
   DATASET_CONTENT_PAGE_LIMIT: string, 
   DEBUG_MODE_CACHE_ON: boolean) {
 
-    console.log("doPrivateTestFor start for " + KEYCLOAK_ASSOCIATED_ROLE);
+console.log("doPrivateTestFor start for " + KEYCLOAK_ASSOCIATED_ROLE);
 
 const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON );
 
 const rules: Check[] = await loadRulesFromCustomDashboard(KEYCLOAK_ASSOCIATED_ROLE);
 
+for (const item of metadata_json.Items) {
+
+    const rules_of_dataset: Map<string, Check[]> = findRulesForDatasetGroupByUrlAndQueryParams(item, rules, sessionStartTs);
+
+    for (const [url, rules] of rules_of_dataset.entries()) {
+
+        console.log(`   Scope URL: ${url}`);
+
+        for (let rule of rules) {
+
+            const p_test_dataset_id = Number((await prisma.test_dataset.create({
+                data: {
+                    session_start_ts: sessionStartTs,
+                    dataset_name: item.Shortname,
+                    dataset_dataspace: item.Dataspace,
+                    dataset_img_url: item.ImageGallery?.[0].ImageUrl,
+                    owner: rule.owner,
+                    used_key: KEYCLOAK_ASSOCIATED_ROLE,
+                    check_name: rule.name,
+                    custom_dashboard_id: Number(rule.custom_dashboard_id),
+                    dataset_query_url: url
+                },
+                select: {
+                    id: true
+                }
+            })).id);
+
+
+            let rule_tested_record_count = 0;
+            try {
+                for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++) {
+
+                    const dataset_page_json_items: DatasetPageItem[] = await fetch_dataset_items_with_paging(url, pageNumber, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON);
+
+                    if (dataset_page_json_items.length == 0)
+                        break;
+
+                    const failed_records: TestDatasetRecordCheckFailedCreateInput[] = []
+
+                    for (let i = 0; i < dataset_page_json_items.length; i++) {
+                        // tested_record_count++;
+                        const obj = dataset_page_json_items[i]
+                        checkRecordWithRule(p_test_dataset_id, rule, obj, failed_records, item.Shortname, 'seq=' + (rule_tested_record_count + i), sessionStartTs, KEYCLOAK_ASSOCIATED_ROLE)
+                    }
+                    
+                    rule_tested_record_count += dataset_page_json_items.length;
+
+                    await prisma.test_dataset_record_check_failed.createMany({ data: failed_records });
+                }
+            }
+            catch (e) {
+                console.error(`      Error fetching dataset items from ${url}: ${e}`);
+                continue;
+            }
+
+            await updateTestedRecords(p_test_dataset_id, rule_tested_record_count);
+        }
+
+    
+    }
+}
+
+/*
 for (let i = 0; i < rules.length; i++) {
     const rule = rules[i];
     console.log(rule)
@@ -219,12 +282,14 @@ for (let i = 0; i < rules.length; i++) {
             const p_test_dataset_id = Number((await prisma.test_dataset.create({
                 data: {
                     session_start_ts: sessionStartTs,
-                    dataset_name: rule.name,
+                    dataset_name: metadata_item.Shortname,
                     dataset_dataspace: metadata_item.Dataspace,
                     dataset_img_url: metadata_item.ImageGallery?.[0].ImageUrl,
                     owner: rule.owner,
                     used_key: KEYCLOAK_ASSOCIATED_ROLE,
-                    custom_dashboard_id: Number(rule.custom_dashboard_id)
+                    custom_dashboard_id: Number(rule.custom_dashboard_id),
+                    check_name: rule.name,
+                    dataset_query_url: xxx
                 },
                 select: {
                     id: true
@@ -252,7 +317,8 @@ for (let i = 0; i < rules.length; i++) {
             break;
         }
     }
-}
+        
+}*/
   }
 
 
@@ -279,7 +345,7 @@ async function fetch_dataset_items_with_paging(url: string, pageNumber: number, 
     to optimize api calls and avoid fetching and count same dataset multiple times
 */
 
-async function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataDatasetItem, rules: Check[], sessionStartTs: Date): Promise<Map<string, Check[]>> {
+function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataDatasetItem, rules: Check[], sessionStartTs: Date): Map<string, Check[]> {
 
     const matched_rules = new Map<string, Check[]>();
 
@@ -303,13 +369,13 @@ async function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: Met
                 // build url like https://mobility.api.opendatahub.com/v2/flat/EnvironmentStation/NO2%20-%20Ossidi%20di%20azoto/2025-10-14T00:00:00.000Z/2025-10-17T23:59:59.999Z?limit=-1&distinct=true&select=sname,mvalue,mvalidtime&where=mperiod.eq.3600,sactive.eq.true,sorigin.eq.APPABZ
                 scope_url += '/' + (apitype_timeseries_param_datatype ?? '*'); // datatype
                 const now = sessionStartTs; // use session start timestamp to have consistent results across rules
-                const fromHours = Number(apitype_timeseries_param_last_from_hours ?? '24');
+                const fromHours = Number(apitype_timeseries_param_last_from_hours ?? String(24*4)); // ODH has a limit of 5 days
                 const toHours = Number(apitype_timeseries_param_last_to_hours ?? '0');
                 const fromDate = new Date(now.getTime() - fromHours * 3600_000);
                 const toDate = new Date(now.getTime() - toHours * 3600_000);
                 scope_url += '/' + fromDate.toISOString();
                 scope_url += '/' + toDate.toISOString();
-                scope_url += '?limit=-1&';
+                scope_url += '?limit=1000&';
                 let where = ''
                 if (apitype_timeseries_param_mperiod !== undefined) {
                     where += `mperiod.eq.${apitype_timeseries_param_mperiod},`;

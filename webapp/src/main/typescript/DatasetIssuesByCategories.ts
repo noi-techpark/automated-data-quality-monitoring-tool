@@ -40,17 +40,17 @@ export class DatasetIssuesByCategories extends CommonWebComponent
 		this.noissues = cs_cast(HTMLDivElement, this.sroot.querySelector('.noissues'))
 	}
 	
-	async refresh(p_test_dataset_id: number) {
+	async refresh(p_test_dataset_ids: string) {
 		
 		// this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records);
 		
 		const loader = new Loader()
 		this.content.appendChild(loader)
 		const resp = await API3.list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw({
-			test_dataset_id: p_test_dataset_id
+			test_dataset_ids: p_test_dataset_ids
 		})
 		loader.remove()
-		console.log(resp) 
+		console.log('resp', resp) 
 		for (let i = 0; i < resp.length; i++)
 		{
 			const category = new DatasetIssueCategoryComponent();

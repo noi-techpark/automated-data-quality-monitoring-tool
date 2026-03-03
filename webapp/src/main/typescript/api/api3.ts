@@ -63,7 +63,7 @@ export class API3 {
 	{
 		const params = new URLSearchParams();
 		params.append('action', 'catchsolve_noiodh.test_dataset_check_category_failed_recors_vw');
-		params.append('test_dataset_id', '' + filter.test_dataset_id);
+		params.append('test_dataset_ids', '' + filter.test_dataset_ids);
 		const current_role = sessionStorage.getItem('used_key_role') ?? 'opendata';
 		params.append('current_role', current_role);
 
@@ -193,8 +193,9 @@ export interface catchsolve_noiodh__standard_dashboards_latest__row {
 	failed_records: number
 	session_start_ts: string
 	tested_records: number
-	custom_dashboard_id?: number
+	custom_dashboards: string
 	test_dataset_id?: number
+	ids_csv: string
 }
 
 export interface catchsolve_noiodh__custom_dashboards__row {
@@ -258,7 +259,7 @@ export interface catchsolve_noiodh__test_dataset_check_category_failed_recors_vw
 	dataset_name?: string
 	failed_records?: number
 	session_start_ts?: string
-	test_dataset_id?: number
+	test_dataset_ids?: string
 	tot_records?: number
 }
 

@@ -132,12 +132,11 @@ export class DatasetIssuesDetail extends CommonWebComponent
 		return groupBy; 
 	}
 	
-	async refresh(p_category_name: string, p_test_dataset_id: number) {
+	async refresh(p_test_dataset_id: string) {
 
 
 		const resp = await API3.list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw({
-			test_dataset_id: p_test_dataset_id,
-			check_category: p_category_name
+			test_dataset_ids: p_test_dataset_id
 		})
 
 		if (resp.length != 1)

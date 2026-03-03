@@ -39,6 +39,8 @@ model test_dataset {
   used_key                         String?
   owner                            String
   custom_dashboard_id              Int?
+  check_name                       String?
+  dataset_query_url                String?
   test_dataset_check               test_dataset_check[]
   test_dataset_record_check_failed test_dataset_record_check_failed[]
 
