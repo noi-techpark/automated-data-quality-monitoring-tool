@@ -160,7 +160,7 @@ public class APIHelper
 				from catchsolve_noiodh.test_dataset
 				order by session_start_ts
 				)
-				select session_start_ts,check_name, (select count(DISTINCT record_jsonpath) from  catchsolve_noiodh.test_dataset_record_check_failed tdrcf where tdrcf.test_dataset_id = t.id ) as failed_recs
+				select session_start_ts,check_name, (select count(DISTINCT record_jsonpath) from  catchsolve_noiodh.test_dataset_record_check_failed tdrcf where tdrcf.test_dataset_id = t.id ) as failed_recs, t.tested_records 
 				from t
 				where (dataset_query_url_fixed, owner, used_key , check_name )  = (select dataset_query_url_fixed, owner, used_key, check_name  from t as t2 where t2.id = ?)
  

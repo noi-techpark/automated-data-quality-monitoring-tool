@@ -171,40 +171,14 @@ export class DatasetIssuesDetail extends CommonWebComponent
 					// const goodarr  = []
 					// const failarr  = []
 					
-					const labels   = []
-					const datasets = []
+					const labels = []
+					const values = []
 					
 					for (let x = 0; x < data.length; x++)
 					{
 						const row = data[x]
 						labels.push(row.session_start_ts.slice(0,16).replace('T', ' '))
-						// const check_stats = JSON.parse(row.check_stats);
-						// console.log(check_stats)
-						// for (let c = 0; c < check_stats.length; c++)
-						{
-							// const check_stat = data[x]
-							let found = false;
-							for (let d = 0; d < datasets.length; d++)
-							{
-								if (datasets[d].label == row.check_name)
-								{
-									datasets[d].data.push(row.failed_recs)
-									found = true
-									break;
-								}
-							}
-							if (!found)
-							{
-								datasets.push({
-									label: row.check_name,
-									data: [row.failed_recs],
-									fill: false,
-									backgroundColor: '#aaa',
-									borderColor: '#aaa',
-									tension: 0.1
-								})
-							}
-						}
+						values.push(row.failed_recs)
 						/*
 						goodarr.push(data[x].tested_records - data[x].failed_recs)
 						failarr.push(data[x].failed_recs)
@@ -213,7 +187,16 @@ export class DatasetIssuesDetail extends CommonWebComponent
 					
 					const chartjs = await this.chartjs_promise
 					chartjs.data.labels = labels
-					chartjs.data.datasets = datasets
+					chartjs.data.datasets = [
+						{
+							label: 'failed records',
+							data: values,
+							fill: false,
+							backgroundColor: '#aaa',
+							borderColor: '#aaa',
+							tension: 0.1
+						}
+					]
 					
 					/*
 					chartjs.data.datasets = [

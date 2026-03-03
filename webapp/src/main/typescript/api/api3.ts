@@ -187,6 +187,7 @@ export interface catchsolve_noiodh__test_dataset_history_vw__row {
 	session_start_ts: string
 	check_name: string
 	failed_recs: number
+	tested_records: number
 }
 
 export interface catchsolve_noiodh__standard_dashboards_latest__row {
