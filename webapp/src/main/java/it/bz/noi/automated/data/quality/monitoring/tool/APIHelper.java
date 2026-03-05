@@ -96,11 +96,6 @@ public class APIHelper
 				list = list__catchsolve_noiodh__standard_dashboards_latest(auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
-			case "catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__test_dataset_check_category_check_name_record_record_failed_vw(filterJson);
-				resp.getWriter().write(list.toPrettyString());
-				break;
 			case "catchsolve_noiodh.test_dataset_record_check_failed":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__test_dataset_record_check_failed(filterJson);
@@ -229,23 +224,6 @@ public class APIHelper
  		wherevalues.add(filter.get("test_dataset_id") == null ? 0 : ((IntNode)filter.get("test_dataset_id")).intValue());
  		wherevalues.add(filter.get("offset") == null ? 0 : ((IntNode)filter.get("offset")).intValue());
  		wherevalues.add(filter.get("limit") == null ? 99999 : ((IntNode)filter.get("limit")).intValue());
-		return execute_query(sql, wherevalues);
-	}
-
-	private static ArrayNode list__test_dataset_check_category_check_name_record_record_failed_vw(ObjectNode filter) throws ParseException, SQLException
-	{
-		String sql = """
-				select *
-				  from catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw
-				 where dataset_name = ?
-				   and session_start_ts = ?
-				   and check_category = ?
-				 order by check_category
-				""";
-		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
-		wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
- 		wherevalues.add(((TextNode)filter.get("check_category")).textValue());
 		return execute_query(sql, wherevalues);
 	}
 

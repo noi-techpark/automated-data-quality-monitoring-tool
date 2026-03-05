@@ -83,14 +83,6 @@ export class API3 {
 		return resp;
 	}
 	
-	static async list__catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw
-	(filter: catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw__byexample):
-	 Promise<catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw__row[]>
-	{
-		const resp = await API3.call('catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw', filter)
-		return resp;
-	}
-	
 	static async list__catchsolve_noiodh__test_dataset_record_check_failed
 	(filter: catchsolve_noiodh__test_dataset_record_check_failed__byexample):
 	 Promise<catchsolve_noiodh__test_dataset_record_check_failed__row[]>
