@@ -335,15 +335,12 @@ export class DatasetIssuesDetail extends CommonWebComponent
 					moreButton.parentElement!.insertBefore(sectionRow2, moreButton)
 					sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), '' + list[k2].nr_check_names + ' check failed')
 					
-					
 					sectionRow2.onclick = async () => {
-							const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
-														session_start_ts: p_session_start_ts,
-														dataset_name: p_dataset_name,
-														check_category: p_category_name,
+							const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids({
+														test_dataset_ids: p_test_dataset_ids,
 														record_jsonpath: list[k2].record_jsonpath
 												});
-
+						sectionRow2.content.textContent = ''
 						for (let k = 0; k < json2.length; k++)
 						{
 							const sectionRow = new SectionRow();

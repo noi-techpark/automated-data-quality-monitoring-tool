@@ -107,6 +107,14 @@ export class API3 {
 		return resp;
 	}
 
+	static async list__catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids
+	(filter: catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids__byexample):
+	 Promise<catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids__row[]>
+	{
+		const resp = await API3.call('catchsolve_noiodh.test_dataset_record_check_failed_check_name__of_ids', filter)
+		return resp;
+	}
+
 	static async list__catchsolve_noiodh__test_dataset_history_vw
 	(filter: catchsolve_noiodh__test_dataset_history_vw__byexample):
 	 Promise<catchsolve_noiodh__test_dataset_history_vw__row[]>
@@ -178,6 +186,10 @@ export interface catchsolve_noiodh__test_dataset_record_check_failed__of_ids__ro
 	record_json: string
 	record_jsonpath: string
 	session_start_ts: string
+}
+
+export interface catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids__row {
+	check_name: string
 }
 
 export interface catchsolve_noiodh__test_dataset_history_vw__row {
@@ -276,6 +288,11 @@ export interface catchsolve_noiodh__test_dataset_record_check_failed__of_ids__by
 	test_dataset_ids?: string
 	offset?: number
 	limit? : number
+}
+
+export interface catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids__byexample {
+	test_dataset_ids: string
+	record_jsonpath: string
 }
 
 export interface catchsolve_noiodh__test_dataset_history_vw__byexample {

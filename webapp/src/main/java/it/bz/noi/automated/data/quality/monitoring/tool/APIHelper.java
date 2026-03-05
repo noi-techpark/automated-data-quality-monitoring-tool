@@ -111,6 +111,11 @@ public class APIHelper
 				list = list__test_dataset_record_check_failed__of_ids(filterJson);
 				resp.getWriter().write(list.toPrettyString());
 				break;
+			case "catchsolve_noiodh.test_dataset_record_check_failed_check_name__of_ids":
+				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+				list = list__test_dataset_record_check_failed_check_name__of_ids(filterJson);
+				resp.getWriter().write(list.toPrettyString());
+				break;
 			case "catchsolve_noiodh.test_dataset_history_vw":
 				resp.setContentType("application/json");
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -175,7 +180,7 @@ public class APIHelper
 	private static ArrayNode list__test_dataset_record_check_failed__of_ids(ObjectNode filter) throws ParseException, SQLException
 	{
 		String sql = """
-		      select record_jsonpath, record_json
+		      select record_jsonpath, record_json, count(distinct check_name) as nr_check_names
 			    from catchsolve_noiodh.test_dataset_record_check_failed
 			   where test_dataset_id = ANY(string_to_array(?, ',')::bigint[]) 
 			   group by 1,2
@@ -187,6 +192,21 @@ public class APIHelper
  		wherevalues.add(test_dataset_ids);
  		wherevalues.add(filter.get("offset") == null ? 0 : ((IntNode)filter.get("offset")).intValue());
  		wherevalues.add(filter.get("limit") == null ? 99999 : ((IntNode)filter.get("limit")).intValue());
+		return execute_query(sql, wherevalues);
+	}
+
+	private static ArrayNode list__test_dataset_record_check_failed_check_name__of_ids(ObjectNode filter) throws ParseException, SQLException
+	{
+		String sql = """
+		      select check_name
+			    from catchsolve_noiodh.test_dataset_record_check_failed
+			   where test_dataset_id = ANY(string_to_array(?, ',')::bigint[])
+			     and record_jsonpath = ?
+			   order by check_name
+				""";
+		ArrayList<Object> wherevalues = new ArrayList<>();
+		wherevalues.add(((TextNode)filter.get("test_dataset_ids")).textValue());
+		wherevalues.add(((TextNode)filter.get("record_jsonpath")).textValue());
 		return execute_query(sql, wherevalues);
 	}
 
