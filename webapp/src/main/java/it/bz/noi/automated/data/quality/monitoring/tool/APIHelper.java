@@ -106,9 +106,9 @@ public class APIHelper
 				list = list__test_dataset_record_check_failed(filterJson);
 				resp.getWriter().write(list.toPrettyString());
 				break;
-			case "catchsolve_noiodh.test_dataset_check_category_record_jsonpath_failed_vw":
+			case "catchsolve_noiodh.test_dataset_record_check_failed__of_ids":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__test_dataset_check_category_record_jsonpath_failed_vw(filterJson);
+				list = list__test_dataset_record_check_failed__of_ids(filterJson);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_history_vw":
@@ -172,22 +172,19 @@ public class APIHelper
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__test_dataset_check_category_record_jsonpath_failed_vw(ObjectNode filter) throws ParseException, SQLException
+	private static ArrayNode list__test_dataset_record_check_failed__of_ids(ObjectNode filter) throws ParseException, SQLException
 	{
 		String sql = """
-				select *
-				  from catchsolve_noiodh.test_dataset_check_category_record_jsonpath_failed_vw
-				 where dataset_name = ?
-				   and session_start_ts = ?
-				   and check_category = ?
-				 order by dataset_name, session_start_ts, check_category
-			   offset ?
-				 limit ?
+		      select record_jsonpath, record_json
+			    from catchsolve_noiodh.test_dataset_record_check_failed
+			   where test_dataset_id = ANY(string_to_array(?, ',')::bigint[]) 
+			   group by 1,2
+			  offset ?
+			   limit ?
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
-		wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
- 		wherevalues.add(((TextNode)filter.get("check_category")).textValue());
+		String test_dataset_ids = ((TextNode)filter.get("test_dataset_ids")).textValue();
+ 		wherevalues.add(test_dataset_ids);
  		wherevalues.add(filter.get("offset") == null ? 0 : ((IntNode)filter.get("offset")).intValue());
  		wherevalues.add(filter.get("limit") == null ? 99999 : ((IntNode)filter.get("limit")).intValue());
 		return execute_query(sql, wherevalues);

@@ -17,12 +17,8 @@ export class DatasetIssuesDetail extends CommonWebComponent
 	
 	container 
 	
-	last_session_start_ts: string|null = null
-	last_dataset_name: string|null = null
-	last_check_category: string|null = null
-	last_failed_records: number|null = null
-	last_tot_records: number|null = null
-	last_test_dataset_id: number|null=null
+	last_test_dataset_id: string|null=null
+	last_test_dataset_ids: string|null=null
 	
 	current_tab: 'issues' | 'records' = 'issues'
 	
@@ -74,16 +70,15 @@ export class DatasetIssuesDetail extends CommonWebComponent
 		
 		this.issues.onclick = () => {
 			this.current_tab = 'issues'
-			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null
-				&& this.last_failed_records != null && this.last_tot_records != null)
-				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records)
+			if (this.last_test_dataset_id != null && this.last_test_dataset_ids != null)
+				this.refresh(this.last_test_dataset_id, this.last_test_dataset_ids)
+			
 		}
 		
 		this.records.onclick = () => {
 			this.current_tab = 'records'
-			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null
-				&& this.last_failed_records != null && this.last_tot_records != null)
-				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records)
+			if (this.last_test_dataset_id != null && this.last_test_dataset_ids != null)
+				this.refresh(this.last_test_dataset_id, this.last_test_dataset_ids)
 		}
 		
 		this.canvas = cs_cast(HTMLCanvasElement, this.sroot.querySelector('canvas'));
@@ -134,6 +129,8 @@ export class DatasetIssuesDetail extends CommonWebComponent
 	
 	async refresh(p_test_dataset_id: string, p_test_dataset_ids: string) {
 
+		this.last_test_dataset_id = p_test_dataset_id
+		this.last_test_dataset_ids = p_test_dataset_ids
 
 		const resp = await API3.list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw({
 			test_dataset_ids: p_test_dataset_id
@@ -148,21 +145,14 @@ export class DatasetIssuesDetail extends CommonWebComponent
 		category.hideMoreDiv()
 		category.refresh(data, p_test_dataset_ids)
 
-		this.last_session_start_ts = data.session_start_ts
-		this.last_dataset_name = data.dataset_name
-		this.last_check_category = data.check_category
-		this.last_failed_records = data.failed_records
-		this.last_tot_records = data.tot_records
-		this.last_test_dataset_id = data.test_dataset_id
 		
 		// this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records)
 		
 		;(async () => {
 					
-					// TOD invece di dataset_name usa 
+					// TODO invece di dataset_name usa 
 					const data = await API3.list__catchsolve_noiodh__test_dataset_history_vw({
-						test_dataset_id: this.last_test_dataset_id!,					
-						check_category: this.last_check_category!
+						test_dataset_id: Number(this.last_test_dataset_id)
 					})
 
 
@@ -312,63 +302,6 @@ export class DatasetIssuesDetail extends CommonWebComponent
 					}
 					moreButton.onclick = nextFun
 					nextFun()
-					
-					/*
-					//console.log('sezione aperta, ricarico!')
-					const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
-								session_start_ts: p_session_start_ts,
-								dataset_name: p_dataset_name,
-								check_category: p_category_name,
-								check_name: issue.check_name
-					});
-					const groupBy = this.groupRecords(json2)
-					const keys = Object.keys(groupBy)
-					console.log(keys)
-					if (keys.length == 1 && keys[0] == '')
-					{
-						const moreButton = document.createElement('button')
-						moreButton.textContent = 'next 10'
-						section.addElementToContentArea(moreButton)
-						const nextFun = () => {
-							const list = groupBy[keys[0]]
-							for (let k2 = 0; k2 < list.length; k2++)
-							{
-								const sectionRow2 = new SectionRow();
-								section.addElementToContentArea(sectionRow2)
-								// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
-								sectionRow2.refresh(list[k2].problem_hint)
-								sectionRow2.onclick = () => {
-									alert(list[k2].record_json)
-								}
-							}
-							
-						}
-						moreButton.onclick = nextFun
-					}
-					else
-					{
-						for (let k = 0; k < keys.length; k++)
-						{
-							const sectionRow = new OpenCloseSection();
-							section.addElementToContentArea(sectionRow)
-							sectionRow.refresh(keys[k], '' + groupBy[keys[k]].length + ' records')
-							sectionRow.onclick = () => {
-								const list = groupBy[keys[k]]
-								console.log(list)
-								for (let k2 = 0; k2 < list.length; k2++)
-								{
-									const sectionRow2 = new SectionRow();
-									sectionRow.addElementToContentArea(sectionRow2)
-									// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
-									sectionRow2.refresh(list[k2].problem_hint)
-									sectionRow2.onclick = () => {
-										alert(list[k2].record_json)
-									}
-								}
-							}
-						}
-					}
-					*/
 				}
 			}
 					
@@ -390,18 +323,15 @@ export class DatasetIssuesDetail extends CommonWebComponent
 				const loader = new Loader();
 				this.container.appendChild(loader)
 
-				const list = await API3.list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw({
-					session_start_ts: p_session_start_ts,
-					dataset_name: p_dataset_name,
-					check_category: p_category_name,
-					offset: list_offset,
-					limit: 100
-				});
+					const list = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed__of_ids({
+						test_dataset_ids: p_test_dataset_ids,
+						offset: list_offset,
+						limit: 100
+					});
 				loader.remove();
 				for (let k2 = 0; k2 < list.length; k2++)
 				{
 					const sectionRow2 = new OpenCloseSection();
-					// this.container.appendChild(sectionRow2)
 					moreButton.parentElement!.insertBefore(sectionRow2, moreButton)
 					sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), '' + list[k2].nr_check_names + ' check failed')
 					
@@ -421,6 +351,7 @@ export class DatasetIssuesDetail extends CommonWebComponent
 							sectionRow.refresh("failed: " + json2[k].check_name)
 						}
 					}
+						 
 				}
 				list_offset += 100
 			}

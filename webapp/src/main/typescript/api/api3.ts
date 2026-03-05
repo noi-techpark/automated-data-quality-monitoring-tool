@@ -99,11 +99,11 @@ export class API3 {
 		return resp;
 	}
 
-	static async list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw
-	(filter: catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw__byexample):
-	 Promise<catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw__row[]>
+	static async list__catchsolve_noiodh__test_dataset_record_check_failed__of_ids
+	(filter: catchsolve_noiodh__test_dataset_record_check_failed__of_ids__byexample):
+	 Promise<catchsolve_noiodh__test_dataset_record_check_failed__of_ids__row[]>
 	{
-		const resp = await API3.call('catchsolve_noiodh.test_dataset_check_category_record_jsonpath_failed_vw', filter)
+		const resp = await API3.call('catchsolve_noiodh.test_dataset_record_check_failed__of_ids', filter)
 		return resp;
 	}
 
@@ -171,7 +171,7 @@ export interface catchsolve_noiodh__test_dataset_check_category_failed_recors_vw
 	test_dataset_id: number
 }
 
-export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw__row {
+export interface catchsolve_noiodh__test_dataset_record_check_failed__of_ids__row {
 	check_category: string
 	dataset_name: string
 	nr_check_names: number
@@ -266,13 +266,14 @@ export interface catchsolve_noiodh__test_dataset_check_category_failed_recors_vw
 	tot_records?: number
 }
 
-export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw__byexample {
+export interface catchsolve_noiodh__test_dataset_record_check_failed__of_ids__byexample {
 	check_category?: string
 	dataset_name?: string
 	nr_check_names?: number
 	record_json?: string
 	record_jsonpath?: string
 	session_start_ts?: string
+	test_dataset_ids?: string
 	offset?: number
 	limit? : number
 }
