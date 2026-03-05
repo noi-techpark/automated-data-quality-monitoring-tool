@@ -55,7 +55,7 @@ export class DatasetIssuesByCategories extends CommonWebComponent
 		{
 			const category = new DatasetIssueCategoryComponent();
 			this.content.appendChild(category);
-			category.refresh(resp[i])
+			category.refresh(resp[i], p_test_dataset_ids)
 		}
 		this.noissues.style.display = resp.length == 0 ? 'block' : 'none';
 			

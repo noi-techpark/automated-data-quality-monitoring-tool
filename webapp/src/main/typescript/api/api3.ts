@@ -314,6 +314,7 @@ export interface catchsolve_noiodh__test_dataset_record_check_failed__byexample 
 	session_start_ts?: string
 	offset?: number
 	limit? : number
+	test_dataset_id: number
 }
 
 // end interfaces

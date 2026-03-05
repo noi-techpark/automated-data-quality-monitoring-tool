@@ -197,22 +197,19 @@ public class APIHelper
 	{
 		String sql = """
 				select *
-				  from catchsolve_noiodh.test_dataset_record_check_failed_impacted_csv_vw
-				 where dataset_name = ?
-				   and session_start_ts = ?
-				   and check_category = ?
-				   and check_name  like  ?
-				   and record_jsonpath like ?
-				 order by dataset_name, session_start_ts, check_category, check_name
+				  from catchsolve_noiodh.test_dataset_record_check_failed
+				 where test_dataset_id = ?
+				 order by id
 			   offset ?
 				 limit ?
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
-		wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
- 		wherevalues.add(((TextNode)filter.get("check_category")).textValue());
- 		wherevalues.add(filter.get("check_name")  == null ? "%" : ((TextNode)filter.get("check_name")).textValue());
- 		wherevalues.add(filter.get("record_jsonpath") == null ? "%" : ((TextNode)filter.get("record_jsonpath")).textValue());
+		// wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
+		// wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
+ 		// wherevalues.add(((TextNode)filter.get("check_category")).textValue());
+ 		// wherevalues.add(filter.get("check_name")  == null ? "%" : ((TextNode)filter.get("check_name")).textValue());
+ 		// wherevalues.add(filter.get("record_jsonpath") == null ? "%" : ((TextNode)filter.get("record_jsonpath")).textValue());
+ 		wherevalues.add(filter.get("test_dataset_id") == null ? 0 : ((IntNode)filter.get("test_dataset_id")).intValue());
  		wherevalues.add(filter.get("offset") == null ? 0 : ((IntNode)filter.get("offset")).intValue());
  		wherevalues.add(filter.get("limit") == null ? 99999 : ((IntNode)filter.get("limit")).intValue());
 		return execute_query(sql, wherevalues);

@@ -99,8 +99,9 @@ export class MainComponent extends CommonWebComponent
 				// const failed_records = parseInt(cs_notnull(params.get('failed_records')))
 				// const tot_records = parseInt(cs_notnull(params.get('tot_records')))
 				const test_dataset_id = cs_notnull(params.get('test_dataset_id'))
+				const test_dataset_ids = cs_notnull(params.get('test_dataset_ids'))
 				
-				detail.refresh(test_dataset_id);
+				detail.refresh(test_dataset_id, test_dataset_ids);
 				// TODO
 				// menu.selectItem(dataset_name)
 			}
