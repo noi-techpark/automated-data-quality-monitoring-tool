@@ -173,27 +173,39 @@ export class DatasetIssuesDetail extends CommonWebComponent
 					
 					const labels = []
 					const values = []
-					
+					const totals = []
+
+					// TODO aggiungi un secondo dataset che è total trend è che usa  
+
 					for (let x = 0; x < data.length; x++)
 					{
 						const row = data[x]
-						labels.push(row.session_start_ts.slice(0,16).replace('T', ' '))
-						values.push(row.failed_recs)
+						labels.unshift(row.session_start_ts.slice(0,16).replace('T', ' '))
+						values.unshift(row.failed_recs)
+						totals.unshift(row.tested_records - row.failed_recs)
 						/*
 						goodarr.push(data[x].tested_records - data[x].failed_recs)
 						failarr.push(data[x].failed_recs)
 						 */
 					}
-					
+
 					const chartjs = await this.chartjs_promise
 					chartjs.data.labels = labels
 					chartjs.data.datasets = [
 						{
+							label: 'good records',
+							data: totals,
+							fill: true,
+							backgroundColor: '#080',
+							borderColor: '#080',
+							tension: 0.1
+						},
+						{
 							label: 'failed records',
 							data: values,
-							fill: false,
-							backgroundColor: '#aaa',
-							borderColor: '#aaa',
+							fill: true,
+							backgroundColor: '#800',
+							borderColor: '#800',
 							tension: 0.1
 						}
 					]
