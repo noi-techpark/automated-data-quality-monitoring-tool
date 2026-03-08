@@ -79,7 +79,7 @@ async function onTick() {
         const test_start_ts = new Date();
         console.log('Cron job executed at', test_start_ts.toISOString());
         console.log(`Account for client_id=${account.CLIENT_ID}, realm=${account.REALM}, associated_role=${account.ASSOCIATED_ROLE}`);
-        await doPrivateTestFor(
+        await doPublicTestFor(
           test_start_ts,
           KEYCLOAK_BASE_URL,
           account.CLIENT_ID,

@@ -125,66 +125,25 @@ export async function doPublicTestFor(
   DATASET_CONTENT_PAGE_LIMIT: string, 
   DEBUG_MODE_CACHE_ON: boolean) {
 
-const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON );
-const rules: Check[] = await loadRules();
+  const rules: Check[] = (await loadRules()).map((rule) => ({
+      ...rule,
+      owner: 'public',
+      custom_dashboard_id: undefined
+  }));
 
-const OWNER = 'public'
-
-for (const item of metadata_json.Items) {
-    console.log(`Dataset: ${item.Shortname}, ApiType: ${item.ApiType}, ApiUrl: ${item.ApiUrl}`);
-
-    const p_test_dataset_id = Number((await prisma.test_dataset.create({
-        data: {
-            session_start_ts: sessionStartTs,
-            dataset_name: item.Shortname,
-            dataset_dataspace: item.Dataspace,
-            dataset_img_url: item.ImageGallery?.[0].ImageUrl,
-            owner: OWNER,
-            used_key: KEYCLOAK_ASSOCIATED_ROLE
-        },
-        select: {
-            id: true
-        }
-    })).id);
-
-    let dataset_tested_record_count = 0;
-
-    const rules_of_dataset: Map<string, Check[]> = findRulesForDatasetGroupByUrlAndQueryParams(item, rules, sessionStartTs);
-    for (const [url, rules] of rules_of_dataset.entries()) {
-
-        console.log(`   Scope URL: ${url}`);
-        let rule_tested_record_count = 0;
-        try {
-            for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++) {
-
-                const dataset_page_json_items: DatasetPageItem[] = await fetch_dataset_items_with_paging(url, pageNumber, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON);
-
-                if (dataset_page_json_items.length == 0)
-                    break;
-
-                processDatasetItems(p_test_dataset_id, dataset_page_json_items, rules, item.Shortname, rule_tested_record_count, sessionStartTs, KEYCLOAK_ASSOCIATED_ROLE);
-                
-                rule_tested_record_count += dataset_page_json_items.length;
-            }
-        }
-        catch (e) {
-            console.error(`      Error fetching dataset items from ${url}: ${e}`);
-            continue;
-        }
-
-        // update counters per all the rules applied to this scope url
-        //for (const rule of rules) {
-        //    await upsertDatasetCheckTestedRecords(sessionStartTs, item.Shortname, rule.name, rule.category, rule_tested_record_count);
-        //}       
-
-        // this is an approximation as multiple rules can apply to same record in different scope urls
-        // to avoid overcounting we should define unique record ids across rules and datasets
-        dataset_tested_record_count += rule_tested_record_count;
-        await updateTestedRecords(p_test_dataset_id, dataset_tested_record_count);
-    
-    }
+  await runChecksPerRule(
+      sessionStartTs,
+      rules,
+      METADATA_BASE_URL,
+      KEYCLOAK_BASE_URL,
+      KEYCLOAK_CLIENT_ID,
+      KEYCLOAK_REALM,
+      KEYCLOAK_CLIENT_SECRET,
+      KEYCLOAK_ASSOCIATED_ROLE,
+      DATASET_CONTENT_PAGE_LIMIT,
+      DEBUG_MODE_CACHE_ON
+  );
 }
-  }
 
 
 export async function doPrivateTestFor(
@@ -200,71 +159,88 @@ export async function doPrivateTestFor(
   DATASET_CONTENT_PAGE_LIMIT: string, 
   DEBUG_MODE_CACHE_ON: boolean) {
 
-console.log("doPrivateTestFor start for " + KEYCLOAK_ASSOCIATED_ROLE);
+  console.log("doPrivateTestFor start for " + KEYCLOAK_ASSOCIATED_ROLE);
+  const rules: Check[] = await loadRulesFromCustomDashboard(KEYCLOAK_ASSOCIATED_ROLE);
 
-const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON );
+  await runChecksPerRule(
+      sessionStartTs,
+      rules,
+      METADATA_BASE_URL,
+      KEYCLOAK_BASE_URL,
+      KEYCLOAK_CLIENT_ID,
+      KEYCLOAK_REALM,
+      KEYCLOAK_CLIENT_SECRET,
+      KEYCLOAK_ASSOCIATED_ROLE,
+      DATASET_CONTENT_PAGE_LIMIT,
+      DEBUG_MODE_CACHE_ON
+  );
+}
 
-const rules: Check[] = await loadRulesFromCustomDashboard(KEYCLOAK_ASSOCIATED_ROLE);
+async function runChecksPerRule(
+    sessionStartTs: Date,
+    rules: Check[],
+    METADATA_BASE_URL: string,
+    KEYCLOAK_BASE_URL: string,
+    KEYCLOAK_CLIENT_ID: string,
+    KEYCLOAK_REALM: string,
+    KEYCLOAK_CLIENT_SECRET: string,
+    KEYCLOAK_ASSOCIATED_ROLE: string,
+    DATASET_CONTENT_PAGE_LIMIT: string,
+    DEBUG_MODE_CACHE_ON: boolean
+): Promise<void> {
+    const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON );
 
-for (const item of metadata_json.Items) {
+    for (const item of metadata_json.Items) {
+        const rules_of_dataset: Map<string, Check[]> = findRulesForDatasetGroupByUrlAndQueryParams(item, rules, sessionStartTs);
 
-    const rules_of_dataset: Map<string, Check[]> = findRulesForDatasetGroupByUrlAndQueryParams(item, rules, sessionStartTs);
+        for (const [url, rules] of rules_of_dataset.entries()) {
+            console.log(`   Scope URL: ${url}`);
 
-    for (const [url, rules] of rules_of_dataset.entries()) {
-
-        console.log(`   Scope URL: ${url}`);
-
-        for (let rule of rules) {
-
-            const p_test_dataset_id = Number((await prisma.test_dataset.create({
-                data: {
-                    session_start_ts: sessionStartTs,
-                    dataset_name: item.Shortname,
-                    dataset_dataspace: item.Dataspace,
-                    dataset_img_url: item.ImageGallery?.[0].ImageUrl,
-                    owner: rule.owner,
-                    used_key: KEYCLOAK_ASSOCIATED_ROLE,
-                    check_name: rule.name,
-                    custom_dashboard_id: Number(rule.custom_dashboard_id),
-                    dataset_query_url: url
-                },
-                select: {
-                    id: true
-                }
-            })).id);
-
-
-            let rule_tested_record_count = 0;
-            try {
-                for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++) {
-
-                    const dataset_page_json_items: DatasetPageItem[] = await fetch_dataset_items_with_paging(url, pageNumber, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON);
-
-                    if (dataset_page_json_items.length == 0)
-                        break;
-
-                    const failed_records: TestDatasetRecordCheckFailedCreateInput[] = []
-
-                    for (let i = 0; i < dataset_page_json_items.length; i++) {
-                        // tested_record_count++;
-                        const obj = dataset_page_json_items[i]
-                        checkRecordWithRule(p_test_dataset_id, rule, obj, failed_records, item.Shortname, 'seq=' + (rule_tested_record_count + i), sessionStartTs, KEYCLOAK_ASSOCIATED_ROLE)
+            for (let rule of rules) {
+                const p_test_dataset_id = Number((await prisma.test_dataset.create({
+                    data: {
+                        session_start_ts: sessionStartTs,
+                        dataset_name: item.Shortname,
+                        dataset_dataspace: item.Dataspace,
+                        dataset_img_url: item.ImageGallery?.[0].ImageUrl,
+                        owner: rule.owner,
+                        used_key: KEYCLOAK_ASSOCIATED_ROLE,
+                        check_name: rule.name,
+                        custom_dashboard_id: rule.custom_dashboard_id ?? null,
+                        dataset_query_url: url
+                    },
+                    select: {
+                        id: true
                     }
-                    
-                    rule_tested_record_count += dataset_page_json_items.length;
+                })).id);
 
-                    await prisma.test_dataset_record_check_failed.createMany({ data: failed_records });
+                let rule_tested_record_count = 0;
+                try {
+                    for (let pageNumber = 1; pageNumber <= parseInt(DATASET_CONTENT_PAGE_LIMIT); pageNumber++) {
+                        const dataset_page_json_items: DatasetPageItem[] = await fetch_dataset_items_with_paging(url, pageNumber, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON);
+
+                        if (dataset_page_json_items.length == 0)
+                            break;
+
+                        const failed_records: TestDatasetRecordCheckFailedCreateInput[] = []
+
+                        for (let i = 0; i < dataset_page_json_items.length; i++) {
+                            const obj = dataset_page_json_items[i]
+                            checkRecordWithRule(p_test_dataset_id, rule, obj, failed_records, item.Shortname, 'seq=' + (rule_tested_record_count + i), sessionStartTs, KEYCLOAK_ASSOCIATED_ROLE)
+                        }
+
+                        rule_tested_record_count += dataset_page_json_items.length;
+                        await prisma.test_dataset_record_check_failed.createMany({ data: failed_records });
+                    }
                 }
-            }
-            catch (e) {
-                console.error(`      Error fetching dataset items from ${url}: ${e}`);
-                continue;
-            }
+                catch (e) {
+                    console.error(`      Error fetching dataset items from ${url}: ${e}`);
+                    continue;
+                }
 
-            await updateTestedRecords(p_test_dataset_id, rule_tested_record_count);
+                await updateTestedRecords(p_test_dataset_id, rule_tested_record_count);
+            }
         }
-
-    
     }
 }
 
@@ -319,7 +295,6 @@ for (let i = 0; i < rules.length; i++) {
     }
         
 }*/
-  }
 
 
 
