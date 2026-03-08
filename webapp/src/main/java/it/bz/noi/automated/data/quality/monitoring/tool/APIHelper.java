@@ -278,6 +278,7 @@ public class APIHelper
 	{
 		String userRole = auth.getCurrentRole();
 		String userId = auth.getSub();
+		String kind = filter.get("kind").asText();
 		Integer id = null;
 		if (filter.get("id") != null && !filter.get("id").isNull())
 			id = filter.get("id").asInt();

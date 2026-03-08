@@ -48,7 +48,8 @@ export class CustomDashboardsComponent extends CommonWebComponent
 		this.boxContainer.textContent = ('');
 		const loader = new Loader();
 		this.boxContainer.appendChild(loader)
-		const dashboards = await API3.list__catchsolve_noiodh__custom_dashboards({})
+		const used_key = sessionStorage.getItem('used_key_role')!
+		const dashboards = await API3.list__catchsolve_noiodh__custom_dashboards({used_key, kind: 'custom'})
 		loader.remove();
 		for (let dashboard of dashboards)
 		{

@@ -421,7 +421,7 @@ async function loadRulesFromCustomDashboard(KEYCLOAK_ASSOCIATED_ROLE: string): P
                 : `$.${field.name} ${op} ${compareLiteral}`;
 
             const rule: Check = {
-                custom_dashboard_id: dashboard.id as unknown as number,
+                custom_dashboard_id: Number(dashboard.id),
                 owner: dashboard.user_id,
                 name: dashboard.name,
                 category: dashboard.name,

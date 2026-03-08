@@ -75,11 +75,24 @@ cron.schedule(CRON_SCHEDULE,async  () => {
 });
 
 async function onTick() {
+    const test_start_ts = new Date();
     for(let account of KEYCLOAK_ACCOUNTS) {
-        const test_start_ts = new Date();
         console.log('Cron job executed at', test_start_ts.toISOString());
         console.log(`Account for client_id=${account.CLIENT_ID}, realm=${account.REALM}, associated_role=${account.ASSOCIATED_ROLE}`);
         await doPublicTestFor(
+          test_start_ts,
+          KEYCLOAK_BASE_URL,
+          account.CLIENT_ID,
+          account.REALM,
+          account.CLIENT_SECRET,
+          account.ASSOCIATED_ROLE,
+          LOG_LEVEL,
+          DATABASE_URL,
+          METADATA_BASE_URL,
+          DATASET_CONTENT_PAGE_LIMIT,
+          DEBUG_MODE_CACHE_ON,
+        );
+        await doPrivateTestFor(
           test_start_ts,
           KEYCLOAK_BASE_URL,
           account.CLIENT_ID,
