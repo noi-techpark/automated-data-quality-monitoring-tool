@@ -67,8 +67,9 @@ export class MenuComponent extends CommonWebComponent
 
 		let menuready_fun: (x: null) => void
 		this.menuready_promise = new Promise(s => menuready_fun = s);
-		const json_promise = API3.list__catchsolve_noiodh__standard_dashboards_latest({})
-		const custom_dashboards_promise = API3.list__catchsolve_noiodh__custom_dashboards({})
+		const used_key = sessionStorage.getItem('used_key_role')!
+		const json_promise = API3.list__catchsolve_noiodh__custom_dashboards({used_key: used_key, kind: 'standard'})
+		const custom_dashboards_promise = API3.list__catchsolve_noiodh__custom_dashboards({used_key: used_key, kind: 'custom'})
 		const loader = new Loader();
 		this.sroot.appendChild(loader)
 		Promise.all([json_promise, custom_dashboards_promise]).then(([json, customDashboards]) => {
@@ -88,23 +89,20 @@ export class MenuComponent extends CommonWebComponent
 				this.menuitemByName[dataset.dataset_name] = menu1_submenu
 				this.submenus.appendChild(menu1_submenu);
 				menu1_submenu.onclick = () => {
-					if (dataset.test_dataset_id != null)
-						location.hash = '#page=dataset-categories&test_dataset_id=' + dataset.test_dataset_id
+					location.hash = '#page=dataset-categories&test_dataset_ids=' + dataset.ids_csv
 				}
 			}
 			for (let dashboard of customDashboards)
 			{
+				const customDashboardsList = dashboard.custom_dashboards == null || dashboard.custom_dashboards === 'null' ? [] : JSON.parse(dashboard.custom_dashboards)
+				const firstCustomDashboardId = customDashboardsList.length === 0 ? '' : customDashboardsList[0].custom_dashboard_id
 				const menuCustom = document.createElement('div');
 				menuCustom.className = 'flex-row'
 				const label = document.createElement('span');
 				label.textContent = dashboard.dataset_name;
 				label.className = 'flex-grow'
 				menuCustom.onclick = () => {
-					if (dashboard.test_dataset_id != null) {
-						location.hash = '#page=dataset-categories&test_dataset_id=' + dashboard.test_dataset_id
-					} else {
-						location.hash = `#customdataset?id=${dashboard.id}`
-					}
+					location.hash = dashboard.ids_csv === '' ? `#customdataset?id=${firstCustomDashboardId}` : '#page=dataset-categories&test_dataset_ids=' + dashboard.ids_csv
 				};
 				// TODO
 				// this.menuitemByName[`custom:${dashboard.id}`] = menuCustom
