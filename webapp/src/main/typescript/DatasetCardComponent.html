@@ -16,6 +16,8 @@
 		cursor: pointer;
 		width: 13rem;
 		box-shadow: 4px 4px #ccc;
+		display: flex;
+		flex-direction: column;
 	}
 	.menu {
 		position: absolute;
@@ -66,11 +68,11 @@
 	.title {
 		font-weight: bold;
 		margin-top: .7rem;
-		margin-bottom: 0.3rem;
 		text-align: center;
 		overflow: hidden;
-		height: 2rem;
+		height: 1rem;
 		line-height: 1rem;
+		margin-bottom: 0.3rem;
 	}
 	.dataset-query-url {
 		font-size: 0.7rem;
@@ -80,6 +82,8 @@
 		white-space: normal;
 		overflow-wrap: normal;
 		word-break: normal;
+		margin-bottom: 0.6rem;
+		flex-grow: 1;
 	}
 	
 	/*
@@ -108,6 +112,9 @@
 	
 	.wrapper {
 		padding: 1rem;
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.lastupdate {
