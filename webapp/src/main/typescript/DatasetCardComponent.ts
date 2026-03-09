@@ -9,6 +9,11 @@ import { LabelAndData } from "./LabelAndData.js"
 import { catchsolve_noiodh__standard_dashboards_latest__row } from "./api/api3.js";
 import template from './DatasetCardComponent.html?raw'
 
+interface DashboardOption {
+	custom_dashboard_id: number
+	name: string
+}
+
 export class DatasetCardComponent extends CommonWebComponent
 {
 	dtitle
@@ -22,6 +27,8 @@ export class DatasetCardComponent extends CommonWebComponent
 	#edit_hash: string
 	#menu
 	#menuButton
+	#menuList
+	#dashboardOptions: DashboardOption[]
 	
 	constructor()
 	{
@@ -36,6 +43,7 @@ export class DatasetCardComponent extends CommonWebComponent
 		this.lastupdate = cs_cast(HTMLSpanElement,   this.sroot.querySelector('.lastupdate .data'))
 		this.#menu      = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu'))
 		this.#menuButton = cs_cast(HTMLButtonElement, this.sroot.querySelector('.menu-button'))
+		this.#menuList = cs_cast(HTMLDivElement, this.sroot.querySelector('.menu-list'))
 				
 		// this.img.style.display = 'none';
 		
@@ -44,10 +52,11 @@ export class DatasetCardComponent extends CommonWebComponent
 		this.failedrecs.setLabel('passed checks')
 
 		this.#edit_hash = ''
+		this.#dashboardOptions = []
 
 		this.#menuButton.onclick = (event) => {
 			event.stopPropagation()
-			location.hash = this.#edit_hash			
+			this.#menu.classList.toggle('open')
 		}
 		
 		// this.failedrecs.setSeverity("fail")
@@ -64,8 +73,28 @@ export class DatasetCardComponent extends CommonWebComponent
 	}
 
 	#resync_menu() {
-		const showMenu = this.#edit_hash !== ''
+		const showMenu = this.#dashboardOptions.length > 0
 		this.#menu.classList.toggle('display-none', !showMenu)
+		if (!showMenu)
+			this.#menu.classList.remove('open')
+	}
+
+	#renderMenuList()
+	{
+		this.#menuList.textContent = ''
+		for (let i = 0; i < this.#dashboardOptions.length; i++)
+		{
+			const option = this.#dashboardOptions[i]
+			const item = document.createElement('div')
+			item.classList.add('menu-item')
+			item.textContent = option.name
+			item.onclick = (event) => {
+				event.stopPropagation()
+				this.#menu.classList.remove('open')
+				location.hash = '#customdataset?id=' + option.custom_dashboard_id
+			}
+			this.#menuList.appendChild(item)
+		}
 	}
 
 	
@@ -85,6 +114,9 @@ export class DatasetCardComponent extends CommonWebComponent
 		
 		this.dtitle.textContent = dataset.dataset_name
 		this.datasetQueryUrl.textContent = dataset.dataset_subset ?? ''
+		this.#dashboardOptions = dataset.custom_dashboards == null || dataset.custom_dashboards === 'null' ? [] : JSON.parse(dataset.custom_dashboards)
+		this.#renderMenuList()
+		this.#resync_menu()
 		this.img.src = dataset.dataset_img_url.length > 0 ? dataset.dataset_img_url : 'dataset-placeholder.png'
 		this.checkrecs.setData('' + dataset.tested_records)
 		this.shadowRoot!.querySelector('div.wrapper')!.setAttribute('data-length', '' + dataset.tested_records)
@@ -104,6 +136,7 @@ export class DatasetCardComponent extends CommonWebComponent
 		 */
 		this.lastupdate.textContent = dateformat
 		this.onclick = () => {
+			this.#menu.classList.remove('open')
 			/*
 			if (dataset.test_dataset_id != null)
 				location.hash = '#page=dataset-categories&test_dataset_id=' + dataset.test_dataset_id
