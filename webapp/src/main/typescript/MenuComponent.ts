@@ -29,8 +29,8 @@ export class MenuComponent extends CommonWebComponent
 
 		const isPublic: boolean = !kc.authenticated;
 
-		// customTitle.classList.toggle('display-none', isPublic)
-		// submenusCustom.classList.toggle('display-none', isPublic)
+		customTitle.classList.toggle('display-none', isPublic)
+		submenusCustom.classList.toggle('display-none', isPublic)
 		
 		title.onclick = () => {
 			title.classList.toggle('close')

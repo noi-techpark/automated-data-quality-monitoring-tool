@@ -31,6 +31,31 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		</data_quality_rule>
 	</check>
 
+	<check>
+		<name>GpsInfo must be inside Europe bounding box</name>
+		<category>GpsInfo must be inside Europe bounding box</category>
+		<description>
+			This rule checks that if GPS information is provided as a list, all entries have coordinates located within the approximate bounding box of Europe
+			(Latitude between 34° and 72°, Longitude between -25° and 45°).  
+			If there is no list (GpsInfo is not an array), the rule automatically passes.
+		</description>
+		<data_scope_filters>
+			<dataset_shortname>Accommodation</dataset_shortname>
+			<dataset_dataspace>tourism</dataset_dataspace>
+		</data_scope_filters>
+		<data_quality_rule>
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
+			
+				!Array.isArray($.GpsInfo) || $.GpsInfo.every($ => 
+						$.Latitude >= 34 &&
+						$.Latitude <= 72 &&
+						$.Longitude >= -25 &&
+						$.Longitude <= 45
+				)
+			]]></rule_expression>
+		</data_quality_rule>
+	</check>
 
 	<check>
 	
@@ -99,6 +124,102 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		</data_quality_rule>
 	</check>
 
+	<check>
+	
+		<name>NO2-Alphasense_raw | datatype: NO2-Alphasense_raw | mperiod: 60 | last 24h</name>
+		<category>NO2-Alphasense_raw | datatype: NO2-Alphasense_raw | mperiod: 60 | last 24h</category>
+		<description>
+			Timeseries for datatype "NO2-Alphasense_raw" sampled every 60 seconds over the last 24 hours to now (24->0).
+			Passes when mvalue exists, is numeric, and is greater than 0.
+		</description>
+
+		<data_scope_filters>
+
+			<dataset_shortname>Enviromental Station</dataset_shortname>
+			<dataset_dataspace>environmental</dataset_dataspace>
+			<dataset_apitype>timeseries</dataset_apitype>
+
+			<apitype_timeseries_param_datatype>NO2-Alphasense_raw</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_mperiod>60</apitype_timeseries_param_mperiod>
+			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
+			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
+
+		</data_scope_filters>
+
+		<data_quality_rule>
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
+			
+				typeof $.mvalue === "number" && $.mvalue > 0
+
+			]]></rule_expression>
+		</data_quality_rule>
+	</check>
+
+	<check>
+	
+		<name>NO2-Alphasense_raw | datatype: NO2-Alphasense_raw | mperiod: 3600 | last 24h</name>
+		<category>NO2-Alphasense_raw | datatype: NO2-Alphasense_raw | mperiod: 3600 | last 24h</category>
+		<description>
+			Timeseries for datatype "NO2-Alphasense_raw" sampled every 3600 seconds over the last 24 hours to now (24->0).
+			Passes when mvalue exists, is numeric, and is greater than 0.
+		</description>
+
+		<data_scope_filters>
+
+			<dataset_shortname>Enviromental Station</dataset_shortname>
+			<dataset_dataspace>environmental</dataset_dataspace>
+			<dataset_apitype>timeseries</dataset_apitype>
+
+			<apitype_timeseries_param_datatype>NO2-Alphasense_raw</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
+			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
+			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
+
+		</data_scope_filters>
+
+		<data_quality_rule>
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
+			
+				typeof $.mvalue === "number" && $.mvalue > 0
+
+			]]></rule_expression>
+		</data_quality_rule>
+	</check>
+
+	<check>
+	
+		<name>NO2-Alphasense_processed | datatype: NO2-Alphasense_processed | mperiod: 3600 | last 24h</name>
+		<category>NO2-Alphasense_processed | datatype: NO2-Alphasense_processed | mperiod: 3600 | last 24h</category>
+		<description>
+			Timeseries for datatype "NO2-Alphasense_processed" sampled every 3600 seconds over the last 24 hours to now (24->0).
+			Passes when mvalue exists, is numeric, and is greater than 0.
+		</description>
+
+		<data_scope_filters>
+
+			<dataset_shortname>Enviromental Station</dataset_shortname>
+			<dataset_dataspace>environmental</dataset_dataspace>
+			<dataset_apitype>timeseries</dataset_apitype>
+
+			<apitype_timeseries_param_datatype>NO2-Alphasense_processed</apitype_timeseries_param_datatype>
+			<apitype_timeseries_param_mperiod>3600</apitype_timeseries_param_mperiod>
+			<apitype_timeseries_param_last_from_hours>24</apitype_timeseries_param_last_from_hours>
+			<apitype_timeseries_param_last_to_hours>0</apitype_timeseries_param_last_to_hours>
+
+		</data_scope_filters>
+
+		<data_quality_rule>
+			<rule_language>javascript</rule_language>
+			<rule_expression><![CDATA[
+			
+				typeof $.mvalue === "number" && $.mvalue > 0
+
+			]]></rule_expression>
+		</data_quality_rule>
+	</check>
+
 <check>
 	<name>ImageGallery must be a non-empty array</name>
 	<category>ImageGallery must be a non-empty array</category>
@@ -154,5 +275,33 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		]]></rule_expression>
 	</data_quality_rule>
 </check>
+
+<!--
+<check>
+	<name>Italian language must include Title and BaseText</name>
+	<category>content completeness</category>
+	<description>
+		This rule checks that, if the record declares the Italian language (it) in HasLanguage,
+		then both Title and BaseText attributes exist and are non-empty for that language.
+		If HasLanguage does not include "it", the rule automatically passes.
+	</description>
+
+	<data_scope_filters>
+		<dataset_shortname>Accommodation</dataset_shortname>
+		<dataset_dataspace>tourism</dataset_dataspace>
+	</data_scope_filters>
+
+	<data_quality_rule>
+		<rule_language>javascript</rule_language>
+		<rule_expression><![CDATA[
+
+			$.HasLanguage.every(lang => $.Title?.[lang] !== undefined && $.BaseText?.[lang] !== undefined )
+
+		]]></rule_expression>
+	</data_quality_rule>
+</check>
+-->
+
+
 
 </checks>
