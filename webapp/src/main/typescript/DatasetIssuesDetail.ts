@@ -237,23 +237,6 @@ export class DatasetIssuesDetail extends CommonWebComponent
 			const loader = new Loader();
 			this.container.appendChild(loader)
 
-			/*
-			const json = await API3.list__catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw({
-				session_start_ts: p_session_start_ts,
-				dataset_name: p_dataset_name,
-				check_category: p_category_name
-			})
-			 */
-
-		/*
-		this.last_session_start_ts = data.session_start_ts
-		this.last_dataset_name = data.dataset_name
-		this.last_check_category = data.check_category
-		this.last_failed_records = data.failed_records
-		this.last_tot_records = data.tot_records
-		this.last_test_dataset_id = data.test_dataset_id
-		 */
-
 			const json = [{
 				check_name: 'failed',
 				nr_records: -1
