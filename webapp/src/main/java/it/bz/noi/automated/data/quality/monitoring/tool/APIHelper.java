@@ -90,9 +90,9 @@ public class APIHelper
 				list = list__test_dataset_history_vw(filterJson);
 				resp.getWriter().write(list.toPrettyString());
 				break;
-			case "catchsolve_noiodh.custom_dashboards":
+			case "catchsolve_noiodh.dashboards":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__custom_dashboards(filterJson, auth);
+				list = list__catchsolve_noiodh__dashboards(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.custom_dashboard":
@@ -225,7 +225,7 @@ public class APIHelper
 		return execute_query(sql.toString(), wherevalues);
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__custom_dashboards(ObjectNode filter, UserAuthInfo auth) throws SQLException
+	private static ArrayNode list__catchsolve_noiodh__dashboards(ObjectNode filter, UserAuthInfo auth) throws SQLException
 	{
 		String userRole = auth.getCurrentRole();
 		String userId = auth.getSub();

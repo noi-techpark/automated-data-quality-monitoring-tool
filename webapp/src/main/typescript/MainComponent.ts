@@ -75,7 +75,7 @@ export class MainComponent extends CommonWebComponent
 				/*
 				const [standardDatasets, customDatasets] = await Promise.all([
 					API3.list__catchsolve_noiodh__standard_dashboards_latest({used_key: sessionStorage.getItem('used_key_role')!}),
-					API3.list__catchsolve_noiodh__custom_dashboards({})
+					API3.list__catchsolve_noiodh__dashboards({})
 				])
 				const dataset = [...standardDatasets, ...customDatasets].find((row) => row.test_dataset_id === parseInt(cs_notnull(params.get('test_dataset_id'))))
 				if (dataset == null)

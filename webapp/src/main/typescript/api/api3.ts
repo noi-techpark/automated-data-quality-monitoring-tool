@@ -25,11 +25,11 @@ export class API3 {
 
 	// begin crudl methods
 
-	static async list__catchsolve_noiodh__custom_dashboards
-	(filter: catchsolve_noiodh__custom_dashboards_list__byexample):
+	static async list__catchsolve_noiodh__dashboards
+	(filter: catchsolve_noiodh__dashboards__byexample):
 	 Promise<catchsolve_noiodh__standard_dashboards_latest__row[]>
 	{
-		const resp = await API3.call('catchsolve_noiodh.custom_dashboards', filter)
+		const resp = await API3.call('catchsolve_noiodh.dashboards', filter)
 		return resp;
 	}
 
@@ -298,7 +298,7 @@ export interface catchsolve_noiodh__custom_dashboards__byexample {
 	user_role?: string
 }
 
-export interface catchsolve_noiodh__custom_dashboards_list__byexample {
+export interface catchsolve_noiodh__dashboards__byexample {
 	used_key?: string
 	kind?: 'standard' | 'custom'
 }

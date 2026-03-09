@@ -68,8 +68,8 @@ export class MenuComponent extends CommonWebComponent
 		let menuready_fun: (x: null) => void
 		this.menuready_promise = new Promise(s => menuready_fun = s);
 		const used_key = sessionStorage.getItem('used_key_role')!
-		const json_promise = API3.list__catchsolve_noiodh__custom_dashboards({used_key: used_key, kind: 'standard'})
-		const custom_dashboards_promise = API3.list__catchsolve_noiodh__custom_dashboards({used_key: used_key, kind: 'custom'})
+		const json_promise = API3.list__catchsolve_noiodh__dashboards({used_key: used_key, kind: 'standard'})
+		const custom_dashboards_promise = API3.list__catchsolve_noiodh__dashboards({used_key: used_key, kind: 'custom'})
 		const loader = new Loader();
 		this.sroot.appendChild(loader)
 		Promise.all([json_promise, custom_dashboards_promise]).then(([json, customDashboards]) => {
