@@ -304,7 +304,7 @@ public class APIHelper
 			union all
 			select test_definition_json::jsonb ->> 'dataset', name, user_id, cd2.user_role, to_timestamp(0), 0, '' , '', 0, jsonb_build_array(jsonb_build_object('custom_dashboard_id', cd2.id, 'name', cd2.name))::text, ''
 				from  catchsolve_noiodh.custom_dashboards cd2
-			where id not in (select custom_dashboard_id from catchsolve_noiodh.test_dataset)
+			where id not in (select custom_dashboard_id from catchsolve_noiodh.test_dataset where custom_dashboard_id is not null)
 				and cd2.user_id  = ?
 				and cd2.user_role = ?
 						
@@ -442,7 +442,7 @@ public class APIHelper
 				{
 					String name = meta.getColumnLabel(c + 1);
 					Object value = rs.getObject(c + 1);
-					System.out.println("readin " + name + " value");
+					// ystem.out.println("readin " + name + " value");
 					JsonNode valueJson = value == null ? NullNode.instance : switch (value.getClass().getName())
 					{
 						case "java.lang.String" -> TextNode.valueOf((String)value);

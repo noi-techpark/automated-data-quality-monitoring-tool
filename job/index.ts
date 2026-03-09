@@ -421,44 +421,53 @@ async function loadRulesFromCustomDashboard(KEYCLOAK_ASSOCIATED_ROLE: string): P
 
     const rules: Check[] = [];
 
-    for (let i = 0; i < dashboards.length; i++) {
+    dashboardLoop: for (let i = 0; i < dashboards.length; i++) {
         const dashboard = dashboards[i];
         const definition = JSON.parse(dashboard.test_definition_json) as CustomDashboardDefinition;
+
+        const expressions: string[] = [];
 
         for (let j = 0; j < definition.checks.length; j++) {
             const check = definition.checks[j];
             const field = JSON.parse(check.field_name) as CustomDashboardFieldName;
             const op = check.operation === "=" ? "==" : check.operation;
-            const compareLiteral = field.type === "number" ? String(Number(check.compare_value)) : JSON.stringify(check.compare_value);
+            const compareValue = String(check.compare_value);
+            const isValidCompareValue = /^[A-Za-z0-9.-]+$/.test(compareValue);
+            if (!isValidCompareValue) {
+                console.warn(`Skipping dashboard rule "${dashboard.name}" due to invalid compare_value`);
+                continue dashboardLoop;
+            }
+            const compareLiteral = field.type === "number" ? compareValue : JSON.stringify(compareValue);
             const expr = field.is_array
                 ? `Array.isArray($.${field.name}) && $.${field.name}.every(v => v ${op} ${compareLiteral})`
                 : `$.${field.name} ${op} ${compareLiteral}`;
-
-            const rule: Check = {
-                custom_dashboard_id: Number(dashboard.id),
-                owner: dashboard.user_id,
-                name: dashboard.name,
-                category: dashboard.name,
-                description: `${definition.data_provider} | ${definition.dataset}`,
-                data_scope_filters: {
-                    dataset_shortname: definition.dataset,
-                    dataset_dataspace: undefined,
-                    dataset_apitype: definition.dataset_type,
-                    apitype_timeseries_param_datatype: definition.timeseries.datatype,
-                    apitype_timeseries_param_mperiod: definition.timeseries.mperiod,
-                    apitype_timeseries_param_sactive: definition.timeseries.active_status === "only-active" ? "true" : undefined,
-                    apitype_timeseries_param_sorigin: undefined,
-                    apitype_timeseries_param_last_from_hours: undefined,
-                    apitype_timeseries_param_last_to_hours: undefined
-                },
-                data_quality_rule: {
-                    rule_language: "javascript",
-                    rule_expression: expr
-                }
-            };
-
-            rules.push(rule);
+            expressions.push(expr);
         }
+
+        const rule: Check = {
+            custom_dashboard_id: Number(dashboard.id),
+            owner: dashboard.user_id,
+            name: dashboard.name,
+            category: dashboard.name,
+            description: `${definition.data_provider} | ${definition.dataset}`,
+            data_scope_filters: {
+                dataset_shortname: definition.dataset,
+                dataset_dataspace: undefined,
+                dataset_apitype: definition.dataset_type,
+                apitype_timeseries_param_datatype: definition.timeseries.datatype,
+                apitype_timeseries_param_mperiod: definition.timeseries.mperiod,
+                apitype_timeseries_param_sactive: definition.timeseries.active_status === "only-active" ? "true" : undefined,
+                apitype_timeseries_param_sorigin: undefined,
+                apitype_timeseries_param_last_from_hours: undefined,
+                apitype_timeseries_param_last_to_hours: undefined
+            },
+            data_quality_rule: {
+                rule_language: "javascript",
+                rule_expression: expressions.join(" && ")
+            }
+        };
+
+        rules.push(rule);
     }
 
     return rules;
@@ -473,10 +482,10 @@ async function loadRules(): Promise<Check[]> {
 
     const parser = new xml2js.Parser({ explicitArray: false });
     const rules: ChecksRoot = await parser.parseStringPromise(checks_xml)
-    if (!Array.isArray(rules.checks.check)) // fix xml2js problem when only one check
-        rules.checks.check = [rules.checks.check]
-    
-    return rules.checks.check;
+    if (!rules?.checks || typeof rules.checks !== "object" || !("check" in rules.checks) || !rules.checks.check) {
+        return [];
+    }
+    return Array.isArray(rules.checks.check) ? rules.checks.check : [rules.checks.check];
 
 }
 
@@ -532,8 +541,12 @@ async function processDatasetItems(p_test_dataset_id: number,dataset_page_json_i
 function checkRecordWithRule(p_test_dataset_id: number, rule: Check, obj: DatasetPageItem, failed_records: TestDatasetRecordCheckFailedCreateInput[], dataset_Shortname: string, rec_id: string, sessionStartTs: Date, KEYCLOAK_ASSOCIATED_ROLE: string) {
     switch (rule.data_quality_rule.rule_language) {
         case 'javascript':
-            const fn = new Function("$", `return (${rule.data_quality_rule.rule_expression});`);
+            const ruleExpression = rule.data_quality_rule.rule_expression.trim();
+            if (ruleExpression === "") {
+                break;
+            }
             try {
+                const fn = new Function("$", `return (${ruleExpression});`);
                 const result = fn(obj);
                 if (typeof result != 'boolean')
                     throw new Error('rule code invalid, instead of boolean has returned a ' + (typeof result))
