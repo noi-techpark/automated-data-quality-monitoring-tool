@@ -25,14 +25,6 @@ export class API3 {
 
 	// begin crudl methods
 
-	static async list__catchsolve_noiodh__standard_dashboards_latest
-	(filter: catchsolve_noiodh__standard_dashboards_latest__byexample):
-	 Promise<catchsolve_noiodh__standard_dashboards_latest__row[]>
-	{
-		const resp = await API3.call('catchsolve_noiodh.standard_dashboards_latest', filter)
-		return resp;
-	}
-
 	static async list__catchsolve_noiodh__custom_dashboards
 	(filter: catchsolve_noiodh__custom_dashboards_list__byexample):
 	 Promise<catchsolve_noiodh__standard_dashboards_latest__row[]>
@@ -296,15 +288,6 @@ export interface catchsolve_noiodh__test_dataset_history_vw__byexample {
 	dataset_name?: string
 	session_start_ts?: string
 	test_dataset_id?: number
-}
-
-export interface catchsolve_noiodh__standard_dashboards_latest__byexample {
-	dataset_img_url?: string
-	dataset_name?: string
-	failed_records?: number
-	session_start_ts?: string
-	tested_records?: number
-	used_key?: string
 }
 
 export interface catchsolve_noiodh__custom_dashboards__byexample {

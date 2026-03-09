@@ -1,0 +1,10 @@
+
+DROP VIEW IF EXISTS catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw;
+DROP VIEW IF EXISTS catchsolve_noiodh.test_dataset_check_category_failed_recors_vw;
+DROP VIEW IF EXISTS catchsolve_noiodh.test_dataset_check_category_record_jsonpath_failed_vw;
+DROP VIEW IF EXISTS catchsolve_noiodh.test_dataset_history_vw;
+DROP VIEW IF EXISTS catchsolve_noiodh.test_dataset_max_ts_vw;
+DROP VIEW IF EXISTS catchsolve_noiodh.test_dataset_record_check_failed_impacted_csv_vw;
+
+DROP TABLE IF EXISTS catchsolve_noiodh.test_dataset_check;
+DROP TABLE IF EXISTS catchsolve_noiodh.rules;

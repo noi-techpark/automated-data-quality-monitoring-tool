@@ -10,9 +10,6 @@
 package it.bz.noi.automated.data.quality.monitoring.tool;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -60,25 +57,6 @@ public class APIHelper
 		ArrayNode list;
 		switch (action)
 		{
-			case "get_dataset_list":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				resp.getWriter().write(get_dataset_list());
-				break;
-			case "catchsolve_noiodh.test_dataset_check_name_count_records_vw":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__test_dataset_check_name_count_records(filterJson);
-				resp.getWriter().write(list.toPrettyString());
-				break;
-			case "catchsolve_noiodh.test_dataset_check_name_fields_record_id_snippet_vw":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__test_dataset_check_name_fields_record_id_snippet_vw(filterJson);
-				resp.getWriter().write(list.toPrettyString());
-				break;
-			case "catchsolve_noiodh.test_dataset_record_count_attributes_vw":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__test_dataset_record_count_attributes_vw(filterJson);
-				resp.getWriter().write(list.toPrettyString());
-				break;
 			case "catchsolve_noiodh.test_dataset_check_category_failed_recors_vw":
 				resp.setContentType("application/json");
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -89,11 +67,6 @@ public class APIHelper
 			case "catchsolve_noiodh.test_dataset_check_category_check_name_failed_recors_vw":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(filterJson);
-				resp.getWriter().write(list.toPrettyString());
-				break;
-			case "catchsolve_noiodh.standard_dashboards_latest":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__standard_dashboards_latest(auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_record_check_failed":
@@ -227,28 +200,6 @@ public class APIHelper
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__standard_dashboards_latest(UserAuthInfo auth) throws SQLException
-	{
-		String sql = """
-				select
-					owner,
-					used_key,
-					dataset_name,
-					session_start_ts,
-					tested_records,
-					dataset_img_url,
-					failed_records,
-					test_dataset_id
-		    	from catchsolve_noiodh.test_dataset_max_ts_vw
-				where used_key = ?
-				and owner = 'public'
-				order by dataset_name;
-				""";
-		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(auth.getCurrentRole());
-		return execute_query(sql, wherevalues);
-	}
-
 	private static ArrayNode list__catchsolve_noiodh__custom_dashboard(ObjectNode filter, UserAuthInfo auth) throws SQLException
 	{
 		String userRole = auth.getCurrentRole();
@@ -367,62 +318,6 @@ public class APIHelper
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_record_count_attributes_vw(ObjectNode filter) throws ParseException, SQLException
-	{
-		String sql = """
-				select *
-				  from catchsolve_noiodh.test_dataset_record_count_attributes_vw
-				 where (? is null or dataset_name like ?)
-				   and (?::timestamptz is null or session_start_ts = ?)
-				 order by record_names
-				""";
-		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
-		wherevalues.add(wherevalues.get(wherevalues.size() - 1));
-		wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
-		wherevalues.add(wherevalues.get(wherevalues.size() - 1));
-		return execute_query(sql, wherevalues);
-	}
-
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_name_fields_record_id_snippet_vw(ObjectNode filter) throws SQLException, ParseException
-	{
-		String sql = """
-				select *
-				  from catchsolve_noiodh.test_dataset_check_name_fields_record_id_snippet_vw
-				 where (? is null or dataset_name like ?)
-				   and (?::timestamptz is null or session_start_ts = ?)
-				   and (? is null or check_name = ?)
-				 order by record_names
-				""";
-		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
-		wherevalues.add(wherevalues.get(wherevalues.size() - 1));
-		wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
-		wherevalues.add(wherevalues.get(wherevalues.size() - 1));
-		wherevalues.add(((TextNode)filter.get("check_name")).textValue());
-		wherevalues.add(wherevalues.get(wherevalues.size() - 1));
-		return execute_query(sql, wherevalues);
-	}
-
-
-
-	static ArrayNode list__catchsolve_noiodh__test_dataset_check_name_count_records(ObjectNode filter) throws SQLException, ParseException
-	{
-		String sql = """
-				select *
-				  from catchsolve_noiodh.test_dataset_check_name_count_records_vw
-				 where (? is null or dataset_name like ?)
-				   and (?::timestamptz is null or session_start_ts = ?)
-			    order by check_name
-				""";
-		ArrayList<Object> wherevalues = new ArrayList<>();
-		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
-		wherevalues.add(wherevalues.get(wherevalues.size() - 1));
-		wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
-		wherevalues.add(wherevalues.get(wherevalues.size() - 1));
-		return execute_query(sql, wherevalues);
-	}
-
 	static ArrayNode execute_query(String sql, ArrayList<Object> wherevalues) throws SQLException
 	{
 		ObjectMapper om = new ObjectMapper();
@@ -478,19 +373,5 @@ public class APIHelper
 			throw new IllegalStateException(jsdate);
 		return jsdate;
 	}
-
-    public static String get_dataset_list() throws IOException
-    {
-        // Base URL can be overridden via environment variable TOURISM_API_BASE_JAVA
-        String base = System.getenv("TOURISM_API_BASE_JAVA");
-        if (base == null || base.isBlank()) {
-            base = "https://tourism.api.opendatahub.com";
-        }
-        String endpoint = base + "/v1/MetaData?pagesize=1000&origin=webcomp-datasets-list";
-        URL url = URI.create(endpoint).toURL();
-        URLConnection urlc = url.openConnection();
-        String json = new String(urlc.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        return json;
-    }
 
 }
