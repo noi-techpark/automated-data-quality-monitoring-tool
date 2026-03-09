@@ -61,33 +61,33 @@ public class APIHelper
 				resp.setContentType("application/json");
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(
-						req.getParameter("test_dataset_ids"));
+						req.getParameter("test_dataset_ids"), auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_check_category_check_name_failed_recors_vw":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(filterJson);
+				list = list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_record_check_failed":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__test_dataset_record_check_failed(filterJson);
+				list = list__test_dataset_record_check_failed(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_record_check_failed__of_ids":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__test_dataset_record_check_failed__of_ids(filterJson);
+				list = list__test_dataset_record_check_failed__of_ids(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_record_check_failed_check_name__of_ids":
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__test_dataset_record_check_failed_check_name__of_ids(filterJson);
+				list = list__test_dataset_record_check_failed_check_name__of_ids(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_history_vw":
 				resp.setContentType("application/json");
 				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-				list = list__test_dataset_history_vw(filterJson);
+				list = list__test_dataset_history_vw(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.dashboards":
@@ -119,82 +119,112 @@ public class APIHelper
 		}
 	}
 
-	private static ArrayNode list__test_dataset_history_vw(ObjectNode filter) throws SQLException
+	private static ArrayNode list__test_dataset_history_vw(ObjectNode filter, UserAuthInfo auth) throws SQLException
 	{
 		String sql = """
-				with t as (
-				select regexp_replace(
-									dataset_query_url,
-									'\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z',
-									'YYYY-MM-DDTHH:MM:SS.000Z',
-									'g'
-									) as dataset_query_url_fixed,
-									*
-				from catchsolve_noiodh.test_dataset
-				order by session_start_ts desc
-				)
-				select session_start_ts,check_name, (select count(DISTINCT record_jsonpath) from  catchsolve_noiodh.test_dataset_record_check_failed tdrcf where tdrcf.test_dataset_id = t.id ) as failed_recs, t.tested_records 
-				from t
-				where (dataset_query_url_fixed, owner, used_key , check_name )  = (select dataset_query_url_fixed, owner, used_key, check_name  from t as t2 where t2.id = ?)
+				select td.session_start_ts, td.check_name,
+				       (select count(distinct record_jsonpath)
+				          from catchsolve_noiodh.test_dataset_record_check_failed tdrcf
+				         where tdrcf.test_dataset_id = td.id) as failed_recs,
+				       td.tested_records
+				  from catchsolve_noiodh.test_dataset td
+				 where td.owner in (?, ?)
+				   and td.used_key = ?
+				   and (td.dataset_name, td.dataset_subset, td.owner, td.used_key, td.check_name) = (
+				       select td2.dataset_name, td2.dataset_subset, td2.owner, td2.used_key, td2.check_name
+				         from catchsolve_noiodh.test_dataset td2
+				        where td2.id = ?
+				          and td2.owner in (?, ?)
+				          and td2.used_key = ?
+				   )
 				order by session_start_ts desc
 				limit 5
  
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
+		String userId = auth.getSub();
+		String userRole = auth.getCurrentRole();
+		wherevalues.add("public");
+		wherevalues.add(userId);
+		wherevalues.add(userRole);
 		wherevalues.add(((NumericNode)filter.get("test_dataset_id")).numberValue().intValue());
+		wherevalues.add("public");
+		wherevalues.add(userId);
+		wherevalues.add(userRole);
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__test_dataset_record_check_failed__of_ids(ObjectNode filter) throws ParseException, SQLException
+	private static ArrayNode list__test_dataset_record_check_failed__of_ids(ObjectNode filter, UserAuthInfo auth) throws ParseException, SQLException
 	{
 		String sql = """
 		      select record_jsonpath, record_json, count(distinct check_name) as nr_check_names
 			    from catchsolve_noiodh.test_dataset_record_check_failed
 			   where test_dataset_id = ANY(string_to_array(?, ',')::bigint[]) 
+			     and owner in (?, ?)
+			     and used_key = ?
 			   group by 1,2
 			  offset ?
 			   limit ?
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
+		String userId = auth.getSub();
+		String userRole = auth.getCurrentRole();
 		String test_dataset_ids = ((TextNode)filter.get("test_dataset_ids")).textValue();
  		wherevalues.add(test_dataset_ids);
+ 		wherevalues.add("public");
+ 		wherevalues.add(userId);
+ 		wherevalues.add(userRole);
  		wherevalues.add(filter.get("offset") == null ? 0 : ((IntNode)filter.get("offset")).intValue());
  		wherevalues.add(filter.get("limit") == null ? 99999 : ((IntNode)filter.get("limit")).intValue());
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__test_dataset_record_check_failed_check_name__of_ids(ObjectNode filter) throws ParseException, SQLException
+	private static ArrayNode list__test_dataset_record_check_failed_check_name__of_ids(ObjectNode filter, UserAuthInfo auth) throws ParseException, SQLException
 	{
 		String sql = """
 		      select check_name
 			    from catchsolve_noiodh.test_dataset_record_check_failed
 			   where test_dataset_id = ANY(string_to_array(?, ',')::bigint[])
 			     and record_jsonpath = ?
+			     and owner in (?, ?)
+			     and used_key = ?
 			   order by check_name
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
+		String userId = auth.getSub();
+		String userRole = auth.getCurrentRole();
 		wherevalues.add(((TextNode)filter.get("test_dataset_ids")).textValue());
 		wherevalues.add(((TextNode)filter.get("record_jsonpath")).textValue());
+		wherevalues.add("public");
+		wherevalues.add(userId);
+		wherevalues.add(userRole);
 		return execute_query(sql, wherevalues);
 	}
 
-	private static ArrayNode list__test_dataset_record_check_failed(ObjectNode filter) throws ParseException, SQLException
+	private static ArrayNode list__test_dataset_record_check_failed(ObjectNode filter, UserAuthInfo auth) throws ParseException, SQLException
 	{
 		String sql = """
 				select *
 				  from catchsolve_noiodh.test_dataset_record_check_failed
 				 where test_dataset_id = ?
+				   and owner in (?, ?)
+				   and used_key = ?
 				 order by id
 			   offset ?
 				 limit ?
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
+		String userId = auth.getSub();
+		String userRole = auth.getCurrentRole();
 		// wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
 		// wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
  		// wherevalues.add(((TextNode)filter.get("check_category")).textValue());
  		// wherevalues.add(filter.get("check_name")  == null ? "%" : ((TextNode)filter.get("check_name")).textValue());
  		// wherevalues.add(filter.get("record_jsonpath") == null ? "%" : ((TextNode)filter.get("record_jsonpath")).textValue());
  		wherevalues.add(filter.get("test_dataset_id") == null ? 0 : ((IntNode)filter.get("test_dataset_id")).intValue());
+ 		wherevalues.add("public");
+ 		wherevalues.add(userId);
+ 		wherevalues.add(userRole);
  		wherevalues.add(filter.get("offset") == null ? 0 : ((IntNode)filter.get("offset")).intValue());
  		wherevalues.add(filter.get("limit") == null ? 99999 : ((IntNode)filter.get("limit")).intValue());
 		return execute_query(sql, wherevalues);
@@ -233,9 +263,6 @@ public class APIHelper
 		System.out.println("KIND:"  + kind);
 		if (kind.equals("standard"))
 			userId = "public";
-		Integer id = null;
-		if (filter.get("id") != null && !filter.get("id").isNull())
-			id = filter.get("id").asInt();
 		ArrayList<Object> wherevalues = new ArrayList<>();
 		StringBuilder sql = new StringBuilder("""
 			select td.dataset_name, td.dataset_subset, owner, used_key, session_start_ts, tested_records, dataset_img_url, 
@@ -275,13 +302,7 @@ public class APIHelper
 		return execute_query(sql, new ArrayList<>());
 	}
 
-	private static void checkUserAllowed(ArrayList<String> user_odh_roles, String used_key) throws SQLException
-	{
-		if (!user_odh_roles.contains(used_key))
-			throw new SQLException("User not allowed to access dataset using role: " + used_key + ", he has roles: " + String.join(", ", user_odh_roles));
-	}
-
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(String testDatasetIds) throws SQLException
+	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(String testDatasetIds, UserAuthInfo auth) throws SQLException
 	{
 		StringBuilder sql = new StringBuilder("""
 				select session_start_ts,
@@ -293,28 +314,59 @@ public class APIHelper
 					count(DISTINCT f.record_jsonpath) as failed_records
 				from catchsolve_noiodh.test_dataset_record_check_failed  f
 				where test_dataset_id = ANY(string_to_array(?, ',')::bigint[]) 
+				  and owner in (?, ?)
+				  and used_key = ?
 				group by 1,2,3,4,5,6
 				order by check_name
 				""");
 		ArrayList<Object> wherevalues = new ArrayList<>();
+		String userId = auth.getSub();
+		String userRole = auth.getCurrentRole();
 		wherevalues.add(testDatasetIds);
+		wherevalues.add("public");
+		wherevalues.add(userId);
+		wherevalues.add(userRole);
 		return execute_query(sql.toString(), wherevalues);
 	}
 
-	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(ObjectNode filter) throws ParseException, SQLException
+	private static ArrayNode list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(ObjectNode filter, UserAuthInfo auth) throws ParseException, SQLException
 	{
 		String sql = """
-				select *
-				  from catchsolve_noiodh.test_dataset_check_category_check_name_failed_recors_vw
-				 where dataset_name = ?
-				   and session_start_ts = ?
-				   and check_category = ?
-				 order by check_category
+				select
+					f.check_category,
+					f.check_name,
+					f.dataset_name,
+					count(DISTINCT f.record_jsonpath) as failed_records,
+					f.session_start_ts,
+					(
+						select count(DISTINCT f2.record_jsonpath)
+						from catchsolve_noiodh.test_dataset_record_check_failed f2
+						where f2.session_start_ts = f.session_start_ts
+						  and f2.dataset_name = f.dataset_name
+						  and f2.owner in (?, ?)
+						  and f2.used_key = ?
+					) as tot_records
+				  from catchsolve_noiodh.test_dataset_record_check_failed f
+				 where f.dataset_name = ?
+				   and f.session_start_ts = ?
+				   and f.check_category = ?
+				   and f.owner in (?, ?)
+				   and f.used_key = ?
+				 group by f.check_category, f.check_name, f.dataset_name, f.session_start_ts
+				 order by f.check_category
 				""";
 		ArrayList<Object> wherevalues = new ArrayList<>();
+		String userId = auth.getSub();
+		String userRole = auth.getCurrentRole();
+		wherevalues.add("public");
+		wherevalues.add(userId);
+		wherevalues.add(userRole);
 		wherevalues.add(((TextNode)filter.get("dataset_name")).textValue());
 		wherevalues.add(jsdate2timestamp(((TextNode)filter.get("session_start_ts")).textValue()));
 		wherevalues.add(((TextNode)filter.get("check_category")).textValue());
+		wherevalues.add("public");
+		wherevalues.add(userId);
+		wherevalues.add(userRole);
 		return execute_query(sql, wherevalues);
 	}
 
