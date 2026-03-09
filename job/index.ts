@@ -191,12 +191,12 @@ async function runChecksPerRule(
     const metadata_json: MetadataResponse = await fetch_json_with_optional_cache(METADATA_BASE_URL, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_REALM, KEYCLOAK_BASE_URL, KEYCLOAK_ASSOCIATED_ROLE, DEBUG_MODE_CACHE_ON );
 
     for (const item of metadata_json.Items) {
-        const rules_of_dataset: Map<string, Check[]> = findRulesForDatasetGroupByUrlAndQueryParams(item, rules, sessionStartTs);
+        const rules_of_dataset: Map<string, { subset: string, checks: Check[] }> = findRulesForDatasetGroupByUrlAndQueryParams(item, rules, sessionStartTs);
 
-        for (const [url, rules] of rules_of_dataset.entries()) {
+        for (const [url, groupedRules] of rules_of_dataset.entries()) {
             console.log(`   Scope URL: ${url}`);
 
-            for (let rule of rules) {
+            for (let rule of groupedRules.checks) {
                 const p_test_dataset_id = Number((await prisma.test_dataset.create({
                     data: {
                         session_start_ts: sessionStartTs,
@@ -207,7 +207,8 @@ async function runChecksPerRule(
                         used_key: KEYCLOAK_ASSOCIATED_ROLE,
                         check_name: rule.name,
                         custom_dashboard_id: rule.custom_dashboard_id ?? null,
-                        dataset_query_url: url
+                        dataset_query_url: url,
+                        dataset_subset: groupedRules.subset
                     },
                     select: {
                         id: true
@@ -320,9 +321,9 @@ async function fetch_dataset_items_with_paging(url: string, pageNumber: number, 
     to optimize api calls and avoid fetching and count same dataset multiple times
 */
 
-function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataDatasetItem, rules: Check[], sessionStartTs: Date): Map<string, Check[]> {
+function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataDatasetItem, rules: Check[], sessionStartTs: Date): Map<string, { subset: string, checks: Check[] }> {
 
-    const matched_rules = new Map<string, Check[]>();
+    const matched_rules = new Map<string, { subset: string, checks: Check[] }>();
 
     for (const rule of rules) {
 
@@ -333,7 +334,13 @@ function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataD
             const match_dataset_shortname =  dataset_shortname === undefined || dataset_shortname === '' || dataset_shortname === dataset_metadata.Shortname
             const match_dataset_dataspace =  dataset_dataspace === undefined || dataset_dataspace === '' || dataset_dataspace === dataset_metadata.Dataspace
             const match_dataset_apitype   =  dataset_apitype   === undefined || dataset_apitype   === '' || dataset_apitype   === dataset_metadata.ApiType
+
+            if (!(match_dataset_shortname && match_dataset_dataspace && match_dataset_apitype))
+                continue;
+
             rest = rest1
+
+            let dataset_subset = ''
 
             if (dataset_apitype === 'timeseries') {
 
@@ -342,10 +349,16 @@ function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataD
                         apitype_timeseries_param_sactive, apitype_timeseries_param_sorigin,
                         ...rest2 } = rest;
                 // build url like https://mobility.api.opendatahub.com/v2/flat/EnvironmentStation/NO2%20-%20Ossidi%20di%20azoto/2025-10-14T00:00:00.000Z/2025-10-17T23:59:59.999Z?limit=-1&distinct=true&select=sname,mvalue,mvalidtime&where=mperiod.eq.3600,sactive.eq.true,sorigin.eq.APPABZ
-                scope_url += '/' + (apitype_timeseries_param_datatype ?? '*'); // datatype
+                const datatype = apitype_timeseries_param_datatype ?? '*'
+                dataset_subset += 'datatype=' + datatype
+                scope_url += '/' + datatype; // datatype
                 const now = sessionStartTs; // use session start timestamp to have consistent results across rules
-                const fromHours = Number(apitype_timeseries_param_last_from_hours ?? String(24*4)); // ODH has a limit of 5 days
-                const toHours = Number(apitype_timeseries_param_last_to_hours ?? '0');
+                const from = apitype_timeseries_param_last_from_hours ?? String(24*4)
+                dataset_subset += ', from=' + from + 'h'
+                const fromHours = Number(from); // ODH has a limit of 5 days
+                const to = apitype_timeseries_param_last_to_hours ?? '0'
+                dataset_subset += ', to=' + to + 'h'
+                const toHours = Number(to);
                 const fromDate = new Date(now.getTime() - fromHours * 3600_000);
                 const toDate = new Date(now.getTime() - toHours * 3600_000);
                 scope_url += '/' + fromDate.toISOString();
@@ -354,12 +367,15 @@ function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataD
                 let where = ''
                 if (apitype_timeseries_param_mperiod !== undefined) {
                     where += `mperiod.eq.${apitype_timeseries_param_mperiod},`;
+                    dataset_subset += ', mperiod=' + apitype_timeseries_param_mperiod
                 }
                 if (apitype_timeseries_param_sactive !== undefined) {
                     where += `sactive.eq.${apitype_timeseries_param_sactive},`;
+                    dataset_subset += ', sactive=' + apitype_timeseries_param_sactive
                 }
                 if (apitype_timeseries_param_sorigin !== undefined) {
                     where += `sorigin.eq.${apitype_timeseries_param_sorigin},`;
+                    dataset_subset += ', sorigin=' + apitype_timeseries_param_sorigin
                 }
                 if (where != '')
                     scope_url += 'where=' + where.slice(0, -1) + '&';
@@ -375,17 +391,15 @@ function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataD
                 throw new Error(`Unexpected filter attribute(s): ${ Object.keys(rest).join(', ')}`);
             }
 
-            if (match_dataset_shortname && match_dataset_dataspace && match_dataset_apitype) {
             
-                // console.log('Evaluating rule', rule.name, 'for dataset', dataset_metadata.Shortname, 'with scope url', scope_url);
+            // console.log('Evaluating rule', rule.name, 'for dataset', dataset_metadata.Shortname, 'with scope url', scope_url);
 
-                if (!matched_rules.has(scope_url)) {
-                    matched_rules.set(scope_url, []);
-                }
-                matched_rules.get(scope_url)!.push(rule);
-
+            if (!matched_rules.has(scope_url)) {
+                matched_rules.set(scope_url, { subset: dataset_subset, checks: [] });
             }
+            matched_rules.get(scope_url)!.checks.push(rule);
 
+            
     }
 
     return matched_rules;

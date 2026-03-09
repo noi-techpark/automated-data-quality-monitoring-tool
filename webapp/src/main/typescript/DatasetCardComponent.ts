@@ -12,6 +12,7 @@ import template from './DatasetCardComponent.html?raw'
 export class DatasetCardComponent extends CommonWebComponent
 {
 	dtitle
+	datasetQueryUrl
 	img
 	checkrecs
 	checkattr
@@ -30,6 +31,7 @@ export class DatasetCardComponent extends CommonWebComponent
 		this.checkattr  = cs_cast(LabelAndData,      this.sroot.querySelector('.checkattr'))
 		this.failedrecs = cs_cast(LabelAndData,      this.sroot.querySelector('.totissues'))
 		this.dtitle     = cs_cast(HTMLDivElement,    this.sroot.querySelector('.title'))
+		this.datasetQueryUrl = cs_cast(HTMLDivElement, this.sroot.querySelector('.dataset-query-url'))
 		this.img        = cs_cast(HTMLImageElement,  this.sroot.querySelector('.img'))
 		this.lastupdate = cs_cast(HTMLSpanElement,   this.sroot.querySelector('.lastupdate .data'))
 		this.#menu      = cs_cast(HTMLDivElement,   this.sroot.querySelector('.menu'))
@@ -82,6 +84,7 @@ export class DatasetCardComponent extends CommonWebComponent
 		}).format(date)
 		
 		this.dtitle.textContent = dataset.dataset_name
+		this.datasetQueryUrl.textContent = dataset.dataset_subset ?? ''
 		this.img.src = dataset.dataset_img_url.length > 0 ? dataset.dataset_img_url : 'dataset-placeholder.png'
 		this.checkrecs.setData('' + dataset.tested_records)
 		this.shadowRoot!.querySelector('div.wrapper')!.setAttribute('data-length', '' + dataset.tested_records)

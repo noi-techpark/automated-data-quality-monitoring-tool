@@ -197,6 +197,9 @@ export interface catchsolve_noiodh__test_dataset_history_vw__row {
 export interface catchsolve_noiodh__standard_dashboards_latest__row {
 	dataset_img_url: string
 	dataset_name: string
+	dataset_subset?: string
+	dataset_query_url?: string
+	dataset_query_url_fixed?: string
 	failed_records: number
 	session_start_ts: string
 	tested_records: number

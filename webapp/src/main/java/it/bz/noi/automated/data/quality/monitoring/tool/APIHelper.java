@@ -279,52 +279,41 @@ public class APIHelper
 		String userRole = auth.getCurrentRole();
 		String userId = auth.getSub();
 		String kind = filter.get("kind").asText();
+		System.out.println("KIND:"  + kind);
+		if (kind.equals("standard"))
+			userId = "public";
 		Integer id = null;
 		if (filter.get("id") != null && !filter.get("id").isNull())
 			id = filter.get("id").asInt();
 		ArrayList<Object> wherevalues = new ArrayList<>();
 		StringBuilder sql = new StringBuilder("""
-			with t as (
-				-- need to remove absolute data
-				select regexp_replace(
-					dataset_query_url,
-					'\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z',
-					'YYYY-MM-DDTHH:MM:SS.000Z',
-					'g'
-					) as dataset_query_url_fixed , tested_records , dataset_name, dataset_img_url, session_start_ts, 
-					array_agg(td.id) as ids,
-					string_agg('' || td.id, ',' order by td.id) as ids_csv,
-					json_agg(jsonb_build_object('custom_dashboard_id', td.custom_dashboard_id, 'name', cd.name))::text as custom_dashboards,
-					array_agg(td.custom_dashboard_id) as custom_dashboard_ids
+			select td.dataset_name, td.dataset_subset, owner, used_key, session_start_ts, tested_records, dataset_img_url, 
+					max(dataset_query_url) as dataset_query_url,
+					(select count(distinct record_jsonpath) from catchsolve_noiodh.test_dataset_record_check_failed tdrcf where tdrcf.test_dataset_id = any(array_agg(td.id))) as failed_records,
+					json_agg(jsonb_build_object('custom_dashboard_id', td.custom_dashboard_id, 'name', cd.name)) filter (where td.custom_dashboard_id is not null)::text as custom_dashboards, string_agg('' || td.id, ',' order by td.id) as ids_csv				
 				from catchsolve_noiodh.test_dataset td 
 				left join catchsolve_noiodh.custom_dashboards cd on td.custom_dashboard_id  = cd.id 
-				where owner = ?
-				and used_key = ?
-				group by 1,2,3,4,5
-				),
-				t2 as (
-				-- use only newer test
-				select row_number() over(partition by dataset_query_url_fixed order by session_start_ts  desc) as rank, *
-				from t
-				)
-				select dataset_query_url_fixed, tested_records, dataset_name, dataset_img_url, session_start_ts, ids_csv, custom_dashboards,
-						-- count failed records
-						(select count(distinct record_jsonpath) from catchsolve_noiodh.test_dataset_record_check_failed tdrcf where tdrcf.test_dataset_id = any(t2.ids)) as failed_records
-				from t2
-				where rank = 1
-				union all
- 				select null, 0, cd2."name" ,null,null,null,jsonb_build_array(jsonb_build_object('custom_dashboard_id', cd2.id, 'name', cd2.name))::text,null
-				from catchsolve_noiodh.custom_dashboards cd2
-				where id not in (select distinct custom_dashboard_id from catchsolve_noiodh.test_dataset)
-				and user_id = ?
-				and user_role = ?	
-			
+			where (td.dataset_name, td.dataset_subset, owner, used_key, session_start_ts) in (
+			select td.dataset_name, td.dataset_subset, owner, used_key, max(session_start_ts) as last_ts
+				from catchsolve_noiodh.test_dataset td 
+			where owner = ?
+			  and used_key = ?
+			group by 1,2,3,4
+			)
+			group by 1,2,3,4,5,6,7
+			union all
+			select test_definition_json::jsonb ->> 'dataset', name, user_id, cd2.user_role, to_timestamp(0), 0, '' , '', 0, jsonb_build_array(jsonb_build_object('custom_dashboard_id', cd2.id, 'name', cd2.name))::text, ''
+				from  catchsolve_noiodh.custom_dashboards cd2
+			where id not in (select custom_dashboard_id from catchsolve_noiodh.test_dataset)
+				and cd2.user_id  = ?
+				and cd2.user_role = ?
+						
 				""");
 		wherevalues.add(userId);
 		wherevalues.add(userRole);
 		wherevalues.add(userId);
 		wherevalues.add(userRole);
-		sql.append(" order by dataset_name");
+		// sql.append(" order by dataset_name");
 		String sqltxt = sql.toString();
 		return execute_query(sqltxt, wherevalues);
 	}
