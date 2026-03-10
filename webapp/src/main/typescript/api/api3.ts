@@ -12,8 +12,8 @@ export class API3 {
 		const params = new URLSearchParams();
 		params.append('action', action);
 		params.append('filter_byexample', JSON.stringify(json));
-		const current_role = sessionStorage.getItem('used_key_role');
-		params.append('current_role', current_role!);
+		const current_role = sessionStorage.getItem('used_key_role') ?? 'opendata';
+		params.append('current_role', current_role);
 
 		const access_token = kc.token;
 		const headers: HeadersInit = access_token ? { Authorization: `Bearer ${access_token}` } : {};
@@ -25,19 +25,20 @@ export class API3 {
 
 	// begin crudl methods
 
-	static async list__catchsolve_noiodh__test_dataset_max_ts_vw
-	(filter: catchsolve_noiodh__test_dataset_max_ts_vw__byexample):
-	 Promise<catchsolve_noiodh__test_dataset_max_ts_vw__row[]>
+	static async list__catchsolve_noiodh__dashboards
+	(filter: catchsolve_noiodh__dashboards__byexample):
+	 Promise<catchsolve_noiodh__standard_dashboards_latest__row[]>
 	{
-		const resp = await API3.call('catchsolve_noiodh.catchsolve_noiodh__test_dataset_max_ts_vw', filter)
+		const resp = await API3.call('catchsolve_noiodh.dashboards', filter)
 		return resp;
 	}
 
-	static async list__catchsolve_noiodh__custom_dashboards
+
+	static async list__catchsolve_noiodh__custom_dashboard
 	(filter: catchsolve_noiodh__custom_dashboards__byexample):
 	 Promise<catchsolve_noiodh__custom_dashboards__row[]>
 	{
-		const resp = await API3.call('catchsolve_noiodh.custom_dashboards', filter)
+		const resp = await API3.call('catchsolve_noiodh.custom_dashboard', filter)
 		return resp;
 	}
 
@@ -52,8 +53,18 @@ export class API3 {
 	(filter: catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__byexample):
 	 Promise<catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__row[]>
 	{
-		const resp = await API3.call('catchsolve_noiodh.test_dataset_check_category_failed_recors_vw', filter)
-		return resp;
+		const params = new URLSearchParams();
+		params.append('action', 'catchsolve_noiodh.test_dataset_check_category_failed_recors_vw');
+		params.append('test_dataset_ids', '' + filter.test_dataset_ids);
+		const current_role = sessionStorage.getItem('used_key_role') ?? 'opendata';
+		params.append('current_role', current_role);
+
+		const access_token = kc.token;
+		const headers: HeadersInit = access_token ? { Authorization: `Bearer ${access_token}` } : {};
+
+		const resp = await fetch('api?' + params.toString(), { headers });
+		const respjson = await resp.json();
+		return respjson;
 	}
 	
 	static async list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw
@@ -61,14 +72,6 @@ export class API3 {
 	 Promise<catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw__row[]>
 	{
 		const resp = await API3.call('catchsolve_noiodh.test_dataset_check_category_check_name_failed_recors_vw', filter)
-		return resp;
-	}
-	
-	static async list__catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw
-	(filter: catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw__byexample):
-	 Promise<catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw__row[]>
-	{
-		const resp = await API3.call('catchsolve_noiodh.test_dataset_check_category_check_name_record_record_failed_vw', filter)
 		return resp;
 	}
 	
@@ -80,11 +83,19 @@ export class API3 {
 		return resp;
 	}
 
-	static async list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw
-	(filter: catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw__byexample):
-	 Promise<catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw__row[]>
+	static async list__catchsolve_noiodh__test_dataset_record_check_failed__of_ids
+	(filter: catchsolve_noiodh__test_dataset_record_check_failed__of_ids__byexample):
+	 Promise<catchsolve_noiodh__test_dataset_record_check_failed__of_ids__row[]>
 	{
-		const resp = await API3.call('catchsolve_noiodh.test_dataset_check_category_record_jsonpath_failed_vw', filter)
+		const resp = await API3.call('catchsolve_noiodh.test_dataset_record_check_failed__of_ids', filter)
+		return resp;
+	}
+
+	static async list__catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids
+	(filter: catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids__byexample):
+	 Promise<catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids__row[]>
+	{
+		const resp = await API3.call('catchsolve_noiodh.test_dataset_record_check_failed_check_name__of_ids', filter)
 		return resp;
 	}
 
@@ -144,13 +155,15 @@ export interface catchsolve_noiodh__test_dataset_check_category_check_name_recor
 
 export interface catchsolve_noiodh__test_dataset_check_category_failed_recors_vw__row {
 	check_category: string
+	check_name: string
 	dataset_name: string
 	failed_records: number
 	session_start_ts: string
-	tot_records: number
+	tot_records: number,
+	test_dataset_id: number
 }
 
-export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw__row {
+export interface catchsolve_noiodh__test_dataset_record_check_failed__of_ids__row {
 	check_category: string
 	dataset_name: string
 	nr_check_names: number
@@ -159,19 +172,32 @@ export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_
 	session_start_ts: string
 }
 
-export interface catchsolve_noiodh__test_dataset_history_vw__row {
-	check_category: string
-	check_stats: string
-	dataset_name: string
-	session_start_ts: string
+export interface catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids__row {
+	check_name: string
 }
 
-export interface catchsolve_noiodh__test_dataset_max_ts_vw__row {
+export interface catchsolve_noiodh__test_dataset_history_vw__row {
+	// check_category: string
+	// check_stats: string
+	// dataset_name: string
+	session_start_ts: string
+	check_name: string
+	failed_recs: number
+	tested_records: number
+}
+
+export interface catchsolve_noiodh__standard_dashboards_latest__row {
 	dataset_img_url: string
 	dataset_name: string
+	dataset_subset?: string
+	dataset_query_url?: string
+	dataset_query_url_fixed?: string
 	failed_records: number
 	session_start_ts: string
 	tested_records: number
+	custom_dashboards: string
+	test_dataset_id?: number
+	ids_csv: string
 }
 
 export interface catchsolve_noiodh__custom_dashboards__row {
@@ -235,18 +261,25 @@ export interface catchsolve_noiodh__test_dataset_check_category_failed_recors_vw
 	dataset_name?: string
 	failed_records?: number
 	session_start_ts?: string
+	test_dataset_ids?: string
 	tot_records?: number
 }
 
-export interface catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw__byexample {
+export interface catchsolve_noiodh__test_dataset_record_check_failed__of_ids__byexample {
 	check_category?: string
 	dataset_name?: string
 	nr_check_names?: number
 	record_json?: string
 	record_jsonpath?: string
 	session_start_ts?: string
+	test_dataset_ids?: string
 	offset?: number
 	limit? : number
+}
+
+export interface catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids__byexample {
+	test_dataset_ids: string
+	record_jsonpath: string
 }
 
 export interface catchsolve_noiodh__test_dataset_history_vw__byexample {
@@ -254,15 +287,7 @@ export interface catchsolve_noiodh__test_dataset_history_vw__byexample {
 	check_stats?: string
 	dataset_name?: string
 	session_start_ts?: string
-}
-
-export interface catchsolve_noiodh__test_dataset_max_ts_vw__byexample {
-	dataset_img_url?: string
-	dataset_name?: string
-	failed_records?: number
-	session_start_ts?: string
-	tested_records?: number
-	used_key?: string
+	test_dataset_id?: number
 }
 
 export interface catchsolve_noiodh__custom_dashboards__byexample {
@@ -271,6 +296,11 @@ export interface catchsolve_noiodh__custom_dashboards__byexample {
 	test_definition_json?: string
 	user_id?: string
 	user_role?: string
+}
+
+export interface catchsolve_noiodh__dashboards__byexample {
+	used_key?: string
+	kind?: 'standard' | 'custom'
 }
 
 export interface catchsolve_noiodh__test_dataset_record_check_failed__byexample {
@@ -285,6 +315,7 @@ export interface catchsolve_noiodh__test_dataset_record_check_failed__byexample 
 	session_start_ts?: string
 	offset?: number
 	limit? : number
+	test_dataset_id: number
 }
 
 // end interfaces

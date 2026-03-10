@@ -5,7 +5,7 @@
 import { CommonWebComponent } from './CommonWebComponent.js';
 import { DatasetCardComponent } from './DatasetCardComponent.js';
 import { Loader } from './Loader.js';
-import { API3, catchsolve_noiodh__test_dataset_max_ts_vw__row } from './api/api3.js';
+import { API3, catchsolve_noiodh__standard_dashboards_latest__row } from './api/api3.js';
 import { kc } from './auth.js';
 import { cs_cast } from './quality.js';
 import template from './CustomDashboardsComponent.html?raw'
@@ -48,25 +48,19 @@ export class CustomDashboardsComponent extends CommonWebComponent
 		this.boxContainer.textContent = ('');
 		const loader = new Loader();
 		this.boxContainer.appendChild(loader)
-		const used_key = sessionStorage.getItem('used_key_role') ?? ''
-		const [datasets, dashboards] = await Promise.all([
-			// TODO manage custom dataset test too
-			[] as catchsolve_noiodh__test_dataset_max_ts_vw__row[],
-			API3.list__catchsolve_noiodh__custom_dashboards({})
-		])
+		const used_key = sessionStorage.getItem('used_key_role')!
+		const dashboards = await API3.list__catchsolve_noiodh__dashboards({used_key, kind: 'custom'})
 		loader.remove();
-		const datasetByName = new Map(datasets.map((row) => [row.dataset_name, row]))
 		for (let dashboard of dashboards)
 		{
-			const dataset = datasetByName.get(dashboard.name) ?? this.buildFallbackDataset(dashboard.name)
 			const box = new DatasetCardComponent();
-			box.edit_hash = `#customdataset?id=${dashboard.id}`;
-			box.menu_edit_hash = `#customdataset?id=${dashboard.id}`
+			box.edit_hash = `#customdataset?id=${dashboard.custom_dashboard_id}`;
+			// box.menu_edit_hash = `#customdataset?id=${dashboard.custom_dashboard_id}`
 			box.menu_on_delete = async () => {
-				if (!confirm(`Delete "${dashboard.name}"?`)) {
+				if (!confirm(`Delete "${dashboard.dataset_name}"?`)) {
 					return
 				}
-				const ok = await this.deleteCustomDashboard(dashboard.id)
+				const ok = await this.deleteCustomDashboard(dashboard.custom_dashboard_id!)
 				if (!ok) {
 					alert('Delete failed')
 					return
@@ -79,15 +73,11 @@ export class CustomDashboardsComponent extends CommonWebComponent
 				box.remove()
 			}
 			this.boxContainer.appendChild(box)
-			box.refresh(dataset)
-			/*
-			box.onclick = () => {
-				location.hash = `#customdataset?id=${dashboard.id}`;
-				window.scrollTo(0,0);
-			}
-			 */
+			
+			box.refresh(dashboard)
+		
 			this.boxes.push(box)
-			this.titles.push(dashboard.name)
+			this.titles.push(dashboard.dataset_name)
 		}
 		this.boxContainer.appendChild(this.createAddDatasetCard())
 	}
@@ -130,7 +120,7 @@ export class CustomDashboardsComponent extends CommonWebComponent
 		return card
 	}
 
-	private buildFallbackDataset(datasetName: string): catchsolve_noiodh__test_dataset_max_ts_vw__row
+	private buildFallbackDataset(datasetName: string): catchsolve_noiodh__standard_dashboards_latest__row
 	{
 		return {
 			dataset_img_url: '',

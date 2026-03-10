@@ -7,6 +7,7 @@ import template from './CustomDatasetFormQualityCheck.html?raw'
 import type { AutoComplete, OptionItem } from './AutoComplete.js'
 import { SelectedFieldType } from './CustomDatasetForm.js'
 
+const COMPARE_VALUE_REGEXP = /^[A-Za-z0-9.-]+$/
 
 function get_field_name_type(fieldName: string): string {
     return fieldName.trim().length === 0
@@ -68,7 +69,10 @@ function get_compare_value_placeholder(fieldName: string): string {
 }
 
 function isvalid_state(fieldName: string, operation: string, compareValue: string): boolean {
-    return fieldName.trim() !== '' && operation !== '' && compareValue.trim() !== ''
+    return fieldName.trim() !== '' &&
+        operation !== '' &&
+        compareValue.trim() !== '' &&
+        COMPARE_VALUE_REGEXP.test(compareValue)
 }
 
 export class CustomDatasetFormQualityCheck extends CommonWebComponent
@@ -128,7 +132,12 @@ export class CustomDatasetFormQualityCheck extends CommonWebComponent
         this.#operation.items = get_operation_items(this.#fieldName.value)
         this.#operation.value = this.#state.operation
         this.#compareInput.value = this.#state.compare_value
+        this.#compareInput.pattern = '[A-Za-z0-9.-]+'
         this.#compareInput.placeholder = get_compare_value_placeholder(this.#fieldName.value)
+        this.#compareInput.classList.toggle(
+            'isnotvalid',
+            this.#compareInput.value.trim() !== '' && !COMPARE_VALUE_REGEXP.test(this.#compareInput.value)
+        )
 
         const isvalid = isvalid_state(this.#fieldName.value, this.#operation.value, this.#compareInput.value)
         this.#mainRow.classList.toggle('isnotvalid', !isvalid)

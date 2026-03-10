@@ -17,11 +17,8 @@ export class DatasetIssuesDetail extends CommonWebComponent
 	
 	container 
 	
-	last_session_start_ts: string|null = null
-	last_dataset_name: string|null = null
-	last_check_category: string|null = null
-	last_failed_records: number|null = null
-	last_tot_records: number|null = null
+	last_test_dataset_id: string|null=null
+	last_test_dataset_ids: string|null=null
 	
 	current_tab: 'issues' | 'records' = 'issues'
 	
@@ -73,16 +70,15 @@ export class DatasetIssuesDetail extends CommonWebComponent
 		
 		this.issues.onclick = () => {
 			this.current_tab = 'issues'
-			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null
-				&& this.last_failed_records != null && this.last_tot_records != null)
-				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records)
+			if (this.last_test_dataset_id != null && this.last_test_dataset_ids != null)
+				this.refresh(this.last_test_dataset_id, this.last_test_dataset_ids)
+			
 		}
 		
 		this.records.onclick = () => {
 			this.current_tab = 'records'
-			if (this.last_session_start_ts != null && this.last_dataset_name != null && this.last_check_category != null
-				&& this.last_failed_records != null && this.last_tot_records != null)
-				this.refresh(this.last_session_start_ts, this.last_dataset_name, this.last_check_category, this.last_failed_records, this.last_tot_records)
+			if (this.last_test_dataset_id != null && this.last_test_dataset_ids != null)
+				this.refresh(this.last_test_dataset_id, this.last_test_dataset_ids)
 		}
 		
 		this.canvas = cs_cast(HTMLCanvasElement, this.sroot.querySelector('canvas'));
@@ -131,74 +127,78 @@ export class DatasetIssuesDetail extends CommonWebComponent
 		return groupBy; 
 	}
 	
-	async refresh(p_session_start_ts: string, p_dataset_name: string, p_category_name: string, p_failed_records: number, p_tot_records: number) {
-		
-		this.last_session_start_ts = p_session_start_ts
-		this.last_dataset_name = p_dataset_name
-		this.last_check_category = p_category_name
-		this.last_failed_records = p_failed_records
-		this.last_tot_records = p_tot_records
+	async refresh(p_test_dataset_id: string, p_test_dataset_ids: string) {
+
+		this.last_test_dataset_id = p_test_dataset_id
+		this.last_test_dataset_ids = p_test_dataset_ids
+
+		const resp = await API3.list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw({
+			test_dataset_ids: p_test_dataset_id
+		})
+
+		if (resp.length != 1)
+			alert(resp.length)
+
+		const data = resp[0]
+
+		const category = cs_cast(DatasetIssueCategoryComponent, this.sroot.querySelector('cs-dataset-issue-category'))
+		category.hideMoreDiv()
+		category.refresh(data, p_test_dataset_ids)
+
 		
 		// this.info_and_settings.refresh(p_session_start_ts, p_dataset_name, p_failed_records, p_tot_records)
 		
-		console.log(p_session_start_ts)
-		console.log(p_dataset_name)
-		console.log(p_category_name);
-		
-		(async () => {
+		;(async () => {
 					
-					
+					// TODO invece di dataset_name usa 
 					const data = await API3.list__catchsolve_noiodh__test_dataset_history_vw({
-						dataset_name: this.last_dataset_name!,
-						check_category: this.last_check_category!
+						test_dataset_id: Number(this.last_test_dataset_id)
 					})
-					
+
+
+					console.log('history data', data)
+
 					// const goodarr  = []
 					// const failarr  = []
 					
-					const labels   = []
-					const datasets = []
-					
+					const labels = []
+					const values = []
+					const totals = []
+
+					// TODO aggiungi un secondo dataset che è total trend è che usa  
+
 					for (let x = 0; x < data.length; x++)
 					{
 						const row = data[x]
-						labels.push(row.session_start_ts.slice(0,16).replace('T', ' '))
-						const check_stats = JSON.parse(row.check_stats);
-						console.log(check_stats)
-						for (let c = 0; c < check_stats.length; c++)
-						{
-							const check_stat = check_stats[c]
-							let found = false;
-							for (let d = 0; d < datasets.length; d++)
-							{
-								if (datasets[d].label == check_stat.check_name)
-								{
-									datasets[d].data.push(check_stat.failed_recs)
-									found = true
-									break;
-								}
-							}
-							if (!found)
-							{
-								datasets.push({
-									label: check_stat.check_name,
-									data: [check_stat.failed_recs],
-									fill: false,
-									backgroundColor: '#aaa',
-									borderColor: '#aaa',
-									tension: 0.1
-								})
-							}
-						}
+						labels.unshift(row.session_start_ts.slice(0,16).replace('T', ' '))
+						values.unshift(row.failed_recs)
+						totals.unshift(row.tested_records - row.failed_recs)
 						/*
 						goodarr.push(data[x].tested_records - data[x].failed_recs)
 						failarr.push(data[x].failed_recs)
 						 */
 					}
-					
+
 					const chartjs = await this.chartjs_promise
 					chartjs.data.labels = labels
-					chartjs.data.datasets = datasets
+					chartjs.data.datasets = [
+						{
+							label: 'good records',
+							data: totals,
+							fill: true,
+							backgroundColor: '#080',
+							borderColor: '#080',
+							tension: 0.1
+						},
+						{
+							label: 'failed records',
+							data: values,
+							fill: true,
+							backgroundColor: '#800',
+							borderColor: '#800',
+							tension: 0.1
+						}
+					]
 					
 					/*
 					chartjs.data.datasets = [
@@ -225,16 +225,7 @@ export class DatasetIssuesDetail extends CommonWebComponent
 									
 		})();
 		
-		const category = cs_cast(DatasetIssueCategoryComponent, this.sroot.querySelector('cs-dataset-issue-category'))
-		category.hideMoreDiv()
-		category.refresh(
-		{
-			dataset_name: p_dataset_name,
-			session_start_ts: p_session_start_ts,
-			check_category: p_category_name,
-			failed_records: p_failed_records,
-			tot_records: p_tot_records
-		})
+
 		
 		this.container.textContent = ''
 		
@@ -245,12 +236,13 @@ export class DatasetIssuesDetail extends CommonWebComponent
 			
 			const loader = new Loader();
 			this.container.appendChild(loader)
-		
-			const json = await API3.list__catchsolve_noiodh__test_dataset_check_category_check_name_record_record_failed_vw({
-				session_start_ts: p_session_start_ts,
-				dataset_name: p_dataset_name,
-				check_category: p_category_name
-			})
+
+			const json = [{
+				check_name: 'failed',
+				nr_records: -1
+			}
+
+			]
 
 			loader.remove();
 	
@@ -272,12 +264,9 @@ export class DatasetIssuesDetail extends CommonWebComponent
 					const nextFun = async () => {
 						
 						const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
-														session_start_ts: p_session_start_ts,
-														dataset_name: p_dataset_name,
-														check_category: p_category_name,
-														check_name: issue.check_name,
 														limit: 100,
-														offset: list_offset
+														offset: list_offset,
+														test_dataset_id: data.test_dataset_id
 											});
 						
 						// const list = groupBy[keys[0]]
@@ -296,63 +285,6 @@ export class DatasetIssuesDetail extends CommonWebComponent
 					}
 					moreButton.onclick = nextFun
 					nextFun()
-					
-					/*
-					//console.log('sezione aperta, ricarico!')
-					const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
-								session_start_ts: p_session_start_ts,
-								dataset_name: p_dataset_name,
-								check_category: p_category_name,
-								check_name: issue.check_name
-					});
-					const groupBy = this.groupRecords(json2)
-					const keys = Object.keys(groupBy)
-					console.log(keys)
-					if (keys.length == 1 && keys[0] == '')
-					{
-						const moreButton = document.createElement('button')
-						moreButton.textContent = 'next 10'
-						section.addElementToContentArea(moreButton)
-						const nextFun = () => {
-							const list = groupBy[keys[0]]
-							for (let k2 = 0; k2 < list.length; k2++)
-							{
-								const sectionRow2 = new SectionRow();
-								section.addElementToContentArea(sectionRow2)
-								// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
-								sectionRow2.refresh(list[k2].problem_hint)
-								sectionRow2.onclick = () => {
-									alert(list[k2].record_json)
-								}
-							}
-							
-						}
-						moreButton.onclick = nextFun
-					}
-					else
-					{
-						for (let k = 0; k < keys.length; k++)
-						{
-							const sectionRow = new OpenCloseSection();
-							section.addElementToContentArea(sectionRow)
-							sectionRow.refresh(keys[k], '' + groupBy[keys[k]].length + ' records')
-							sectionRow.onclick = () => {
-								const list = groupBy[keys[k]]
-								console.log(list)
-								for (let k2 = 0; k2 < list.length; k2++)
-								{
-									const sectionRow2 = new SectionRow();
-									sectionRow.addElementToContentArea(sectionRow2)
-									// sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json))
-									sectionRow2.refresh(list[k2].problem_hint)
-									sectionRow2.onclick = () => {
-										alert(list[k2].record_json)
-									}
-								}
-							}
-						}
-					}
-					*/
 				}
 			}
 					
@@ -374,30 +306,24 @@ export class DatasetIssuesDetail extends CommonWebComponent
 				const loader = new Loader();
 				this.container.appendChild(loader)
 
-				const list = await API3.list__catchsolve_noiodh__test_dataset_check_category_record_jsonpath_failed_vw({
-					session_start_ts: p_session_start_ts,
-					dataset_name: p_dataset_name,
-					check_category: p_category_name,
-					offset: list_offset,
-					limit: 100
-				});
+					const list = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed__of_ids({
+						test_dataset_ids: p_test_dataset_ids,
+						offset: list_offset,
+						limit: 100
+					});
 				loader.remove();
 				for (let k2 = 0; k2 < list.length; k2++)
 				{
 					const sectionRow2 = new OpenCloseSection();
-					// this.container.appendChild(sectionRow2)
 					moreButton.parentElement!.insertBefore(sectionRow2, moreButton)
 					sectionRow2.refresh(this.extractHumanReadableName(list[k2].record_jsonpath, list[k2].record_json), '' + list[k2].nr_check_names + ' check failed')
 					
-					
 					sectionRow2.onclick = async () => {
-							const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed({
-														session_start_ts: p_session_start_ts,
-														dataset_name: p_dataset_name,
-														check_category: p_category_name,
+							const json2 = await API3.list__catchsolve_noiodh__test_dataset_record_check_failed_check_name__of_ids({
+														test_dataset_ids: p_test_dataset_ids,
 														record_jsonpath: list[k2].record_jsonpath
 												});
-
+						sectionRow2.content.textContent = ''
 						for (let k = 0; k < json2.length; k++)
 						{
 							const sectionRow = new SectionRow();
@@ -405,6 +331,7 @@ export class DatasetIssuesDetail extends CommonWebComponent
 							sectionRow.refresh("failed: " + json2[k].check_name)
 						}
 					}
+						 
 				}
 				list_offset += 100
 			}

@@ -37,6 +37,9 @@
         border-radius: 0;
         font-size: 0.95rem;
     }
+    .compare-value.isnotvalid {
+        border-color: #dc2626;
+    }
 
     .delete {
         border: none;
@@ -70,7 +73,7 @@
 
     <cs-auto-complete class="operation flex-grow" data-testid="input-operation"></cs-auto-complete>
 
-    <input class="compare-value flex-grow" data-testid="input-compare-value">
+    <input class="compare-value flex-grow" data-testid="input-compare-value" pattern="[A-Za-z0-9.-]+">
 
     <button class="delete">🗑</button>
 </div>

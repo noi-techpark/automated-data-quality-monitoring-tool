@@ -16,6 +16,8 @@
 		cursor: pointer;
 		width: 13rem;
 		box-shadow: 4px 4px #ccc;
+		display: flex;
+		flex-direction: column;
 	}
 	.menu {
 		position: absolute;
@@ -66,11 +68,22 @@
 	.title {
 		font-weight: bold;
 		margin-top: .7rem;
-		margin-bottom: 0.3rem;
 		text-align: center;
 		overflow: hidden;
-		height: 2rem;
+		height: 1rem;
 		line-height: 1rem;
+		margin-bottom: 0.3rem;
+	}
+	.dataset-query-url {
+		font-size: 0.7rem;
+		color: #666;
+		margin-bottom: 0.5rem;
+		text-align: center;
+		white-space: normal;
+		overflow-wrap: normal;
+		word-break: normal;
+		margin-bottom: 0.6rem;
+		flex-grow: 1;
 	}
 	
 	/*
@@ -99,6 +112,9 @@
 	
 	.wrapper {
 		padding: 1rem;
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.lastupdate {
@@ -120,14 +136,12 @@
 
 </style>
 <div class="menu display-none">
-	<button class="menu-button" type="button">...</button>
-	<div class="menu-list">
-		<div class="menu-item edit">Edit</div>
-		<div class="menu-item delete">Remove</div>
-	</div>
+	<button class="menu-button" type="button">Edit</button>
+	<div class="menu-list"></div>
 </div>
 <div class="wrapper">
 	<div class="title">XXX</div>
+	<div class="dataset-query-url"></div>
 	<img class="img">
 	<cs-label-and-data class="checktrec">checked records</cs-label-and-data>
 	<cs-label-and-data class="checkattr" style="display: none">checked attributes</cs-label-and-data>
@@ -139,5 +153,4 @@
 </div>
 <div class="buttons flex-row gap-medium ">
 	<div class="view_dashboard flex-grow padding-medium">View dashboard</div>
-	<div class="edit display-none padding-medium">✎</div>
 </div>

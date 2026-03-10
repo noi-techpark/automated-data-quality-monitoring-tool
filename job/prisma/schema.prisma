@@ -8,6 +8,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model custom_dashboards {
+  id                   BigInt @unique @default(autoincrement())
+  user_id              String
+  user_role            String
+  name                 String
+  test_definition_json String
+}
+
 model rules {
   id                       String   @id @default(dbgenerated("gen_random_uuid()"))
   name                     String
@@ -21,36 +29,36 @@ model rules {
 }
 
 model test_dataset {
-  id                 BigInt               @unique @default(autoincrement())
-  session_start_ts   DateTime             @db.Timestamptz(6)
-  dataset_name       String
-  tested_records     Int                  @default(0)
-  dataset_img_url    String               @default("")
-  errors             String?
-  dataset_dataspace  String?
-  used_key           String?
-  test_dataset_check test_dataset_check[]
-
-  @@id([session_start_ts, dataset_name])
-  @@unique([session_start_ts, dataset_name], map: "session_start_ts_dataset_name_unique")
+  id                               BigInt                             @unique @default(autoincrement())
+  session_start_ts                 DateTime                           @db.Timestamptz(6)
+  dataset_name                     String
+  tested_records                   Int                                @default(0)
+  dataset_img_url                  String                             @default("")
+  errors                           String?
+  dataset_dataspace                String?
+  used_key                         String?
+  owner                            String
+  custom_dashboard_id              Int?
+  check_name                       String?
+  dataset_query_url                String?
+  dataset_subset                   String                             @default("")
+  test_dataset_record_check_failed test_dataset_record_check_failed[]
 }
 
 model test_dataset_check {
-  id               BigInt       @unique @default(autoincrement())
-  session_start_ts DateTime     @db.Timestamptz(6)
+  id               BigInt   @unique @default(autoincrement())
+  session_start_ts DateTime @db.Timestamptz(6)
   dataset_name     String
   check_name       String
   tested_records   Int?
   check_category   String?
-  test_dataset     test_dataset @relation(fields: [session_start_ts, dataset_name], references: [session_start_ts, dataset_name], onDelete: NoAction, onUpdate: NoAction, map: "test_dataset_check_session_start_ts_fkey")
 
   @@id([session_start_ts, dataset_name, check_name])
-  @@map("test_dataset_check")
 }
 
 model test_dataset_record_check_failed {
-  id                       BigInt   @unique(map: "test_dataset_record_attribute_check_fail_id_key") @default(autoincrement())
-  session_start_ts         DateTime @db.Timestamptz(6)
+  id                       BigInt        @unique(map: "test_dataset_record_attribute_check_fail_id_key") @default(autoincrement())
+  session_start_ts         DateTime      @db.Timestamptz(6)
   dataset_name             String
   record_jsonpath          String
   check_name               String
@@ -60,7 +68,9 @@ model test_dataset_record_check_failed {
   problem_hint             String
   used_key                 String?
   impacted_attribute_value String?
+  owner                    String
+  test_dataset_id          BigInt?
+  test_dataset             test_dataset? @relation(fields: [test_dataset_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_test_dataset_record_check_failed_dataset")
 
   @@index([session_start_ts, dataset_name, check_category, check_name], map: "test_dataset_record_check_fai_session_start_ts_dataset_name_idx")
-  @@map("test_dataset_record_check_failed")
 }

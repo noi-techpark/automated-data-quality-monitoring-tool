@@ -4,6 +4,8 @@
 
 import { CommonWebComponent } from './CommonWebComponent.js'
 import template from './CustomDatasetForm.html?raw'
+import { jwtDecode } from 'jwt-decode'
+import { kc } from './auth.js'
 
 import './AutoComplete.js'
 import './CustomDatasetFormQualityCheck.js'
@@ -252,6 +254,8 @@ export class CustomDatasetForm extends CommonWebComponent
     #datasets: AutoComplete
     #datasetType: HTMLElement
     #dashboardName: HTMLInputElement
+    #currentUser: HTMLSpanElement
+    #currentRole: HTMLSpanElement
     #timeseriesNotApplicableRow: HTMLElement
     #timeseriesActiveRow: HTMLElement
     #timeseriesActiveStatus: AutoComplete
@@ -286,6 +290,8 @@ export class CustomDatasetForm extends CommonWebComponent
         this.#datasets = this.querySelector('.datasets') as AutoComplete
         this.#datasetType = this.querySelector('.dataset-type')
         this.#dashboardName = this.querySelector('.dashboard-name') as HTMLInputElement
+        this.#currentUser = this.querySelector('.current-user') as HTMLSpanElement
+        this.#currentRole = this.querySelector('.current-role') as HTMLSpanElement
         this.#timeseriesNotApplicableRow = this.querySelector('.timeseries-na-row')
         this.#timeseriesActiveRow = this.querySelector('.timeseries-active-row')
         this.#timeseriesActiveStatus = this.querySelector('.timeseries-active-status') as AutoComplete
@@ -302,8 +308,21 @@ export class CustomDatasetForm extends CommonWebComponent
 
         this.#state = createTourismState()
         this.#setupUiEffects()
+        this.#syncAuthInfo()
 
         this.#startPromise = this.#onstart()
+    }
+
+    #syncAuthInfo()
+    {
+        let currentUser = 'anonymous'
+        if (kc.authenticated && kc.token) {
+            const decoded: any = jwtDecode(kc.token)
+            currentUser = decoded.sub || 'User'
+        }
+        const currentRole = sessionStorage.getItem('used_key_role') ?? 'opendata'
+        this.#currentUser.textContent = currentUser
+        this.#currentRole.textContent = currentRole
     }
 
     async loadCustomDashboard(definition: any, dashboardId: number, dashboardName?: string)
@@ -319,6 +338,8 @@ export class CustomDatasetForm extends CommonWebComponent
         state.current_timeseries_mperiod = definition.timeseries?.mperiod ?? ''
         const checks = Array.isArray(definition.checks) ? definition.checks : []
         const fieldNames = field_names(state)
+        this.#currentUser.textContent = definition.user_id ?? this.#currentUser.textContent ?? 'anonymous'
+        this.#currentRole.textContent = definition.user_role ?? this.#currentRole.textContent ?? 'opendata'
         state.qualityChecks = checks.map((row: any) => ({
             __id: crypto.randomUUID(),
             field_name: row.field_name ?? '',
@@ -410,6 +431,8 @@ export class CustomDatasetForm extends CommonWebComponent
                 data_provider: state.current_dataprovider,
                 dataset: state.current_filtered_dataset,
                 dataset_type: datasets_filtered_current_type(state),
+                user_id: this.#currentUser.textContent ?? 'anonymous',
+                user_role: this.#currentRole.textContent ?? 'opendata',
                 timeseries: {
                     active_status: state.current_timeseries_active_status,
                     datatype: state.current_timeseries_datatype,

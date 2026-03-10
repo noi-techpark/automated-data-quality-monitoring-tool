@@ -55,7 +55,7 @@ export class StandardDashboardsComponent extends CommonWebComponent
 		this.boxContainer.appendChild(loader)
 		let used_key = sessionStorage.getItem('used_key_role')!;
 		console.log('used key role', used_key);
-		const json = await API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({used_key: used_key})
+		const json = await API3.list__catchsolve_noiodh__dashboards({used_key: used_key, kind: 'standard'})
 		loader.remove();
 		console.log(json)
 		for (let dataset of json)

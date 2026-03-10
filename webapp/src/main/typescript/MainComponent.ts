@@ -72,12 +72,19 @@ export class MainComponent extends CommonWebComponent
 				const detail = new DatasetIssuesByCategories();
 				this.changingSection.appendChild(detail)
 				const params = new URLSearchParams(cleanedhash.substring(1));
-				const session_start_ts = cs_notnull(params.get('session_start_ts'))
-				const dataset_name = cs_notnull(params.get('dataset_name'))
-				const failed_records = parseInt(cs_notnull(params.get('failed_records')))
-				const tested_records = parseInt(cs_notnull(params.get('tested_records')))
-				detail.refresh(session_start_ts, dataset_name, failed_records, tested_records);
-				menu.selectItem(dataset_name)
+				/*
+				const [standardDatasets, customDatasets] = await Promise.all([
+					API3.list__catchsolve_noiodh__standard_dashboards_latest({used_key: sessionStorage.getItem('used_key_role')!}),
+					API3.list__catchsolve_noiodh__dashboards({})
+				])
+				const dataset = [...standardDatasets, ...customDatasets].find((row) => row.test_dataset_id === parseInt(cs_notnull(params.get('test_dataset_id'))))
+				if (dataset == null)
+					return
+				 */
+				const test_dataset_ids = cs_notnull(params.get('test_dataset_ids'))
+				detail.refresh(test_dataset_ids);
+				// TODO
+				// menu.selectItem(dataset.dataset_name)
 			}
 			
 			if (cleanedhash.startsWith('#page=summary&'))
@@ -86,13 +93,17 @@ export class MainComponent extends CommonWebComponent
 				const detail = new DatasetIssuesDetail();
 				this.changingSection.appendChild(detail)
 				const params = new URLSearchParams(cleanedhash.substring(1));
-				const session_start_ts = cs_notnull(params.get('session_start_ts'))
-				const dataset_name = cs_notnull(params.get('dataset_name'))
-				const category_name = cs_notnull(params.get('category_name'))
-				const failed_records = parseInt(cs_notnull(params.get('failed_records')))
-				const tot_records = parseInt(cs_notnull(params.get('tot_records')))
-				detail.refresh(session_start_ts, dataset_name, category_name, failed_records, tot_records);
-				menu.selectItem(dataset_name)
+				// const session_start_ts = cs_notnull(params.get('session_start_ts'))
+				// const dataset_name = cs_notnull(params.get('dataset_name'))
+				// const category_name = cs_notnull(params.get('category_name'))
+				// const failed_records = parseInt(cs_notnull(params.get('failed_records')))
+				// const tot_records = parseInt(cs_notnull(params.get('tot_records')))
+				const test_dataset_id = cs_notnull(params.get('test_dataset_id'))
+				const test_dataset_ids = cs_notnull(params.get('test_dataset_ids'))
+				
+				detail.refresh(test_dataset_id, test_dataset_ids);
+				// TODO
+				// menu.selectItem(dataset_name)
 			}
 
 			if (cleanedhash.startsWith('#customdataset'))
@@ -111,7 +122,7 @@ export class MainComponent extends CommonWebComponent
 						try {
 							const draft = form.getCustomDashboardDraft()
 							const payload: { id: number; name: string; test_definition_json: any } = {
-								id: draft.id!,
+								id: Number(idParam),
 								name: draft.name,
 								test_definition_json: draft.test_definition_json
 							}
@@ -152,7 +163,7 @@ export class MainComponent extends CommonWebComponent
 					})
 					this.changingSection.appendChild(form)
 					const elaborationHandle = form.setElaborationInProgress()
-					const rows = await API3.list__catchsolve_noiodh__custom_dashboards({ id: Number(idParam) })
+					const rows = await API3.list__catchsolve_noiodh__custom_dashboard({ id: Number(idParam) })
 					if (rows.length === 0) {
 						await form.loadCustomDashboard({}, Number(idParam), 'noname')
 						elaborationHandle.close()

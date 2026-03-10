@@ -6,6 +6,7 @@ import { CommonWebComponent } from './CommonWebComponent.js';
 import { Loader } from './Loader.js';
 import {API3, catchsolve_noiodh__custom_dashboards__row} from './api/api3.js';
 import { cs_cast } from './quality.js';
+import { kc } from './auth.js';
 import template from './MenuComponent.html?raw'
 
 export class MenuComponent extends CommonWebComponent
@@ -26,10 +27,10 @@ export class MenuComponent extends CommonWebComponent
 		this.menuitemByName[''] = title
 		this.menuitemByName['custom'] = customTitle
 
-		const currentRole = sessionStorage.getItem('used_key_role') ?? 'opendata'
-		const isOpendata = currentRole === 'opendata'
-		customTitle.classList.toggle('display-none', isOpendata)
-		submenusCustom.classList.toggle('display-none', isOpendata)
+		const isPublic: boolean = !kc.authenticated;
+
+		customTitle.classList.toggle('display-none', isPublic)
+		submenusCustom.classList.toggle('display-none', isPublic)
 		
 		title.onclick = () => {
 			title.classList.toggle('close')
@@ -66,14 +67,21 @@ export class MenuComponent extends CommonWebComponent
 
 		let menuready_fun: (x: null) => void
 		this.menuready_promise = new Promise(s => menuready_fun = s);
-		const json_promise = API3.list__catchsolve_noiodh__test_dataset_max_ts_vw({used_key: currentRole})
-		const custom_dashboards_promise = isOpendata
-			? Promise.resolve([] as catchsolve_noiodh__custom_dashboards__row[])
-			: API3.list__catchsolve_noiodh__custom_dashboards({
-			})
+		const used_key = sessionStorage.getItem('used_key_role')!
+		const json_promise = API3.list__catchsolve_noiodh__dashboards({used_key: used_key, kind: 'standard'})
+		const custom_dashboards_promise = API3.list__catchsolve_noiodh__dashboards({used_key: used_key, kind: 'custom'})
 		const loader = new Loader();
 		this.sroot.appendChild(loader)
 		Promise.all([json_promise, custom_dashboards_promise]).then(([json, customDashboards]) => {
+			/*
+			const datasetByName = new Map(json.map((dataset) => [dataset.dataset_name, dataset]))
+			const datasetByCustomDashboardId = new Map(
+				customDashboards.map((dashboard) => {
+					const definition = JSON.parse(dashboard.test_definition_json)
+					return [dashboard.id, datasetByName.get(definition.dataset)]
+				})
+			)
+			 */
 			for (let dataset of json)
 			{
 				const menu1_submenu = document.createElement('div');
@@ -81,30 +89,24 @@ export class MenuComponent extends CommonWebComponent
 				this.menuitemByName[dataset.dataset_name] = menu1_submenu
 				this.submenus.appendChild(menu1_submenu);
 				menu1_submenu.onclick = () => {
-					location.hash = '#page=dataset-categories' +
-					                '&dataset_name=' + dataset.dataset_name + 
-									'&session_start_ts=' + dataset.session_start_ts 
-									+ "&failed_records=" + dataset.failed_records
-									+ "&tested_records=" + dataset.tested_records
-
+					location.hash = '#page=dataset-categories&test_dataset_ids=' + dataset.ids_csv
 				}
 			}
 			for (let dashboard of customDashboards)
 			{
+				const customDashboardsList = dashboard.custom_dashboards == null || dashboard.custom_dashboards === 'null' ? [] : JSON.parse(dashboard.custom_dashboards)
+				const firstCustomDashboardId = customDashboardsList.length === 0 ? '' : customDashboardsList[0].custom_dashboard_id
 				const menuCustom = document.createElement('div');
 				menuCustom.className = 'flex-row'
 				const label = document.createElement('span');
-				label.textContent = dashboard.name;
+				label.textContent = dashboard.dataset_name;
 				label.className = 'flex-grow'
-				const editButton = document.createElement('span');
-				editButton.textContent = '✎';
-				editButton.onclick = (event) => {
-					event.stopPropagation();
-					location.hash = `#customdataset?id=${dashboard.id}`;
+				menuCustom.onclick = () => {
+					location.hash = dashboard.ids_csv === '' ? `#customdataset?id=${firstCustomDashboardId}` : '#page=dataset-categories&test_dataset_ids=' + dashboard.ids_csv
 				};
-				this.menuitemByName[`custom:${dashboard.id}`] = menuCustom
+				// TODO
+				// this.menuitemByName[`custom:${dashboard.id}`] = menuCustom
 				menuCustom.appendChild(label);
-				menuCustom.appendChild(editButton);
 				submenusCustom.appendChild(menuCustom);
 			}
 			loader.remove();
