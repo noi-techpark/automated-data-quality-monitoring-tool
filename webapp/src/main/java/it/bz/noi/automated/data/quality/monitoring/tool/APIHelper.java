@@ -48,6 +48,8 @@ public class APIHelper
 	public static void processRequest(HttpServletRequest req, HttpServletResponse resp, UserAuthInfo auth) throws SQLException, IOException, ParseException
 	{
 		ObjectMapper om = new ObjectMapper();
+		resp.setContentType("application/json");
+		resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
 		String action = req.getParameter("action");
 		String filter = req.getParameter("filter_byexample");
@@ -58,55 +60,43 @@ public class APIHelper
 		switch (action)
 		{
 			case "catchsolve_noiodh.test_dataset_check_category_failed_recors_vw":
-				resp.setContentType("application/json");
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__catchsolve_noiodh__test_dataset_check_category_failed_recors_vw(
 						req.getParameter("test_dataset_ids"), auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_check_category_check_name_failed_recors_vw":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__catchsolve_noiodh__test_dataset_check_category_check_name_failed_recors_vw(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_record_check_failed":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__test_dataset_record_check_failed(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_record_check_failed__of_ids":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__test_dataset_record_check_failed__of_ids(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_record_check_failed_check_name__of_ids":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__test_dataset_record_check_failed_check_name__of_ids(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.test_dataset_history_vw":
-				resp.setContentType("application/json");
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__test_dataset_history_vw(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.dashboards":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__catchsolve_noiodh__dashboards(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.custom_dashboard":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__catchsolve_noiodh__custom_dashboard(filterJson, auth);
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "catchsolve_noiodh.custom_dashboards_next_id":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				list = list__catchsolve_noiodh__custom_dashboards_next_id();
 				resp.getWriter().write(list.toPrettyString());
 				break;
 			case "auth_roles":
-				resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 				ArrayNode rolesList = om.createArrayNode();
 				for (String role : auth.getRoles()) {
 					rolesList.add(role);

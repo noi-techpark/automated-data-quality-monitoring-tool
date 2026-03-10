@@ -182,7 +182,7 @@ function field_names(state: TourismState): OptionItem[] {
     ref = ref.substring(1)
     const refParts = ref.split('/')
     const schemaName = refParts.pop()!
-    const primitiveProperties = traverseProperties('', api.components.schemas, schemaName)
+    const primitiveProperties = traverseProperties('$.', api.components.schemas, schemaName)
     primitiveProperties.sort((a, b) => a.label.localeCompare(b.label))
     return primitiveProperties
 }
@@ -211,24 +211,24 @@ function traverseProperties(prefix: string, schemas: Schemas, schemaName: string
         else if (p.type === 'object') {
             if (p.$ref) {
                 const name = p.$ref.split('/').pop()!
-                traverseProperties(k + '.', schemas, name, options)
+                traverseProperties(fullk + '.', schemas, name, options)
             }
 
             if (p.additionalProperties.$ref) {
                 const name = p.additionalProperties.$ref.split('/').pop()!
-                traverseProperties(k + '.*.', schemas, name, options)
+                traverseProperties(fullk + '.*.', schemas, name, options)
             }
         }
         else if (p.type === 'array') {
             if (['string', 'boolean', 'number', 'integer'].includes(p.items.type)) {
                 options.push({
                     value: JSON.stringify({ name: fullk, type: p.items.type, is_array: true } as SelectedFieldType),
-                    label: `${fullk}[] {${p.items.type}}`
+                    label: `${fullk}[*] {${p.items.type}}`
                 })
                 continue
             }
             const name = p.items.$ref.split('/').pop()!
-            traverseProperties(k + '[n].', schemas, name, options)
+            traverseProperties(fullk + '[*].', schemas, name, options)
         }
     }
     return options

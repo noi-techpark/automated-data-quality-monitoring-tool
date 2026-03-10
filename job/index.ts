@@ -2,6 +2,7 @@ import prisma from "./lib/db";
 import xml2js from "xml2js"
 import fs from "fs/promises"
 import { xml2json } from 'xml-js';
+import { JSONPath } from "jsonpath-plus";
 
 
 import {fetch_json_with_optional_cache} from "./lib/utils";
@@ -110,6 +111,51 @@ interface CustomDashboardDefinition {
     mperiod: string;
   };
   checks: CustomDashboardCheck[];
+}
+
+function resolveValuesByPath(root: any, path: string): any[] {
+  return JSONPath({ path, json: root, wrap: true }) as any[];
+}
+
+function evaluateValueOperation(actual: any, operation: string, expected: string, fieldType: string): boolean {
+  if (operation === "=") {
+    return fieldType === "number" ? Number(actual) === Number(expected) : String(actual) === expected;
+  }
+  if (operation === "!=") {
+    return fieldType === "number" ? Number(actual) !== Number(expected) : String(actual) !== expected;
+  }
+  if (operation === "<=") {
+    return Number(actual) <= Number(expected);
+  }
+  if (operation === ">=") {
+    return Number(actual) >= Number(expected);
+  }
+  if (operation === "contains") {
+    return String(actual).includes(expected);
+  }
+  if (operation === "not contains") {
+    return !String(actual).includes(expected);
+  }
+  return false;
+}
+
+function evaluateCustomCheck(
+  record: any,
+  fieldName: string,
+  operation: string,
+  compareValue: string,
+  fieldType: string
+): boolean {
+  const values = resolveValuesByPath(record, fieldName);
+  if (values.length === 0) {
+    return false;
+  }
+  if (operation === "in list" || operation === "not in list") {
+    const expectedSet = compareValue.split(",").map((v) => v.trim()).filter((v) => v !== "");
+    const areAllInList = values.every((v) => expectedSet.includes(String(v)));
+    return operation === "in list" ? areAllInList : !areAllInList;
+  }
+  return values.every((v) => evaluateValueOperation(v, operation, compareValue, fieldType));
 }
 
 export async function doPublicTestFor(
@@ -385,11 +431,12 @@ function findRulesForDatasetGroupByUrlAndQueryParams(dataset_metadata: MetadataD
                     scope_url = scope_url.slice(0, -1);
                 
                 rest = rest2
+
+                if ( Object.keys(rest).length > 0) {
+                    throw new Error(`Unexpected filter attribute(s): ${ Object.keys(rest).join(', ')}`);
+                }
             }
 
-            if ( Object.keys(rest).length > 0) {
-                throw new Error(`Unexpected filter attribute(s): ${ Object.keys(rest).join(', ')}`);
-            }
 
             
             // console.log('Evaluating rule', rule.name, 'for dataset', dataset_metadata.Shortname, 'with scope url', scope_url);
@@ -409,7 +456,7 @@ async function loadRulesFromCustomDashboard(KEYCLOAK_ASSOCIATED_ROLE: string): P
     const dashboards = await prisma.custom_dashboards.findMany({
         where: {
             user_role: KEYCLOAK_ASSOCIATED_ROLE,
-            // id: 22
+            // id: 1
         },
         select: {
             user_id: true,
@@ -430,17 +477,13 @@ async function loadRulesFromCustomDashboard(KEYCLOAK_ASSOCIATED_ROLE: string): P
         for (let j = 0; j < definition.checks.length; j++) {
             const check = definition.checks[j];
             const field = JSON.parse(check.field_name) as CustomDashboardFieldName;
-            const op = check.operation === "=" ? "==" : check.operation;
             const compareValue = String(check.compare_value);
             const isValidCompareValue = /^[A-Za-z0-9.-]+$/.test(compareValue);
             if (!isValidCompareValue) {
                 console.warn(`Skipping dashboard rule "${dashboard.name}" due to invalid compare_value`);
                 continue dashboardLoop;
             }
-            const compareLiteral = field.type === "number" ? compareValue : JSON.stringify(compareValue);
-            const expr = field.is_array
-                ? `Array.isArray($.${field.name}) && $.${field.name}.every(v => v ${op} ${compareLiteral})`
-                : `$.${field.name} ${op} ${compareLiteral}`;
+            const expr = `__eval($, ${JSON.stringify(field.name)}, ${JSON.stringify(check.operation)}, ${JSON.stringify(compareValue)}, ${JSON.stringify(field.type)})`;
             expressions.push(expr);
         }
 
@@ -546,8 +589,8 @@ function checkRecordWithRule(p_test_dataset_id: number, rule: Check, obj: Datase
                 break;
             }
             try {
-                const fn = new Function("$", `return (${ruleExpression});`);
-                const result = fn(obj);
+                const fn = new Function("$", "__eval", `return (${ruleExpression});`);
+                const result = fn(obj, evaluateCustomCheck);
                 if (typeof result != 'boolean')
                     throw new Error('rule code invalid, instead of boolean has returned a ' + (typeof result))
                 if (!result) {
